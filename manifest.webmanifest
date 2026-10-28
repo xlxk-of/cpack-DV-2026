@@ -1,0 +1,16 @@
+{
+  "name": "WICK · Pack Opener",
+  "short_name": "WICK Packs",
+  "description": "Open WICK card packs and build the collection: tear the pack with a finger, turn the cards over, keep them.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0a16",
+  "theme_color": "#0d0a16",
+  "icons": [
+    { "src": "icons/icon_192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon_512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon_512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

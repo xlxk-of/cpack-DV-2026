@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WICK · Pack Opener</title>
+<!-- viewport-fit=cover + the safe-area insets in the stylesheet: the app goes right to the edges of an iPhone and
+     keeps clear of the notch and the home bar. user-scalable=no so a two-finger tear does not zoom the page. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#0d0a16">
+<meta name="description" content="Open WICK card packs and build the collection: tear the pack with a finger, turn the cards over, keep them.">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Add to Home Screen on an iPhone: it opens with no Safari chrome, like an app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WICK Packs">
+<link rel="apple-touch-icon" href="icons/icon_180.png">
+<link rel="icon" href="icons/icon_192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+
+<div id="loading">OPENING THE BOX…</div>
+
+<header id="bar">
+  <img id="logo" src="ui/logo.png" alt="WICK">
+  <button id="sound-btn" class="mini">SOUND ON</button>
+  <button id="menu-btn" class="mini" title="collection, export, import">···</button>
+</header>
+
+<!-- ------------------------------------------------------------------ the packs -->
+<main class="screen" id="screen-packs">
+  <h1>CARD PACKS</h1>
+  <p id="packs-note" class="note"></p>
+  <div id="pack-list"></div>
+  <p class="foot">Every pack, as many as you like. Nothing is spent and nothing is bought: the collection is yours and
+    it stays on this phone.</p>
+</main>
+
+<!-- ------------------------------------------------------------------ the rip and what comes out of it -->
+<main class="screen" id="screen-rip" hidden>
+  <div id="rip-top">
+    <button id="rip-back" class="mini">‹ PACKS</button>
+    <span id="rip-name"></span>
+  </div>
+  <div id="rip-stage">
+    <canvas id="rip-canvas" width="720" height="1040"></canvas>
+    <div id="rip-hint"></div>
+    <div id="rip-grade" data-kind="none"></div>
+  </div>
+  <div id="reveal" hidden>
+    <div id="reveal-cards"></div>
+    <div id="reveal-foot" hidden>
+      <div id="reveal-sum"></div>
+      <div class="row">
+        <button id="again" class="big">OPEN ANOTHER</button>
+        <button id="to-collection" class="big ghost">COLLECTION</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ------------------------------------------------------------------ the collection -->
+<main class="screen" id="screen-collection" hidden>
+  <h1>COLLECTION</h1>
+  <p id="collection-note" class="note"></p>
+  <div id="grid"></div>
+</main>
+
+<!-- one card, large -->
+<div id="sheet" hidden>
+  <div id="sheet-box">
+    <button id="sheet-close" class="mini">CLOSE</button>
+    <div id="sheet-card"></div>
+    <h2 id="sheet-name"></h2>
+    <p id="sheet-copies" class="note"></p>
+    <div class="label">LEVEL TINT</div>
+    <div id="sheet-looks" class="chips"></div>
+    <div class="label">CARD ART</div>
+    <div id="sheet-arts" class="chips"></div>
+    <p id="sheet-art-note" class="note small"></p>
+  </div>
+</div>
+
+<!-- a Mythic Pack's cosmetic, breaking out of its locked card -->
+<div id="unlock" hidden>
+  <div id="unlock-kind"></div>
+  <div id="unlock-new" hidden>NEW</div>
+  <div id="unlock-stage"></div>
+  <div id="unlock-name"></div>
+  <div id="unlock-hint"></div>
+  <button id="unlock-go" class="big" hidden>CONTINUE</button>
+</div>
+
+<nav id="tabs">
+  <button class="tab" data-go="packs" data-on="1">PACKS</button>
+  <button class="tab" data-go="collection" data-on="0">COLLECTION</button>
+</nav>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
