@@ -1,13 +1,23 @@
-// The service worker: what lets the opener work with no signal at all once it is on the home screen. The shell (the
+// The service worker: what lets the game work with no signal at all once it is on the home screen. The shell (the
 // page, the code, the card data, the pack art) is taken on the first visit; a card's picture is kept the first time it
-// is seen, so a collection grows lighter to open the more of it you have opened. Bump VERSION to push an update out:
-// the old cache is thrown away the next time the app is opened twice.
-const VERSION = 'wick-packs-v1';
+// is seen, so a collection grows lighter to open the more of it you have opened (and the arena's own pictures are
+// painted in code, so a battle needs nothing more). Bump VERSION to push an update out: the old cache is thrown away
+// the next time the app is opened twice.
+const VERSION = 'wick-arena-v1';
 const SHELL = [
   './',
   'index.html',
   'manifest.webmanifest',
   'src/app.js',
+  'src/arena.css',
+  'src/duo.js',
+  'src/battle/ai.js',
+  'src/battle/art.js',
+  'src/battle/cards.js',
+  'src/battle/decks.js',
+  'src/battle/play.js',
+  'src/battle/sim.js',
+  'src/battle/view.js',
   'src/card.js',
   'src/pack.js',
   'src/rules.js',
@@ -23,6 +33,17 @@ const SHELL = [
   'ui/unlock_card.png',
   'ui/pack_glow.png',
   'ui/pack_tear.json',
+  'ui/pack_full.png',
+  'ui/pack_legendary.png',
+  'ui/pack_mythic.png',
+  'ui/pack_ranked_0.png',
+  'ui/pack_ranked_1.png',
+  'ui/pack_ranked_2.png',
+  'ui/pack_ranked_3.png',
+  'ui/pack_ranked_4.png',
+  'ui/pack_ranked_5.png',
+  'ui/pack_ranked_6.png',
+  'ui/pack_ranked_7.png',
   'icons/icon_180.png',
   'icons/icon_192.png',
   'icons/icon_512.png',

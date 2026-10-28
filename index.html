@@ -2,45 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>WICK · Pack Opener</title>
+<title>WICK · Arena</title>
 <!-- viewport-fit=cover + the safe-area insets in the stylesheet: the app goes right to the edges of an iPhone and
-     keeps clear of the notch and the home bar. user-scalable=no so a two-finger tear does not zoom the page. -->
+     keeps clear of the notch and the home bar. user-scalable=no so a two-finger tear, or two players at once, does
+     not zoom the page. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
 <meta name="theme-color" content="#0d0a16">
-<meta name="description" content="Open WICK card packs and build the collection: tear the pack with a finger, turn the cards over, keep them.">
+<meta name="description" content="WICK: battle across the river with your cards, win packs, tear them open and build the collection. Two players can share one iPhone Duo.">
 <meta name="mobile-web-app-capable" content="yes">
 <!-- Add to Home Screen on an iPhone: it opens with no Safari chrome, like an app -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WICK Packs">
+<meta name="apple-mobile-web-app-title" content="WICK">
 <link rel="apple-touch-icon" href="icons/icon_180.png">
 <link rel="icon" href="icons/icon_192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="src/style.css">
+<link rel="stylesheet" href="src/arena.css">
 </head>
 <body>
 
-<div id="loading">OPENING THE BOX…</div>
+<div id="loading"><img src="ui/logo.png" alt="WICK"><span>LIGHTING THE CANDLES…</span></div>
 
 <header id="bar">
-  <img id="logo" src="ui/logo.png" alt="WICK">
+  <button id="who" class="who" title="wizards, settings"><span id="who-emblem" class="emblem"></span><span id="who-name"></span></button>
+  <div class="purse" title="gold"><span class="ico-gold"></span><span id="gold">0</span></div>
+  <div class="purse" title="embers: burn a pack's candle down at once"><span class="ico-ember"></span><span id="embers">0</span></div>
   <button id="sound-btn" class="mini">SOUND ON</button>
-  <button id="menu-btn" class="mini" title="collection, export, import">···</button>
 </header>
 
-<!-- ------------------------------------------------------------------ the packs -->
-<main class="screen" id="screen-packs">
-  <h1>CARD PACKS</h1>
+<!-- ------------------------------------------------------------------ home: the ladder and the packs won -->
+<main class="screen" id="screen-home">
+  <div class="home">
+    <section class="home-a">
+      <div id="league"></div>
+      <button id="go-battle" class="battle-btn"><span class="battle-word">BATTLE</span><span id="battle-sub" class="battle-sub"></span></button>
+      <div class="pair">
+        <button id="go-duo" class="mode-btn"><span class="mode-word">DUO DUEL</span><span class="mode-sub">two wizards, one Duo</span></button>
+        <button id="go-practice" class="mode-btn"><span class="mode-word">PRACTICE</span><span class="mode-sub">no trophies</span></button>
+      </div>
+      <div id="deck-peek"></div>
+    </section>
+    <section class="home-b">
+      <div class="sec">PACKS WON</div>
+      <div id="slots"></div>
+      <div class="pair">
+        <button id="free-pack" class="side-pack"></button>
+        <button id="crown-pack" class="side-pack"></button>
+      </div>
+      <p id="home-note" class="note small"></p>
+    </section>
+  </div>
+</main>
+
+<!-- ------------------------------------------------------------------ the shop -->
+<main class="screen" id="screen-packs" hidden>
+  <h1>PACK SHOP</h1>
   <p id="packs-note" class="note"></p>
   <div id="pack-list"></div>
-  <p class="foot">Every pack, as many as you like. Nothing is spent and nothing is bought: the collection is yours and
-    it stays on this phone.</p>
+  <p class="foot" id="packs-foot">Packs are bought with gold, and gold is won in battle. Nothing here costs real money:
+    the collection is yours and it stays on this phone.</p>
 </main>
 
 <!-- ------------------------------------------------------------------ the rip and what comes out of it -->
 <main class="screen" id="screen-rip" hidden>
   <div id="rip-top">
-    <button id="rip-back" class="mini">‹ PACKS</button>
+    <button id="rip-back" class="mini">‹ BACK</button>
     <span id="rip-name"></span>
   </div>
   <div id="rip-stage">
@@ -54,16 +81,18 @@
       <div id="reveal-sum"></div>
       <div class="row">
         <button id="again" class="big">OPEN ANOTHER</button>
-        <button id="to-collection" class="big ghost">COLLECTION</button>
+        <button id="to-collection" class="big ghost">CONTINUE</button>
       </div>
     </div>
   </div>
 </main>
 
-<!-- ------------------------------------------------------------------ the collection -->
+<!-- ------------------------------------------------------------------ the cards: the deck and the collection -->
 <main class="screen" id="screen-collection" hidden>
-  <h1>COLLECTION</h1>
+  <div id="deck-box"></div>
+  <div class="sec">COLLECTION</div>
   <p id="collection-note" class="note"></p>
+  <div id="filters" class="chips"></div>
   <div id="grid"></div>
 </main>
 
@@ -71,14 +100,24 @@
 <div id="sheet" hidden>
   <div id="sheet-box">
     <button id="sheet-close" class="mini">CLOSE</button>
-    <div id="sheet-card"></div>
-    <h2 id="sheet-name"></h2>
-    <p id="sheet-copies" class="note"></p>
-    <div class="label">LEVEL TINT</div>
-    <div id="sheet-looks" class="chips"></div>
-    <div class="label">CARD ART</div>
-    <div id="sheet-arts" class="chips"></div>
-    <p id="sheet-art-note" class="note small"></p>
+    <div class="sheet-cols">
+      <div class="sheet-left">
+        <div id="sheet-card"></div>
+        <h2 id="sheet-name"></h2>
+        <p id="sheet-copies" class="note"></p>
+        <div id="sheet-deck" class="row"></div>
+      </div>
+      <div class="sheet-right">
+        <div class="label">IN THE ARENA</div>
+        <p id="sheet-battle" class="note"></p>
+        <div id="sheet-stats"></div>
+        <div class="label">LEVEL TINT</div>
+        <div id="sheet-looks" class="chips"></div>
+        <div class="label">CARD ART</div>
+        <div id="sheet-arts" class="chips"></div>
+        <p id="sheet-art-note" class="note small"></p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -92,9 +131,18 @@
   <button id="unlock-go" class="big" hidden>CONTINUE</button>
 </div>
 
+<!-- the battle: built by src/battle/play.js -->
+<div id="battle" hidden></div>
+
+<!-- results, the Duo Duel table, practice, the wizards: one panel at a time -->
+<div id="overlay" hidden><div id="overlay-box"></div></div>
+
+<div id="toast"></div>
+
 <nav id="tabs">
-  <button class="tab" data-go="packs" data-on="1">PACKS</button>
-  <button class="tab" data-go="collection" data-on="0">COLLECTION</button>
+  <button class="tab" data-go="packs" data-on="0">SHOP</button>
+  <button class="tab" data-go="home" data-on="1">BATTLE</button>
+  <button class="tab" data-go="collection" data-on="0">CARDS</button>
 </nav>
 
 <script type="module" src="src/app.js"></script>

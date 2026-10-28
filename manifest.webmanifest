@@ -1,11 +1,11 @@
 {
-  "name": "WICK · Pack Opener",
-  "short_name": "WICK Packs",
-  "description": "Open WICK card packs and build the collection: tear the pack with a finger, turn the cards over, keep them.",
+  "name": "WICK · Arena",
+  "short_name": "WICK",
+  "description": "Battle across the river with your WICK cards, win packs, tear them open and build the collection. Two players can share one iPhone Duo.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#0d0a16",
   "theme_color": "#0d0a16",
   "icons": [

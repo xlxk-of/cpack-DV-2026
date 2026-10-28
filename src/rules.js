@@ -149,3 +149,68 @@ export const SCHOOL_COLORS = {
   fire: '#ff8c26', frost: '#73ccff', storm: '#d9ccff',
   shadow: '#9e59d9', arcane: '#bf80ff', holy: '#ffeb8c',
 };
+
+// ==================================================================== THE LADDER
+// The arena's leagues are the ranked tiers of the packs: a win in a league earns that league's Ranked Pack, and
+// climbing a league is how a better pack is earned. Trophies are won and lost a battle at a time; once a league is
+// reached its trophies are never lost again.
+export const LEAGUE_AT = [0, 200, 450, 750, 1100, 1500, 2000, 2600];
+
+export function leagueOf(trophies) {
+  let t = 0;
+  for (let i = 0; i < LEAGUE_AT.length; i++) if (trophies >= LEAGUE_AT[i]) t = i;
+  return t;
+}
+
+/** Trophies a battle wins or loses: about 30 for a win, about 20 for a loss, and never below the league's floor. */
+export function trophyChange(trophies, winner, rng = Math.random) {
+  if (winner === 0) return 28 + Math.floor(rng() * 5);
+  if (winner === -1) return 0;
+  const floor = LEAGUE_AT[leagueOf(trophies)];
+  return -Math.min(trophies - floor, 18 + Math.floor(rng() * 5));
+}
+
+/** What a win puts in a pack slot: mostly the league's Ranked Pack, sometimes the next one up, rarely more. */
+export function packForWin(tier, rng = Math.random) {
+  const r = rng();
+  if (r < 0.03) return 'mythic';
+  if (r < 0.10) return 'legendary';
+  if (r < 0.22 && tier < RANKED_COPIES.length - 1) return 'ranked:' + (tier + 1);
+  return 'ranked:' + tier;
+}
+
+/** Gold and embers for a battle: more in a higher league and for every crown. */
+export function battleGold(tier, winner, crowns) {
+  if (winner !== 0) return { gold: 5 + crowns * 3, embers: 0 };
+  return { gold: 20 + tier * 10 + crowns * 5, embers: crowns >= 3 ? 2 : 1 };
+}
+
+// A pack from a battle is sealed with a candle: light it, and when it has burned down the pack opens. Only one candle
+// burns at a time. Embers burn one down at once: one ember a minute left.
+export function unlockSeconds(key) {
+  if (key === 'legendary') return 8 * 60;
+  if (key === 'mythic') return 12 * 60;
+  const t = packTier(key);
+  return t >= 0 ? 30 + 45 * t : 0;
+}
+
+export function embersToOpen(secondsLeft) {
+  return Math.max(1, Math.ceil(secondsLeft / 60));
+}
+
+export const SLOTS = 4;
+export const FREE_EVERY = 4 * 3600 * 1000;     // a free Starter Pack every four hours
+export const CROWN_GOAL = 10;                  // ten crowns and the Crown Pack (a Legendary Booster) is yours
+
+/** A pack bought outright, in gold. A ranked pack can only be bought up to your own league. */
+export function packPrice(key) {
+  if (key === 'starter') return 60;
+  if (key === 'legendary') return 1400;
+  if (key === 'mythic') return 2400;
+  const t = packTier(key);
+  return 120 + 90 * t;
+}
+
+// The deck every new wizard starts with: something to walk at the towers, something for the air, two quick spells.
+export const STARTER_DECK = ['ember_sprite', 'bone_knight', 'thunder_roc', 'sentinel', 'fireball', 'frost_shard', 'missiles', 'fire_totem'];
+export const DECK_SIZE = 8;
