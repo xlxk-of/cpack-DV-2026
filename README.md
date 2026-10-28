@@ -55,6 +55,9 @@ A card's **level** (1, 10, 50, 100, 250, 500 and 1000 copies, as ever) makes it 
 tint a card wears in the collection are the ones it wears in your hand in battle, so a scene, or a scene that moves,
 out of a Mythic Pack shows there too.
 
+**Emotes.** The speech button by your name offers four card faces to say something across the river with: *HEE
+HEE!*, *WELL PLAYED*, *OOPS…* and *GRRR!*. The computer rival has a few words of its own when a crown falls.
+
 **The ladder.** Trophies are won (about 30) and lost (about 20) a battle at a time. The **leagues are the ranked tiers
 of the packs**, Bronze up to Top 100, each with the emblem off its own pack; once reached, a league's trophies are
 never lost again. A higher league means better packs and wiser rivals: eleven of them, each a deck with a theme
@@ -81,7 +84,8 @@ the level tint and the picture it may wear, and to put it in the deck.
 | **Open, held upright** | the arena tall, your hand beside it |
 | **Duo Duel** | two players, one Duo laid flat. The river is on the crease, each hand faces its player, and both play at once with a finger each. Fold it shut and the duel pauses |
 
-Opening or closing the Duo in the middle of anything (a battle included) lays the screen out again on the spot.
+Opening or closing the Duo in the middle of anything (a battle included) lays the screen out again on the spot. With
+*Reduce Motion* on (Settings → Accessibility → Motion), the field no longer shakes and the glowing UI holds still.
 
 How the app knows: from the shape of the screen, which is enough on its own. Safari on the Duo can also tell a page
 about the fold directly, through the **Device Posture** and **Viewport Segments** APIs, but only with them turned on

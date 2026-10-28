@@ -26,6 +26,9 @@ const FX_COLORS = {
   barrel: ['#fff3b0', '#ffae3c', '#ff7a1a', '#5a3a1a'],
 };
 
+// a phone set to Reduce Motion: the field does not shake
+const REDUCED = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
@@ -147,6 +150,7 @@ export class ArenaView {
     ctx.clearRect(0, 0, this.cv.width, this.cv.height);
     ctx.imageSmoothingEnabled = false;
     this.shake = Math.max(0, this.shake - dt * 3);
+    if (REDUCED.matches) this.shake = 0;
     const sx = (Math.random() - 0.5) * this.shake * this.S * 0.5, sy = (Math.random() - 0.5) * this.shake * this.S * 0.5;
     this._world(ctx, sx, sy);
     // the floor, the river running, the bridges

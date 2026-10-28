@@ -840,3 +840,8 @@ body[data-battle="1"] #bar, body[data-battle="1"] #tabs, body[data-battle="1"] .
 .bp[data-shape="column"] .bp-note { bottom: auto; top: 30px; left: 8px; right: 8px; transform: none; white-space: normal; text-align: center; z-index: 11; }
 .bp[data-shape="column"] .bp-note.show { animation: note-in 1.6s ease-out; }
 @keyframes note-in { 0% { opacity: 0; } 12%, 75% { opacity: 1; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-pack[data-state="ready"], .slot-pack[data-state="ready"] .slot-art, .match-word, .deck-row[data-swap="1"] .hc,
+  .hc[data-look="7"], .slot-pack[data-state="lit"] .slot-candle::before { animation: none; }
+}
