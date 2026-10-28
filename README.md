@@ -60,7 +60,8 @@ HEE!*, *WELL PLAYED*, *OOPS…* and *GRRR!*. The computer rival has a few words 
 
 **The ladder.** Trophies are won (about 30) and lost (about 20) a battle at a time. The **leagues are the ranked tiers
 of the packs**, Bronze up to Top 100, each with the emblem off its own pack; once reached, a league's trophies are
-never lost again. A higher league means better packs and wiser rivals: eleven of them, each a deck with a theme
+never lost again. A battle's result is kept the moment it ends; a ladder battle left unfinished (the app closed in the
+middle of it) counts as lost. A higher league means better packs and wiser rivals: eleven of them, each a deck with a theme
 (Ember Cult, Frost Choir, Gravecallers, Paladins, Siegewrights…), and between them every card in the box turns up
 on the other side of the river.
 

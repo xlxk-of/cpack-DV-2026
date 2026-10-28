@@ -266,7 +266,8 @@ export class BattleScreen {
     this.root.addEventListener('pointerdown', this._onDown);
     window.addEventListener('pointermove', this._onMove, { passive: false });
     window.addEventListener('pointerup', this._onUp);
-    window.addEventListener('pointercancel', this._onUp);
+    this._onCancel = (e) => this._up(e, true);
+    window.addEventListener('pointercancel', this._onCancel);
     this._onVis = () => { if (document.hidden && !this.ended) this.pause(true); };
     document.addEventListener('visibilitychange', this._onVis);
     this.pauseBtn.addEventListener('click', () => this.pause(!this.paused));
@@ -291,10 +292,10 @@ export class BattleScreen {
     }
     if (e.target === this.canvas) {
       const w = this._world(e);
-      const teams = this.humans.filter((t) => this.sel[t] >= 0);
-      if (!teams.length) return;
-      let team = teams[0];
-      if (teams.length > 1) team = w.y > H / 2 ? 0 : 1;
+      // in a Duo Duel a tap belongs to the player whose half it lands on: the other player's chosen card is theirs
+      // to throw (a drag still goes anywhere)
+      const team = this.duo ? (w.y > H / 2 ? 0 : 1) : 0;
+      if (this.sel[team] < 0) return;
       e.preventDefault();
       this._try(team, this.sel[team], w.x, w.y);
     }
@@ -308,6 +309,7 @@ export class BattleScreen {
       d.moved = true;
       d.el.dataset.lifted = '1';
       this.sel[d.team] = -1;
+      this._paintSel(d.team);
     }
     if (!d.moved) return;
     const w = this._world(e);
@@ -317,7 +319,8 @@ export class BattleScreen {
     else this._unaim(e.pointerId);
   }
 
-  _up(e) {
+  /** A finger lifted, or the system took the touch away (`cancelled`): only a real lift plays a card. */
+  _up(e, cancelled = false) {
     const d = this.drags.get(e.pointerId);
     if (!d) return;
     this.drags.delete(e.pointerId);
@@ -325,6 +328,8 @@ export class BattleScreen {
     d.el.dataset.lifted = '0';
     this._ghost(e.pointerId, d, null);
     this._unaim(e.pointerId);
+    // a drag let go of while the battle is paused (the other player paused it, or the Duo was folded) plays nothing
+    if (cancelled || this.paused || this.ended) return;
     if (!d.moved) {
       // a tap: choose the card (or let go of it), then tap the field
       this.sel[d.team] = this.sel[d.team] === d.slot ? -1 : d.slot;
@@ -634,12 +639,14 @@ export class BattleScreen {
       pl.hand.forEach((c, slot) => {
         const h = p.cards[slot];
         const id = c ? c.id : null;
-        if (id !== h.id || dark !== h.hidden) {
+        const temp = !!(c && c.temp);
+        if (id !== h.id || dark !== h.hidden || temp !== h.temp) {
           h.id = id;
           h.hidden = dark;
+          h.temp = temp;
           h.el.dataset.card = id || '';
           h.el.dataset.hidden = dark ? '1' : '0';
-          h.el.dataset.temp = c && c.temp ? '1' : '0';
+          h.el.dataset.temp = temp ? '1' : '0';
           if (id) {
             this._dress(h.el, id, this.o.players[p.team]);
             $('.hc-name', h.el).textContent = this.byId[id].name;
@@ -683,6 +690,9 @@ export class BattleScreen {
   _finish() {
     this.ended = true;
     const r = this.b.result;
+    // the outcome is the app's the moment it is known, not when CONTINUE is pressed: a phone shut on the result loses
+    // nothing, and an app killed mid-battle cannot dodge a defeat
+    if (this.o.onOver) this.o.onOver({ ...r, rival: this.o.players[1] });
     const box = this.overEl;
     box.hidden = false;
     box.innerHTML = '';
@@ -739,7 +749,7 @@ export class BattleScreen {
     this.root.removeEventListener('pointerdown', this._onDown);
     window.removeEventListener('pointermove', this._onMove);
     window.removeEventListener('pointerup', this._onUp);
-    window.removeEventListener('pointercancel', this._onUp);
+    window.removeEventListener('pointercancel', this._onCancel);
     document.removeEventListener('visibilitychange', this._onVis);
     this.root.innerHTML = '';
   }

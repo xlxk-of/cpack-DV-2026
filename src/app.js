@@ -74,6 +74,7 @@ class App {
     await this.rip.load();
     this._bindChrome();
     watch((f) => this._form(f));
+    this._abandoned();
     this.show('home');
     $('#loading').remove();
     setInterval(() => this._tick(), 1000);
@@ -91,6 +92,7 @@ class App {
     Save.saveIndex(this.idx);
     this.pid = id;
     this.state = Save.load(id);
+    this._abandoned();
     this._paintBar();
     this.show(this.screen === 'rip' ? 'home' : this.screen);
     if (!this.state.intro) this._intro();
@@ -397,6 +399,7 @@ class App {
       this.toast('WIN A BATTLE TO FILL THIS SLOT');
       return;
     }
+    if (st !== 'sealed' && this._halfOpen()) return;
     if (st === 'ready') {
       this.sfx.play('card_select', 1, 0.7);
       s.slots[i] = null;
@@ -428,6 +431,7 @@ class App {
 
   _free() {
     const s = this.state;
+    if (this._halfOpen()) return;
     if (s.freeAt - now() > 0) {
       this.toast('THE FREE PACK COMES ROUND IN ' + hms(s.freeAt - now()));
       return;
@@ -438,6 +442,7 @@ class App {
 
   _crownPack() {
     const s = this.state;
+    if (this._halfOpen()) return;
     if (s.crowns < CROWN_GOAL) {
       this.toast('WIN ' + (CROWN_GOAL - s.crowns) + ' MORE CROWNS FOR THE CROWN PACK');
       return;
@@ -456,6 +461,14 @@ class App {
   _resume() {
     const p = this.state.pending;
     if (p) this._startRip(p.key, p.back || 'home');
+  }
+
+  /** A pack already paid for and half open is finished first, so opening another can never lose it. */
+  _halfOpen() {
+    if (!this.state.pending) return false;
+    this.toast('FINISH THE PACK YOU STARTED FIRST');
+    this._resume();
+    return true;
   }
 
   // ---------------------------------------------------------------- the shop
@@ -492,6 +505,7 @@ class App {
   }
 
   _buy(key) {
+    if (this._halfOpen()) return;
     const t = packTier(key);
     const free = collector();
     if (t > this.tier() && !free) {
@@ -783,6 +797,7 @@ class App {
       t.dataset.on = s.deckAt === i ? '1' : '0';
       t.addEventListener('click', () => {
         s.deckAt = i;
+        this.swap = null;
         this._save();
         this.sfx.play('tick', 1, 0.4);
         this._paintCollection();
@@ -811,6 +826,12 @@ class App {
       } else c.dataset.empty = '1';
       c.addEventListener('click', () => {
         if (this.swap) {
+          if (deck.includes(this.swap)) {
+            this.toast(this.byId[this.swap].name.toUpperCase() + ' IS ALREADY IN THIS DECK');
+            this.swap = null;
+            this._paintCollection();
+            return;
+          }
           const d = deck.slice();
           if (id) d[i] = this.swap;
           else d.push(this.swap);
@@ -1153,7 +1174,8 @@ class App {
       return;
     }
     const others = Save.index().list.filter((p) => p.id !== this.pid);
-    let foe = others.length ? others[0].id : 'guest';
+    const ready = (id) => this.deck(Save.load(id)).length === DECK_SIZE;
+    let foe = (others.find((p) => ready(p.id)) || { id: 'guest' }).id;
     let guestDeck = PRESET_DECKS[0].key;
     let fair = true;
     let minutes = 3;
@@ -1204,6 +1226,10 @@ class App {
       if (rec) el('p', 'note small', box, 'Between you so far: ' + rec.w + ' won, ' + rec.l + ' lost, ' + rec.d + ' drawn.');
       const row = el('div', 'row', box);
       el('button', 'big', row, 'TO THE RIVER').addEventListener('click', () => {
+        if (foe !== 'guest' && !ready(foe)) {
+          this.toast('THAT WIZARD NEEDS A DECK OF 8 FIRST');
+          return;
+        }
         let far;
         if (foe === 'guest') {
           const d = PRESET_DECKS.find((x) => x.key === guestDeck);
@@ -1220,12 +1246,17 @@ class App {
   }
 
   _fight(mode, players, extra) {
+    if (mode === 'ladder') {
+      this.state.ongoing = { tier: extra.tier, rival: extra.rival.name, deckName: extra.rival.deckName };
+      this._save();
+    }
     const root = $('#battle');
     root.hidden = false;
     document.body.dataset.battle = '1';
     this.battle = new BattleScreen(root, {
       cards: this.cards, sfx: this.sfx, mode, players, seed: (Math.random() * 1e9) | 0,
       onEnd: (r) => this._battleEnd(mode, r, extra),
+      onOver: mode === 'ladder' ? (r) => this._settle(r) : null,
       hint: mode !== 'duo' && this.state.stats.battles === 0 && !this._hinted,
     });
     this._hinted = true;
@@ -1256,8 +1287,11 @@ class App {
     }
   }
 
-  /** What a ladder battle brings: trophies, gold, embers, crowns toward the Crown Pack, and a pack for a win. */
-  _rewards(r, extra) {
+  /**
+   * What a ladder battle brings: trophies, gold, embers, crowns toward the Crown Pack, and a pack for a win. Settled
+   * (and saved) the moment the battle ends; the results panel only shows what was settled.
+   */
+  _settle(r) {
     const s = this.state;
     const tierBefore = this.tier();
     const dt = trophyChange(s.trophies, r.winner);
@@ -1283,8 +1317,24 @@ class App {
         pack = key;
       } else full = true;
     }
+    delete s.ongoing;
     this._save();
-    const tierAfter = this.tier();
+    this._settled = { dt, won, myCrowns, purse, pack, full, tierBefore, tierAfter: this.tier() };
+    return this._settled;
+  }
+
+  /** A ladder battle the app was closed in the middle of: it counts as lost, as walking away from it would. */
+  _abandoned() {
+    const o = this.state.ongoing;
+    if (!o) return;
+    const got = this._settle({ winner: 1, crowns: [0, 3], reason: 'abandoned' });
+    this.toast('YOUR LAST BATTLE WAS LEFT UNFINISHED · ' + got.dt + ' TROPHIES');
+  }
+
+  _rewards(r, extra) {
+    const s = this.state;
+    const { dt, won, myCrowns, purse, pack, full, tierBefore, tierAfter } = this._settled || this._settle(r);
+    this._settled = null;
     this.show('home');
     this._overlay((box) => {
       box.className = 'results';

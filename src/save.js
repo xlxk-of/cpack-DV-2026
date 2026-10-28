@@ -92,11 +92,17 @@ export function save(id, state) {
   }
 }
 
+function idNumber(id) {
+  return parseInt(String(id).slice(1), 10) || 0;
+}
+
 export function create(name) {
   const idx = index();
-  let n = idx.list.length + 1;
-  while (idx.list.some((p) => p.id === 'p' + n)) n++;
+  // an id is never used twice, so a new wizard never inherits a deleted one's place in anyone's records
+  let n = Math.max(idx.next || 0, idx.list.length + 1, ...idx.list.map((p) => idNumber(p.id) + 1));
+  while (idx.list.some((p) => p.id === 'p' + n) || read(PROFILE('p' + n))) n++;
   const id = 'p' + n;
+  idx.next = n + 1;
   const state = { ...fresh(), name };
   write(PROFILE(id), state);
   idx.list.push({ id, name });
@@ -108,8 +114,16 @@ export function remove(id) {
   const idx = index();
   if (idx.list.length <= 1) return;
   idx.list = idx.list.filter((p) => p.id !== id);
+  idx.next = Math.max(idx.next || 0, idNumber(id) + 1);
   if (idx.active === id) idx.active = idx.list[0].id;
   try { localStorage.removeItem(PROFILE(id)); } catch (e) { /* nothing to do */ }
+  for (const p of idx.list) {
+    const st = read(PROFILE(p.id));
+    if (st && st.rivals && st.rivals[id]) {
+      delete st.rivals[id];
+      write(PROFILE(p.id), st);
+    }
+  }
   saveIndex(idx);
 }
 

@@ -505,7 +505,7 @@ export class Battle {
     const def = BATTLE[e.card] || {};
     if (e.feather) {
       // Phoenix Feather: up again with half its health, no feather this time
-      const [u] = this._summon(e.team, e.card, e.level, e.x, e.y, { one: true, hp: e.maxHp * 0.5, maxHp: e.maxHp, instant: true, mirror: e.mirror });
+      const [u] = this._summon(e.team, e.card, e.level, e.x, e.y, { one: true, hp: e.maxHp * 0.5, maxHp: e.maxHp, instant: true, mirror: e.mirror, reborn: e.reborn });
       u.deployT = 0.4;
       this.emit({ t: 'reborn', team: e.team, x: e.x, y: e.y, card: e.card });
     } else if (def.egg && !e.reborn) {
