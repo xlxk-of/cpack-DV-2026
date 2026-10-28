@@ -958,7 +958,8 @@ class App {
     $('#overlay-box').innerHTML = '';
   }
 
-  _confirm(title, text, yes, onYes, extra = '') {
+  /** A question with a yes and a no, asked on the page itself (a home-screen app shows no browser dialogs). */
+  _confirm(title, text, yes, onYes, extra = '', onNo = null) {
     this._overlay((box) => {
       box.className = 'ask';
       el('h2', '', box, title);
@@ -971,8 +972,94 @@ class App {
           onYes();
         });
       }
-      el('button', 'big ghost', row, yes ? 'NOT NOW' : 'OK').addEventListener('click', () => this._closeOverlay());
+      el('button', 'big ghost', row, yes ? 'NOT NOW' : 'OK').addEventListener('click', () => {
+        this._closeOverlay();
+        if (onNo) onNo();
+      });
     });
+  }
+
+  /** A wizard's name, typed on the page. */
+  _askName(title, initial, onName, onNo) {
+    this._overlay((box) => {
+      box.className = 'ask';
+      el('h2', '', box, title);
+      const input = el('input', 'name-in', box);
+      input.id = 'name-ask';
+      input.maxLength = 14;
+      input.value = initial;
+      input.placeholder = 'WIZARD';
+      input.autocomplete = 'off';
+      const row = el('div', 'row', box);
+      const ok = el('button', 'big', row, 'OK');
+      const go = () => {
+        const name = input.value.trim().toUpperCase().slice(0, 14);
+        if (!name) return input.focus();
+        this._closeOverlay();
+        onName(name);
+      };
+      ok.addEventListener('click', go);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+      el('button', 'big ghost', row, 'CANCEL').addEventListener('click', () => {
+        this._closeOverlay();
+        if (onNo) onNo();
+      });
+      setTimeout(() => input.focus(), 50);
+    }, { closes: false });
+  }
+
+  /** The collection as a line of text, to carry to another phone. */
+  _export() {
+    const text = Save.toText(this.state);
+    this._overlay((box) => {
+      box.className = 'ask';
+      el('h2', '', box, 'EXPORT');
+      el('p', 'note small', box, 'This line of text is ' + this.state.name + '\'s whole collection. Paste it into IMPORT on another phone.');
+      const area = el('textarea', 'carry', box);
+      area.id = 'carry-out';
+      area.readOnly = true;
+      area.value = text;
+      const row = el('div', 'row', box);
+      const copy = el('button', 'big', row, 'COPY');
+      copy.addEventListener('click', () => {
+        const done = () => { copy.textContent = 'COPIED'; };
+        const fallback = () => { area.focus(); area.select(); copy.textContent = 'SELECTED · COPY IT'; };
+        try {
+          navigator.clipboard.writeText(text).then(done, fallback);
+        } catch (e) {
+          fallback();
+        }
+      });
+      el('button', 'big ghost', row, 'BACK').addEventListener('click', () => this._wizards());
+    }, { closes: false });
+  }
+
+  _import() {
+    this._overlay((box) => {
+      box.className = 'ask';
+      el('h2', '', box, 'IMPORT');
+      el('p', 'note small', box, 'Paste a collection exported from WICK. It replaces ' + this.state.name + '\'s cards, decks and trophies.');
+      const area = el('textarea', 'carry', box);
+      area.id = 'carry-in';
+      area.placeholder = 'paste here';
+      const bad = el('p', 'note small warn', box, '');
+      bad.hidden = true;
+      const row = el('div', 'row', box);
+      el('button', 'big', row, 'IMPORT').addEventListener('click', () => {
+        try {
+          this.state = { ...Save.fromText(area.value), intro: true };
+        } catch (e) {
+          bad.hidden = false;
+          bad.textContent = 'That is not a WICK collection: copy the whole line from EXPORT and paste it again.';
+          return;
+        }
+        this._save();
+        this._closeOverlay();
+        this.toast('COLLECTION IMPORTED');
+        this.show('collection');
+      });
+      el('button', 'big ghost', row, 'BACK').addEventListener('click', () => this._wizards());
+    }, { closes: false });
   }
 
   // ---------------------------------------------------------------- battles
@@ -1260,26 +1347,23 @@ class App {
       }
       const row = el('div', 'row', box);
       el('button', 'mini', row, '+ NEW WIZARD').addEventListener('click', () => {
-        const name = (prompt('A name for the new wizard:', '') || '').trim().toUpperCase().slice(0, 14);
-        if (!name) return;
-        const id = Save.create(name);
-        this._use(id);
-        this._closeOverlay();
+        this._askName('A NEW WIZARD', '', (name) => this._use(Save.create(name)), () => this._wizards());
       });
       el('button', 'mini', row, 'RENAME').addEventListener('click', () => {
-        const name = (prompt('Rename ' + this.state.name + ':', this.state.name) || '').trim().toUpperCase().slice(0, 14);
-        if (!name) return;
-        this.state.name = name;
-        this._save();
-        this._paintBar();
-        paint(box);
+        this._askName('RENAME ' + this.state.name, this.state.name, (name) => {
+          this.state.name = name;
+          this._save();
+          this._paintBar();
+          this._wizards();
+        }, () => this._wizards());
       });
       if (Save.index().list.length > 1) {
         el('button', 'mini', row, 'DELETE').addEventListener('click', () => {
-          if (!confirm('Delete ' + this.state.name + ' and every card they hold?')) return;
-          Save.remove(this.pid);
-          this._use(Save.index().active);
-          paint(box);
+          this._confirm('DELETE ' + this.state.name + '?', 'Every card, deck, trophy and pack they hold goes with them. This cannot be undone.', 'DELETE', () => {
+            Save.remove(this.pid);
+            this._use(Save.index().active);
+            this._wizards();
+          }, '', () => this._wizards());
         });
       }
       el('div', 'label', box, 'THE SCREEN');
@@ -1306,30 +1390,15 @@ class App {
         + n(st.duels, 'duel') + (this.state.best.avg !== null ? ' · straightest rip ' + this.state.best.avg.toFixed(2) + ' px off the line' : ''));
       el('div', 'label', box, 'THE COLLECTION');
       const io = el('div', 'row', box);
-      el('button', 'mini', io, 'EXPORT').addEventListener('click', () => {
-        const text = Save.toText(this.state);
-        navigator.clipboard?.writeText(text).catch(() => {});
-        prompt('Your collection (copy this):', text);
-      });
-      el('button', 'mini', io, 'IMPORT').addEventListener('click', () => {
-        const text = prompt('Paste a collection:', '');
-        if (!text) return;
-        try {
-          this.state = { ...Save.fromText(text), intro: true };
-          this._save();
-          this._closeOverlay();
-          this.show('collection');
-        } catch (e) {
-          alert('That is not a WICK collection.');
-        }
-      });
+      el('button', 'mini', io, 'EXPORT').addEventListener('click', () => this._export());
+      el('button', 'mini', io, 'IMPORT').addEventListener('click', () => this._import());
       el('button', 'mini', io, 'WIPE').addEventListener('click', () => {
-        if (!confirm('Throw ' + this.state.name + '\'s whole collection away?')) return;
-        Save.wipe(this.pid);
-        this.state = Save.load(this.pid);
-        this._closeOverlay();
-        this.show('home');
-        this._intro();
+        this._confirm('WIPE ' + this.state.name + '?', 'Their whole collection goes: every card, deck, trophy and pack. EXPORT it first to keep a copy.', 'WIPE', () => {
+          Save.wipe(this.pid);
+          this.state = Save.load(this.pid);
+          this.show('home');
+          this._intro();
+        }, '', () => this._wizards());
       });
       el('button', 'big ghost', box, 'CLOSE').addEventListener('click', () => this._closeOverlay());
     };

@@ -25,6 +25,13 @@ const el = (tag, cls, parent, text) => {
 };
 
 const CROWN = '<svg viewBox="0 0 9 7" class="crown-svg" aria-hidden="true"><path d="M0 1h1v1h1v1h1V0h1v1h1V0h1v3h1V2h1V1h1v6H0z"/></svg>';
+// what a wizard can say across the river, each with a card's face
+export const EMOTES = [
+  { card: 'ember_sprite', text: 'HEE HEE!' },
+  { card: 'bone_knight', text: 'WELL PLAYED' },
+  { card: 'snowman_decoy', text: 'OOPS…' },
+  { card: 'inferno_golem', text: 'GRRR!' },
+];
 const WHY = { mana: 'NOT ENOUGH MANA', zone: 'NOT THERE', friend: 'NEEDS ONE OF YOURS NEAR', troop: 'NEEDS A SUMMON OF YOURS NEAR', foe: 'NOTHING TO COPY', time: 'TIME HAS STOPPED' };
 
 function clock(s) {
@@ -106,6 +113,21 @@ export class BattleScreen {
     el('div', 'bp-name', top, this.o.players[team].name);
     const crowns = el('div', 'bp-crowns crowns', top);
     const clockEl = el('div', 'bp-clock', top);
+    const say = el('button', 'bp-say', top);
+    say.setAttribute('aria-label', 'emote');
+    say.innerHTML = '<span></span>';
+    const pick = el('div', 'bp-emotes', p);
+    pick.hidden = true;
+    EMOTES.forEach((em, i) => {
+      const b = el('button', 'bp-emote', pick);
+      b.style.backgroundImage = 'url(art/' + em.card + '.png)';
+      el('span', '', b, em.text);
+      b.addEventListener('click', () => {
+        pick.hidden = true;
+        this._emote(team, i);
+      });
+    });
+    say.addEventListener('click', () => { pick.hidden = !pick.hidden; });
     const note = el('div', 'bp-note', p);
     const hand = el('div', 'bp-hand', p);
     const next = el('div', 'bp-next', hand);
@@ -487,6 +509,8 @@ export class BattleScreen {
           break;
         case 'crown':
           s.play('pack_good', 1, 0.8);
+          // the computer has something to say about it, now and then
+          if (this.brains[1] && !this.b.over && Math.random() < 0.5) setTimeout(() => this._emote(1, ev.team === 1 ? 0 : 2), 700);
           if (!this.b.over) this._banner(this._who(ev.team) + ' TAKES A CROWN', 1.6, ev.team === 0 || this.duo ? 'good' : 'bad');
           break;
         case 'trap': s.synth('boom', 0.6); break;
@@ -506,6 +530,17 @@ export class BattleScreen {
         default: break;
       }
     }
+  }
+
+  /** A wizard says something. One at a time, and not too often. */
+  _emote(team, i) {
+    const now = performance.now();
+    this.emoteAt = this.emoteAt || [0, 0];
+    if (now - this.emoteAt[team] < 2500) return;
+    this.emoteAt[team] = now;
+    const em = EMOTES[i];
+    this.view.emote(team, em.card, em.text);
+    this.sfx.synth('sparkle', 0.7);
   }
 
   _who(team) {
@@ -660,13 +695,21 @@ export class BattleScreen {
       const title = el('div', 'b-over-title', side, draw ? 'DRAW' : (won ? 'VICTORY' : 'DEFEAT'));
       title.dataset.kind = draw ? 'draw' : (won ? 'win' : 'lose');
       el('div', 'b-over-who', side, this.duo ? this.o.players[team].name : (won ? 'The candles are yours.' : (draw ? 'Neither flame went out.' : 'Your king\'s candle went out.')));
-      const row = el('div', 'b-over-crowns', side);
-      for (const t of [team, 1 - team]) {
-        const cell = el('div', 'b-over-cell', row);
-        cell.dataset.team = t;
-        el('div', 'b-over-name', cell, this.duo || t === 1 ? this.o.players[t].name : 'YOU');
-        const cr = el('div', 'crowns crowns-lg', cell);
-        cr.innerHTML = crowns(r.crowns[t]);
+      if (this.duo) {
+        // each half speaks to its own player: their crowns, and a word on the other side's
+        const cr = el('div', 'crowns crowns-lg', side);
+        cr.innerHTML = crowns(r.crowns[team]);
+        const theirs = r.crowns[1 - team];
+        el('div', 'b-over-name', side, this.o.players[1 - team].name + ' took ' + theirs + (theirs === 1 ? ' crown' : ' crowns'));
+      } else {
+        const row = el('div', 'b-over-crowns', side);
+        for (const t of [team, 1 - team]) {
+          const cell = el('div', 'b-over-cell', row);
+          cell.dataset.team = t;
+          el('div', 'b-over-name', cell, t === 1 ? this.o.players[t].name : 'YOU');
+          const cr = el('div', 'crowns crowns-lg', cell);
+          cr.innerHTML = crowns(r.crowns[t]);
+        }
       }
       const go = el('button', 'big', side, 'CONTINUE');
       go.addEventListener('click', () => this._done());

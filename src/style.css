@@ -15,6 +15,7 @@
   --k-sheet: 0.86;       /* one card, large */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;    /* one look, candlelit and dark: native controls and scrollbars follow it */
 }
 
 * { box-sizing: border-box; }

@@ -28,7 +28,9 @@ export class Sfx {
   async _loadAll() {
     for (const name of NAMES) {
       try {
-        const res = await fetch('sfx/' + name + '.m4a');
+        // AAC in an MP4 box: named .m4a here, .mp4 where a host serves only that name for it
+        let res = await fetch('sfx/' + name + '.m4a');
+        if (!res.ok) res = await fetch('sfx/' + name + '.mp4');
         const raw = await res.arrayBuffer();
         this.buffers[name] = await this.ctx.decodeAudioData(raw);
       } catch (e) { /* a sound that will not load is simply never heard */ }

@@ -51,6 +51,7 @@ export class ArenaView {
     this.texts = [];
     this.ghosts = [];
     this.flights = [];
+    this.bubbles = [];             // emotes: a card's face and a word, beside a side's king
     this.shake = 0;
     this.time = 0;
     this.previews = [];            // {team, card, x, y, ok, r, place, token...}: a card being aimed, one a player
@@ -171,6 +172,56 @@ export class ArenaView {
     for (const e of list) this._bars(ctx, e);
     this._previewDraw(ctx);
     this._texts(ctx, dt);
+    this._bubbles(dt);
+  }
+
+  /** An emote: a speech bubble with a card's face and a word, beside the side's king, for two seconds. */
+  emote(team, card, text) {
+    this.bubbles = this.bubbles.filter((b) => b.team !== team);
+    this.bubbles.push({ team, card, text, t: 0, T: 2.2 });
+  }
+
+  _bubbles(dt) {
+    const ctx = this.ctx;
+    this.bubbles = this.bubbles.filter((b) => {
+      b.t += dt;
+      const king = this.b.king(b.team);
+      const flip = this._flip(b.team);
+      // beside the king, toward the middle of the field from its own side
+      const toward = b.team === 0 ? -1 : 1;
+      const p = this.toScreen(king.x + 3.6, king.y + toward * (this.duo ? 2.2 : (b.team === 0 ? 2.6 : -0.2)));
+      const d = this.dpr;
+      const k = Math.min(1, b.t / 0.15) * Math.min(1, (b.T - b.t) / 0.3);
+      const s = Math.max(0.75, this.S / 22);
+      ctx.save();
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+      ctx.translate(p.x, p.y);
+      if (this.duo) ctx.rotate(this.turn ? (flip ? -Math.PI / 2 : Math.PI / 2) : (flip ? Math.PI : 0));
+      ctx.scale(s * (0.7 + 0.3 * k), s * (0.7 + 0.3 * k));
+      ctx.globalAlpha = Math.max(0, k);
+      ctx.font = 'bold 12px ui-monospace, "SF Mono", Menlo, monospace';
+      const w = ctx.measureText(b.text).width + 46, h = 34;
+      ctx.fillStyle = '#f4ead0';
+      ctx.strokeStyle = '#120c1c';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.rect(-w / 2, -h / 2, w, h);
+      ctx.moveTo(-w / 2 + 10, h / 2);
+      ctx.lineTo(-w / 2 + 4, h / 2 + 9);
+      ctx.lineTo(-w / 2 + 18, h / 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = TEAM[b.team].ring;
+      ctx.fillRect(-w / 2 + 2, -h / 2 + 2, w - 4, 3);
+      const tk = token(b.card, b.team, 26, {});
+      ctx.imageSmoothingEnabled = false;
+      if (tk) ctx.drawImage(tk, -w / 2 + 4, -h / 2 + 3, 28, 28);
+      ctx.fillStyle = '#120c1c';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(b.text, -w / 2 + 38, 1);
+      ctx.restore();
+      return b.t < b.T;
+    });
   }
 
   /** Back to front: what is nearer the bottom of the screen is drawn later. */

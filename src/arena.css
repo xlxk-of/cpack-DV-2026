@@ -736,11 +736,21 @@ body[data-battle="1"] #bar, body[data-battle="1"] #tabs, body[data-battle="1"] .
 .b-over-name { font-size: 11px; letter-spacing: 0.08em; }
 .b-over-cell[data-team="0"] .b-over-name { color: var(--azure); }
 .b-over-cell[data-team="1"] .b-over-name { color: var(--crimson); }
-.b-over[data-shape="duo-land"] { grid-template-columns: 1fr 1fr; }
-.b-over[data-shape="duo-land"] .b-over-side { width: min(84vh, 560px); flex: none; }
+.b-over[data-shape="duo-land"] { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.b-over[data-shape="duo-land"] .b-over-side { width: min(84vh, 520px); flex: none; }
+.is-duo .b-over-side {
+  gap: 10px;
+  padding: 18px 26px 20px;
+  background: linear-gradient(170deg, rgba(36, 25, 51, 0.96), rgba(18, 13, 27, 0.96));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+.is-duo .b-over-side .b-over-who { font-size: 14px; color: var(--ink); letter-spacing: 0.1em; }
+.is-duo .b-over-side .b-over-name { color: var(--dim); margin-bottom: 4px; }
 .b-over[data-shape="duo-land"] .b-over-side[data-team="0"] { transform: rotate(90deg); }
 .b-over[data-shape="duo-land"] .b-over-side[data-team="1"] { transform: rotate(-90deg); }
-.b-over[data-shape="duo-port"] { grid-template-rows: 1fr 1fr; }
+.b-over[data-shape="duo-port"] { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
 .b-over[data-shape="duo-port"] .b-over-side[data-team="0"] { grid-row: 2; }
 .b-over[data-shape="duo-port"] .b-over-side[data-team="1"] { grid-row: 1; transform: rotate(180deg); }
 
@@ -757,3 +767,76 @@ body[data-battle="1"] #bar, body[data-battle="1"] #tabs, body[data-battle="1"] .
   .sec { margin: 2px 0 4px; }
 }
 .wizards > .big.ghost { margin-top: 16px; }
+
+.carry {
+  width: 100%;
+  height: 96px;
+  resize: none;
+  font: inherit;
+  font-size: 10px;
+  word-break: break-all;
+  color: var(--ink);
+  background: #0c0912;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* emotes: a speech button in the corner of the hand, and the four faces it offers */
+.bp-say {
+  flex: none;
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: #1b1428;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.bp-say span {
+  position: relative;
+  width: 14px;
+  height: 9px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+.bp-say span::after { content: ''; position: absolute; left: 2px; bottom: -4px; border: 3px solid transparent; border-top-color: var(--ink); border-left-color: var(--ink); }
+.bp-emotes {
+  position: absolute;
+  right: 8px;
+  bottom: calc(100% + 6px);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 6px;
+  padding: 8px;
+  background: rgba(16, 12, 24, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  z-index: 12;
+}
+.bp-emote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 9px 4px 40px;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background-color: #1b1428;
+  background-repeat: no-repeat;
+  background-size: 34px 34px;
+  background-position: 2px center;
+  image-rendering: pixelated;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bp[data-shape="column"] .bp-emotes { bottom: auto; top: 32px; left: 8px; right: 8px; grid-template-columns: 1fr; }
+.bp[data-shape="column"] .bp-note { bottom: auto; top: 30px; left: 8px; right: 8px; transform: none; white-space: normal; text-align: center; z-index: 11; }
+.bp[data-shape="column"] .bp-note.show { animation: note-in 1.6s ease-out; }
+@keyframes note-in { 0% { opacity: 0; } 12%, 75% { opacity: 1; } 100% { opacity: 0; } }
