@@ -360,9 +360,26 @@ const STD_DEFS = `
 //   * a form is: flat base + at most one hard-edged shadow shape + small hard-edged highlights. Nothing else.
 //   * light is drawn, not blurred: stepped flat halos (halo), hard light wedges (shafts), four-point stars (star4).
 //   * shapes are simple, rounded and a little wonky; faces are big and readable; round caps and joins always.
+// Rules added after the first review of the whole set (they are what keeps thirty pictures in one hand):
+//   * EYES: always the `eye` helper — white ball, one big dark pupil, one glint. No iris rings, no lens eyes. A
+//     predator may have a yellow ball and a slit pupil. The main character's eyes are BIG: each at least ~34 radius
+//     on the 1024 canvas (together about a tenth of the canvas width or more), whatever the size of the body.
+//   * SKIN: every human and mermaid uses SKIN with SKIN_SHADE for the one shadow tone.
+//   * HALOS are opaque: steps of the BACKDROP colour lightened toward the light's hue (pass `halo` a list of solid
+//     colours, outermost first). Never a translucent yellow disc: over blue or teal it turns olive.
+//   * LIGHT STAYS BEHIND: halos, shafts, rays and sound rings are always drawn behind the subject, never across it.
+//   * BUBBLES are always `inkBubbles` (ink ring, tinted fill, one glint). SPARKLES are always `star4`.
+//   * VALUE: the band directly behind the subject is at least two clear value steps away from the subject's main
+//     colour (a teal ship needs a dark navy or a pale band behind it, not teal). No backdrop band is lighter than
+//     BRIGHTEST_BAND. Far water, sky and ground bands never carry an ink line.
+//   * SAFE AREA: every part of the subject stays inside the middle 80% of the canvas (102..922 on 1024). On the four
+//     full-art cards nothing but backdrop and floor goes below y = 800 (a text plate covers it).
+//   * FOREGROUND: round-tipped weed, bubbles, sparkles. No dark angular blades or shards in the corners.
+//   * The sigil is always centred on its star, not on its bounding box.
 
 export const INK = '#1a1230';
 export const W_SUBJECT = 14, W_INNER = 8, W_DETAIL = 5, W_MID = 7;
+export const SKIN = '#ffd9a8', SKIN_SHADE = '#f0b587', BRIGHTEST_BAND = '#7fdcd6';
 
 /** A flat shape with an ink line round it. o: { w, stroke, opacity, extra attrs... }. `fill: 'none'` for a bare line. */
 export function ink(d, fill, o = {}) {
@@ -413,9 +430,17 @@ export function star4(x, y, s, fill = '#fff', w = W_DETAIL, rot = 0) {
   return el('path', { d, fill, stroke: w ? INK : undefined, 'stroke-width': w || undefined, 'stroke-linejoin': 'round', transform: rot ? `rotate(${rot} ${n2(x)} ${n2(y)})` : undefined });
 }
 
-/** Drawn light: flat rings stepping outward from (x, y). No blur. `steps` rings out to radius r. */
+/** Drawn light: flat rings stepping outward from (x, y), out to radius r. No blur.
+ *  Pass `color` a LIST of solid colours, outermost first, and the rings are opaque (the house rule: each one the
+ *  backdrop colour lightened toward the light). A single colour string gives translucent steps, which is only safe
+ *  when the halo's hue matches what is behind it. */
 export function halo(x, y, r, color = '#fff6c0', steps = 3, opacity = 0.5) {
   const out = [];
+  if (Array.isArray(color)) {
+    const n = color.length;
+    color.forEach((c, i) => out.push(el('circle', { cx: x, cy: y, r: r * (n - i) / n, fill: c })));
+    return g({}, out);
+  }
   for (let i = steps; i >= 1; i--) out.push(el('circle', { cx: x, cy: y, r: r * i / steps, fill: color, opacity: opacity / steps * (steps - i + 1) * 0.9 }));
   return g({}, out);
 }
