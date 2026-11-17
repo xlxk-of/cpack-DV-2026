@@ -34,7 +34,7 @@ export function build(s) {
   const coat = spline([[110, 1100], [140, 910], [270, 780], [512, 740], [754, 780], [884, 910], [914, 1100], [512, 1160]], true);
   const head = 'M286 450C286 300 398 262 512 262C626 262 738 300 738 450C738 590 642 668 512 668C382 668 286 590 286 450Z';
   const earL = 'M300 430C250 420 236 480 262 510C276 526 300 520 306 500Z', earR = 'M724 430C774 420 788 480 762 510C748 526 724 520 718 500Z';
-  const crown = spline(rot([[322, 310], [330, 190], [410, 96], [512, 76], [614, 96], [694, 190], [702, 310], [512, 330]], TILT, HX, HY), true);
+  const crown = spline(rot([[322, 310], [326, 206], [408, 124], [512, 106], [616, 124], [698, 206], [702, 310], [512, 330]], TILT, HX, HY), true);
   const brim = spline(rot([[120, 372], [230, 282], [512, 236], [794, 282], [904, 372], [820, 410], [512, 352], [204, 410]], TILT, HX, HY), true);
   // the seaweed beard: fat fronds off the jaw
   const fr = [[322, 560, 230, -22], [384, 600, 290, 16], [450, 620, 250, -14], [520, 630, 330, 12], [592, 620, 270, -16], [654, 600, 240, 18], [706, 560, 200, 22]];
@@ -97,7 +97,7 @@ export function build(s) {
   body.push(ink(crown, '#f2c531', { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: crown })) }, [
     flat('M560 40C660 100 700 200 700 340L800 340L800 40Z', '#d99a1e'),
-    flat('M330 150C350 110 400 86 440 84C400 110 370 140 356 190Z', '#fff0a0'),
+    flat('M318 170C338 130 388 106 428 104C388 130 358 160 344 210Z', '#fff0a0'),
   ]));
   body.push(stroke(crown, { w: W_INNER }));
   body.push(ink(brim, '#f7d23e', { w: W_INNER }));
@@ -107,7 +107,7 @@ export function build(s) {
   ]));
   body.push(stroke(brim, { w: W_INNER }));
   // barnacles: on the hat, the cheek, the shoulder
-  body.push(barnacle(616, 108, 30), barnacle(662, 154, 22), barnacle(600, 162, 16), barnacle(236, 288, 24), barnacle(274, 262, 16));
+  body.push(barnacle(620, 128, 28), barnacle(664, 170, 20), barnacle(604, 178, 15), barnacle(236, 288, 24), barnacle(274, 262, 16));
   body.push(barnacle(336, 560, 22), barnacle(690, 520, 18), barnacle(760, 870, 28), barnacle(716, 900, 18));
   s.add(2, g({ filter: s.wobble(5) }, body));
 

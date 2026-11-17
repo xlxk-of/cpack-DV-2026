@@ -63,8 +63,8 @@ export function build(s) {
   const collar = poly([[250, 840], [128, 470], [190, 520], [196, 398], [252, 462], [282, 372], [330, 470], [400, 700], [624, 700], [694, 470], [742, 372], [772, 462], [828, 398], [834, 520], [896, 470], [774, 840]], true);
   const neck = 'M462 700L562 700L570 830L454 830Z';
   const skull = 'M290 424C290 248 396 176 512 176C628 176 734 248 734 424C734 500 712 540 678 566L672 614C668 640 650 650 640 652L632 716C626 760 580 782 512 782C444 782 398 760 392 716L384 652C374 650 356 640 352 614L346 566C312 540 290 500 290 424Z';
-  const TILT = -7, CX = 512, CY = 250;
-  const crownPts = rotP([[312, 288], [296, 140], [366, 200], [410, 96], [462, 190], [512, 62], [562, 190], [604, 132], [636, 150], [658, 200], [728, 140], [712, 288], [612, 262], [512, 254], [412, 262]], TILT, CX, CY);
+  const TILT = -5, CX = 512, CY = 250;
+  const crownPts = rotP([[312, 288], [294, 166], [362, 214], [408, 132], [462, 204], [512, 104], [562, 204], [600, 158], [634, 174], [660, 214], [730, 166], [712, 288], [612, 262], [512, 254], [412, 262]], TILT, CX, CY);
   const crown = poly(crownPts, true);
   body.push(contour([cloak, collar, neck, skull, crown]));
 
@@ -112,19 +112,19 @@ export function build(s) {
   body.push(ink(crown, STEEL, { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: crown })) }, [
     flat(poly(rotP([[540, 40], [760, 40], [760, 320], [600, 320], [612, 180]], TILT, CX, CY), true), STEEL_S),
-    flat(poly(rotP([[290, 236], [512, 206], [734, 236], [734, 320], [290, 320]], TILT, CX, CY), true), STEEL_S),
-    flat(poly(rotP([[318, 170], [340, 190], [338, 232], [322, 236]], TILT, CX, CY), true), STEEL_L),
-    flat(poly(rotP([[402, 130], [420, 150], [428, 206], [404, 210]], TILT, CX, CY), true), STEEL_L),
+    flat(poly(rotP([[290, 244], [512, 222], [734, 244], [734, 320], [290, 320]], TILT, CX, CY), true), STEEL_S),
+    flat(poly(rotP([[316, 196], [336, 210], [336, 236], [320, 238]], TILT, CX, CY), true), STEEL_L),
+    flat(poly(rotP([[400, 162], [418, 176], [426, 212], [404, 214]], TILT, CX, CY), true), STEEL_L),
   ]));
   body.push(stroke(crown, { w: W_INNER }));
-  body.push(stroke(poly(rotP([[304, 232], [412, 212], [512, 204], [612, 212], [720, 232]], TILT, CX, CY)), { w: W_DETAIL + 1 }));
-  body.push(stroke(poly(rotP([[672, 222], [684, 250], [668, 262], [680, 282]], TILT, CX, CY)), { w: W_DETAIL }));
-  const tips = rotP([[296, 140], [410, 96], [512, 62], [728, 140]], TILT, CX, CY);
+  body.push(stroke(poly(rotP([[304, 240], [412, 226], [512, 220], [612, 226], [720, 240]], TILT, CX, CY)), { w: W_DETAIL + 1 }));
+  body.push(stroke(poly(rotP([[634, 174], [650, 204], [636, 222], [652, 246], [644, 270]], TILT, CX, CY)), { w: W_DETAIL }), stroke(poly(rotP([[650, 204], [672, 212]], TILT, CX, CY)), { w: W_DETAIL }));
+  const tips = rotP([[294, 166], [408, 132], [512, 104], [730, 166]], TILT, CX, CY);
   tips.forEach(([x, y], i) => body.push(inkCircle(x, y, i === 2 ? 20 : 16, STEEL_L, { w: W_DETAIL + 1 })));
-  const [[gx, gy]] = rotP([[512, 240]], TILT, CX, CY);
-  body.push(halo(gx, gy, 92, '#bff6ff', 2, 0.5));
-  body.push(ink(`M${gx} ${gy - 40}L${gx + 30} ${gy}L${gx} ${gy + 40}L${gx - 30} ${gy}Z`, ICE, { w: W_INNER }));
-  body.push(flat(`M${gx} ${gy - 40}L${gx + 30} ${gy}L${gx} ${gy + 40}Z`, '#3fc0e8'), stroke(`M${gx} ${gy - 40}L${gx + 30} ${gy}L${gx} ${gy + 40}L${gx - 30} ${gy}Z`, { w: W_INNER }));
+  const [[gx, gy]] = rotP([[512, 246]], TILT, CX, CY);
+  body.push(halo(gx, gy, 84, '#bff6ff', 2, 0.5));
+  body.push(ink(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}L${gx - 28} ${gy}Z`, ICE, { w: W_INNER }));
+  body.push(flat(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}Z`, '#3fc0e8'), stroke(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}L${gx - 28} ${gy}Z`, { w: W_INNER }));
   body.push(el('circle', { cx: gx - 10, cy: gy - 8, r: 6, fill: '#fff' }));
 
   // chains across his chest, and one hanging loose

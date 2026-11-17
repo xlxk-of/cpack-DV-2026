@@ -56,10 +56,10 @@ export function build(s) {
     body.push(suckers(pts, 5, 13, 7, 0.45, 0.95, side * 10));
   }
   // the mantle skirt under her chin
-  body.push(ink(skirt, SKIN, { w: W_INNER }));
+  body.push(ink(skirt, '#a656cc', { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: skirt })) }, [
-    flat('M240 600Q512 760 784 600L784 560L240 560Z', SHADE),
-    flat('M620 600C760 700 800 860 760 1100L900 1100L900 600Z', SHADE),
+    flat('M240 600Q512 760 784 600L784 560L240 560Z', '#7c38ac'),
+    flat('M620 600C760 700 800 860 760 1100L900 1100L900 600Z', '#7c38ac'),
   ]));
   body.push(stroke(skirt, { w: W_INNER }));
 
@@ -77,7 +77,7 @@ export function build(s) {
 
   // the arms in front, cradling it
   for (const [d, pts, side] of [[tFrontL, frontL, -1], [tFrontR, frontR, 1]]) {
-    body.push(ink(d, side < 0 ? SKIN : '#a656cc', { w: W_INNER }));
+    body.push(ink(d, SKIN, { w: W_INNER }));
     body.push(suckers(pts, 6, 15, 8, 0.3, 0.96, side * 6));
   }
 

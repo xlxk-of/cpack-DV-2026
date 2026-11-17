@@ -178,6 +178,7 @@ export function build(s) {
   }
   s.add(0, g({}, marks));
   s.specks({ n: 70, rmin: 3, rmax: 7, colors: ['#4f97aa', '#1f506c', '#6fb3bf'], opacity: 0.6, layer: 0 });
+  s.paper({ opacity: 0.08 });
 
   // ---- 1: the ring
   const ringParts = [];
