@@ -5,7 +5,7 @@ import { el, g, spline, ribbon, ink, stroke, flat, inkCircle, inkEllipse, sticke
 export const out = 'ui';
 export const flatOnly = true;
 
-const LX = 800, LY = 668; // the star in the lantern
+const LX = 796, LY = 700; // the star in the lantern
 const ell = (cx, cy, rx, ry) => `M${cx - rx} ${cy}A${rx} ${ry} 0 1 0 ${cx + rx} ${cy}A${rx} ${ry} 0 1 0 ${cx - rx} ${cy}Z`;
 
 export function build(s) {
@@ -17,69 +17,71 @@ export function build(s) {
   s.paper();
 
   // ---- 1: the lantern's light, drawn as flat rings behind her; a little weed
-  s.add(1, halo(LX, LY - 20, 400, '#ffd76a', 3, 0.42));
+  s.add(1, el('circle', { cx: LX, cy: LY - 20, r: 420, fill: '#35398f' }), el('circle', { cx: LX, cy: LY - 20, r: 300, fill: '#5a4a98' }), el('circle', { cx: LX, cy: LY - 20, r: 190, fill: '#9a6a92' }));
   s.weed({ x: 70, h: 420, fill: '#1c6f73', sway: 30, width: 52 });
   s.weed({ x: 150, h: 280, fill: '#17595f', sway: 22, width: 44 });
 
   // ---- 2: the Tidecaller
   const body = [];
-  const hood = spline([[505, 112], [650, 140], [775, 255], [812, 420], [782, 585], [690, 708], [512, 746], [334, 708], [242, 585], [212, 420], [249, 255], [374, 140]], true);
-  const cloak = spline([[130, 1100], [150, 880], [270, 742], [512, 690], [754, 742], [874, 880], [894, 1100], [512, 1160]], true);
-  const tip = ribbon([[420, 170], [330, 96], [236, 110], [196, 176]], 130, 26);
-  const sleeve = ribbon([[1060, 900], [968, 700], [830, 548]], 210, 112);
+  const hood = spline([[505, 96], [660, 126], [792, 248], [830, 420], [798, 595], [700, 722], [512, 760], [324, 722], [226, 595], [194, 420], [232, 248], [364, 126]], true);
+  const cloak = spline([[130, 1100], [150, 880], [270, 752], [512, 700], [754, 752], [874, 880], [894, 1100], [512, 1160]], true);
+  const tip = ribbon([[470, 190], [400, 84], [316, 60], [262, 104]], 200, 30);
+  const sleeve = ribbon([[1040, 940], [980, 700], [852, 508]], 190, 112);
   body.push(sticker([
     { d: tip, fill: '#1b6876' },
     { d: cloak, fill: '#1b6876' },
-    { d: sleeve, fill: '#1f7a85' },
+    { d: sleeve, fill: '#24909a' },
     { d: hood, fill: '#24909a' },
   ]));
   // one hard shadow tone on the hood (the side away from the lantern) and the cloak under the chin
   body.push(g({ 'clip-path': s.clip(el('path', { d: hood })) }, [
-    flat('M150 60L470 60C330 190 300 430 360 620C400 720 470 760 520 780L150 780Z', '#1b6876'),
-    flat('M560 150C690 180 760 300 770 420C720 300 650 215 560 150Z', '#7fe0cf'),
+    flat('M130 40L450 40C310 190 280 430 340 630C380 730 460 772 520 800L130 800Z', '#1b6876'),
+    flat('M580 136C710 170 782 290 792 420C742 300 670 204 580 136Z', '#7fe0cf'),
   ]));
   body.push(g({ 'clip-path': s.clip(el('path', { d: cloak })) }, [
-    flat('M100 700L560 700C420 800 380 930 400 1100L100 1100Z', '#155563'),
-    flat('M250 720Q512 860 774 720L774 690L250 690Z', '#155563'),
+    flat('M100 700L540 700C400 800 360 930 380 1100L100 1100Z', '#155563'),
+    flat('M250 730Q512 880 774 730L774 690L250 690Z', '#155563'),
   ]));
+  body.push(g({ 'clip-path': s.clip(el('path', { d: sleeve })) }, flat('M880 500L1100 760L1100 1000L1000 1000C1000 800 950 650 880 500Z', '#1b6876')));
   body.push(stroke(hood, { w: W_INNER }));
+  body.push(stroke('M512 800Q500 900 440 1040', { w: W_INNER }), stroke('M300 800Q290 880 300 960', { w: W_DETAIL }));
   // cuff on the sleeve
-  body.push(ink(ribbon([[872, 610], [826, 546]], 128, 122), '#f2c14e', { w: W_INNER }));
+  body.push(ink(ribbon([[896, 574], [872, 538]], 120, 116), '#f2c14e', { w: W_INNER }));
 
-  // the hood's opening: gold trim, dark inside
-  body.push(ink(ell(512, 448, 226, 238), '#f2c14e', { w: W_INNER }));
-  body.push(flat('M512 214A226 238 0 0 0 290 420C330 300 400 240 512 232Z', '#c98f2e'));
-  body.push(ink(ell(512, 452, 198, 210), '#0f3340', { w: W_INNER }));
+  // the hood's opening: a gold hem, dark inside, coming to a point at the chin
+  const drop = (k) => `M512 ${452 - 232 * k}C${512 + 150 * k} ${452 - 232 * k} ${512 + 232 * k} ${452 - 120 * k} ${512 + 222 * k} ${452 + 16 * k}C${512 + 214 * k} ${452 + 128 * k} ${512 + 110 * k} ${452 + 206 * k} 512 ${452 + 250 * k}C${512 - 110 * k} ${452 + 206 * k} ${512 - 214 * k} ${452 + 128 * k} ${512 - 222 * k} ${452 + 16 * k}C${512 - 232 * k} ${452 - 120 * k} ${512 - 150 * k} ${452 - 232 * k} 512 ${452 - 232 * k}Z`;
+  body.push(ink(drop(1.07), '#f2c14e', { w: W_INNER }));
+  body.push(g({ 'clip-path': s.clip(el('path', { d: drop(1.07) })) }, flat('M240 180L500 180C380 260 330 420 370 600L420 720L240 720Z', '#c98f2e')));
+  body.push(ink(drop(0.96), '#0f3340', { w: W_INNER }));
 
   // the face
-  const face = 'M342 450C342 330 420 290 512 290C604 290 682 330 682 450C682 560 610 622 512 622C414 622 342 560 342 450Z';
+  const face = 'M330 458C330 330 412 294 512 294C612 294 694 330 694 458C694 572 618 634 512 634C406 634 330 572 330 458Z';
   body.push(ink(face, '#ffd9a8', { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: face })) }, [
-    flat('M330 280L450 280C392 380 392 520 470 640L330 640Z', '#dd9f8c'),           // cool side
-    flat('M700 380C690 500 640 590 560 630L720 640Z', '#fff3c2'),                    // lantern side
+    flat('M310 280L440 280C380 380 380 530 462 650L310 650Z', '#dd9f8c'),           // cool side
+    flat('M712 390C700 510 650 600 566 642L730 650Z', '#fff3c2'),                    // lantern side
   ]));
   body.push(stroke(face, { w: W_INNER }));
   // sea-foam hair: a chunky swept fringe
-  const hair = 'M336 452C316 330 400 262 512 262C624 262 708 330 688 452L654 388L612 424L566 362L506 418L452 356L398 420L372 384Z';
+  const hair = 'M322 462C300 330 396 262 512 262C628 262 724 330 702 462C690 420 668 396 640 384C622 410 590 424 556 424C568 404 572 386 566 366C540 400 490 424 436 424C448 406 452 388 448 372C420 400 384 414 350 410C336 424 328 442 322 462Z';
   body.push(ink(hair, '#d6fff0', { w: W_INNER }));
-  body.push(g({ 'clip-path': s.clip(el('path', { d: hair })) }, flat('M300 240L470 240C400 290 372 360 380 470L300 470Z', '#8fd6c8')));
+  body.push(g({ 'clip-path': s.clip(el('path', { d: hair })) }, flat('M290 240L470 240C400 290 372 360 380 480L290 480Z', '#8fd6c8')));
   body.push(stroke(hair, { w: W_INNER }));
-  body.push(stroke('M560 300Q610 318 628 370', { w: W_DETAIL, stroke: '#8fd6c8' }));
+  body.push(stroke('M580 300Q632 318 650 362', { w: W_DETAIL, stroke: '#8fd6c8' }));
   // eyes: big, level, a little stern
-  body.push(eye(424, 478, 50, { look: [0.3, 0.1], lid: 0.1, lidRot: 12 }), eye(600, 478, 50, { look: [0.3, 0.1], lid: 0.1, lidRot: -12 }));
-  body.push(stroke('M366 418L456 436', { w: W_INNER + 4 }), stroke('M658 418L568 436', { w: W_INNER + 4 }));
-  body.push(el('ellipse', { cx: 372, cy: 546, rx: 24, ry: 14, fill: '#ff8f8f', opacity: 0.8 }), el('ellipse', { cx: 652, cy: 546, rx: 24, ry: 14, fill: '#ff9f7f', opacity: 0.8 }));
-  body.push(stroke('M482 574Q514 592 548 566', { w: W_INNER }));
-  body.push(stroke('M506 520q8 8 16 0', { w: W_DETAIL }));
+  body.push(eye(422, 496, 52, { look: [0.3, 0.1], lid: 0.08, lidRot: 12 }), eye(602, 496, 52, { look: [0.3, 0.1], lid: 0.08, lidRot: -12 }));
+  body.push(stroke('M366 440L456 456', { w: W_INNER + 4 }), stroke('M658 440L568 456', { w: W_INNER + 4 }));
+  body.push(el('ellipse', { cx: 366, cy: 566, rx: 24, ry: 14, fill: '#ff8f8f', opacity: 0.8 }), el('ellipse', { cx: 658, cy: 566, rx: 24, ry: 14, fill: '#ff9f7f', opacity: 0.8 }));
+  body.push(stroke('M482 586Q514 604 548 578', { w: W_INNER }));
+  body.push(stroke('M504 540q8 8 16 0', { w: W_DETAIL }));
 
-  // the clasp at her throat: a gold shell-button
-  body.push(inkCircle(512, 770, 40, '#f2c14e', { w: W_INNER }));
-  body.push(star4(512, 770, 22, '#fff6c0', W_DETAIL));
+  // the clasp at her throat: a gold button with a star on it
+  body.push(inkCircle(512, 760, 42, '#f2c14e', { w: W_INNER }));
+  body.push(star4(512, 760, 24, '#fff6c0', W_DETAIL));
 
   // the lantern's light on her, then the lantern
   body.push(halo(LX, LY, 170, '#ffe58a', 2, 0.4));
-  body.push(stroke(`M${LX - 34} ${LY - 96}C${LX - 40} ${LY - 170} ${LX + 40} ${LY - 170} ${LX + 34} ${LY - 96}`, { w: W_SUBJECT + 10 }));
-  body.push(stroke(`M${LX - 34} ${LY - 96}C${LX - 40} ${LY - 170} ${LX + 40} ${LY - 170} ${LX + 34} ${LY - 96}`, { w: 10, stroke: '#f2c14e' }));
+  body.push(el('circle', { cx: LX, cy: LY - 150, r: 46, fill: 'none', stroke: INK, 'stroke-width': 30 }), el('circle', { cx: LX, cy: LY - 150, r: 46, fill: 'none', stroke: '#f2c14e', 'stroke-width': 14 }));
   const glass = `M${LX - 70} ${LY - 74}Q${LX - 84} ${LY} ${LX - 70} ${LY + 74}L${LX + 70} ${LY + 74}Q${LX + 84} ${LY} ${LX + 70} ${LY - 74}Z`;
   const cap = `M${LX - 62} ${LY - 74}L${LX - 40} ${LY - 112}L${LX + 40} ${LY - 112}L${LX + 62} ${LY - 74}Z`;
   const foot = `M${LX - 70} ${LY + 74}L${LX + 70} ${LY + 74}L${LX + 56} ${LY + 106}L${LX - 56} ${LY + 106}Z`;
@@ -90,13 +92,13 @@ export function build(s) {
   body.push(star4(LX, LY, 50, '#ffffff', W_DETAIL + 1));
   body.push(flat(`M${LX - 58} ${LY - 56}Q${LX - 66} ${LY - 10} ${LX - 58} ${LY + 30}L${LX - 46} ${LY + 30}Q${LX - 52} ${LY - 10} ${LX - 44} ${LY - 56}Z`, '#ffffff', { opacity: 0.9 }));
   // her fist on the handle
-  body.push(inkCircle(LX + 4, LY - 152, 50, '#ffd9a8', { w: W_SUBJECT - 2 }));
-  body.push(flat(`M${LX - 40} ${LY - 152}A44 44 0 0 0 ${LX + 4} ${LY - 108}A60 60 0 0 1 ${LX - 40} ${LY - 152}Z`, '#dd9f8c'));
-  body.push(stroke(`M${LX - 22} ${LY - 166}q4 22 0 34M${LX + 4} ${LY - 170}q4 24 0 40M${LX + 30} ${LY - 166}q4 22 0 34`, { w: W_DETAIL }));
+  body.push(inkCircle(LX + 4, LY - 204, 52, '#ffd9a8', { w: W_SUBJECT - 2 }));
+  body.push(flat(`M${LX - 42} ${LY - 204}A46 46 0 0 0 ${LX + 4} ${LY - 158}A62 62 0 0 1 ${LX - 42} ${LY - 204}Z`, '#dd9f8c'));
+  body.push(stroke(`M${LX - 20} ${LY - 196}q4 20 0 34M${LX + 6} ${LY - 198}q4 22 0 38M${LX + 32} ${LY - 196}q4 20 0 34`, { w: W_DETAIL }));
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: sparks off the star, bubbles
-  s.add(3, star4(905, 500, 30, '#fff6c0'), star4(668, 820, 22, '#ffe9a8'), star4(930, 800, 18), star4(170, 230, 30), star4(120, 600, 20, '#b9f3ff'));
+  s.add(3, star4(916, 640, 28, '#fff6c0'), star4(668, 850, 22, '#ffe9a8'), star4(930, 800, 18), star4(170, 230, 30), star4(120, 600, 20, '#b9f3ff'));
   s.inkBubbles({ n: 6, x0: 40, x1: 260, y0: 300, y1: 900, rmin: 9, rmax: 24 });
   s.specks({ n: 12, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffe9a8', '#b9f3ff'], opacity: 0.9 });
 }

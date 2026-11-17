@@ -1,355 +1,176 @@
-// OLD THOUSAND-ARMS (legendary) — the kraken rising out of the trench, one vast gold eye, arms without number.
-import { el, g, spline, sample, poly, ribbon, glint } from '../lib.mjs';
+// OLD THOUSAND-ARMS (legendary) — a grumpy old kraken with a tall mantle, gold slit eyes and chunky suckered arms
+// curling in from every side; a tiny shipwreck for scale. Doodle style: see THE DOODLE KIT in lib.mjs.
+import { el, g, spline, sample, poly, ink, stroke, flat, inkCircle, inkEllipse, star4, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
-// ------------------------------------------------------------------------------------------------ local helpers
-
-/** Sampled centreline with unit normals and arc length. */
-function frame(pts, per = 12) {
-  const sm = sample(pts, per);
-  let acc = 0;
-  return sm.map((p, i) => {
-    const a = sm[Math.max(0, i - 1)], b = sm[Math.min(sm.length - 1, i + 1)];
-    let dx = b[0] - a[0], dy = b[1] - a[1];
-    const l = Math.hypot(dx, dy) || 1;
-    if (i > 0) acc += Math.hypot(p[0] - sm[i - 1][0], p[1] - sm[i - 1][1]);
-    return { x: p[0], y: p[1], nx: -dy / l, ny: dx / l, t: 0, len: acc };
-  }).map((p, i, all) => { p.t = p.len / (all[all.length - 1].len || 1); return p; });
-}
-
-/** Append a tightening spiral to the end of a point list (a curled arm tip). sign +1 turns clockwise on screen. */
-function curl(pts, radius, turns, sign, shrink = 0.84) {
-  const a = pts[pts.length - 2], b = pts[pts.length - 1];
-  const h = Math.atan2(b[1] - a[1], b[0] - a[0]);
-  const cx = b[0] + Math.cos(h + sign * Math.PI / 2) * radius, cy = b[1] + Math.sin(h + sign * Math.PI / 2) * radius;
-  const a0 = h - sign * Math.PI / 2, N = Math.ceil(turns * 9);
-  const out = pts.slice();
-  for (let k = 1; k <= N; k++) {
-    const t = k / N, ang = a0 + sign * turns * Math.PI * 2 * t, rr = radius * (1 - shrink * t);
-    out.push([cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr]);
-  }
-  return out;
-}
-
-/** A tapered arm with a suckered underside, edge shading and a rim light. Returns markup. */
-function tentacle(s, pts, w0, w1, o) {
-  const f = frame(pts, o.per || 12);
-  const pw = o.pow || 1.25;
-  const W = (t) => w1 + (w0 - w1) * Math.pow(1 - t, pw);
-  const side = o.side || 1;
-  const off = (p, k) => [p.x + p.nx * W(p.t) * k * side, p.y + p.ny * W(p.t) * k * side];
-  const A = f.map((p) => off(p, 0.5)), B = f.map((p) => off(p, -0.5));
-  const d = poly(A.concat(B.slice().reverse()), true);
-  const out = [];
-  if (o.glow) out.push(el('path', { d, fill: o.glow, opacity: o.glowOp || 0.3, filter: 'url(#glow16)' }));
-  out.push(el('path', { d, fill: o.fill }));
-  const inner = [];
-  // the underside: a band along the sucker edge, soft where it meets the back
-  const bw = o.bellyW ?? 0.3;
-  const bellyA = f.map((p) => off(p, 0.56)), bellyB = f.map((p) => off(p, 0.5 - bw));
-  inner.push(el('path', { d: poly(bellyA.concat(bellyB.slice().reverse()), true), fill: o.belly, opacity: o.bellyOp ?? 0.9, filter: s.blur(Math.max(0.8, w0 * 0.02)) }));
-  // soft shadow down the far edge, highlight ridge along the back
-  inner.push(el('path', { d: poly(B), fill: 'none', stroke: o.dark, 'stroke-width': w0 * 0.4, opacity: 0.8, filter: s.blur(Math.max(2, w0 * 0.08)), 'stroke-linejoin': 'round' }));
-  inner.push(el('path', { d: poly(f.map((p) => off(p, -0.1))), fill: 'none', stroke: o.light, 'stroke-width': w0 * 0.13, opacity: o.lightOp ?? 0.5, filter: s.blur(Math.max(1.5, w0 * 0.05)), 'stroke-linecap': 'round' }));
-  // freckles along the back
-  if (o.spots) {
-    let nx = 0, k = 0;
-    for (const p of f) {
-      const w = W(p.t);
-      if (p.len < nx || w < 14) continue;
-      nx = p.len + w * 0.42; k++;
-      const c = off(p, -0.2 + 0.12 * Math.sin(k * 2.4));
-      inner.push(el('circle', { cx: c[0], cy: c[1], r: w * (0.035 + 0.02 * Math.sin(k * 1.7) ** 2), fill: o.spots, opacity: 0.4 }));
-    }
-  }
-  // suckers
-  if (o.suckers !== false) {
-    const sr = o.suckR ?? 0.105;
-    let next = W(0) * 0.2;
-    for (const p of f) {
-      const w = W(p.t);
-      if (p.len < next) continue;
-      next = p.len + Math.max(3, w * sr * 2.7);
-      const rr = w * sr;
-      if (rr < 1) continue;
-      const c = off(p, 0.5 - bw * 0.52);
-      inner.push(el('circle', { cx: c[0], cy: c[1], r: rr, fill: o.sucker, stroke: o.suckerEdge, 'stroke-width': Math.max(0.5, rr * 0.16), 'stroke-opacity': 0.8 }));
-      if (rr > 2) inner.push(el('circle', { cx: c[0] + rr * 0.06, cy: c[1] + rr * 0.08, r: rr * 0.45, fill: o.suckerEdge, opacity: 0.8 }));
-      if (rr > 5) inner.push(el('circle', { cx: c[0] - rr * 0.4, cy: c[1] - rr * 0.42, r: rr * 0.17, fill: '#fff', opacity: 0.55 }));
-    }
-  }
-  out.push(g({ 'clip-path': s.clip(el('path', { d })) }, inner));
-  // edge lines: they also separate the coils of a curled tip
-  out.push(el('path', { d: poly(A), fill: 'none', stroke: o.edge || o.dark, 'stroke-width': Math.max(1, w0 * 0.02), opacity: 0.75, 'stroke-linejoin': 'round' }));
-  out.push(el('path', { d: poly(B.filter((_, i) => f[i].t >= (o.rimFrom || 0))), fill: 'none', stroke: o.rim, 'stroke-width': Math.max(1.1, w0 * 0.028), opacity: o.rimOp ?? 0.8, 'stroke-linejoin': 'round' }));
-  return g({}, out);
-}
-
-/** A turbulence texture filter: fills its source shape with blotches of `color` (alpha from the noise). */
-function mottle(s, color, freq, contrast, seed) {
-  const id = s.uid('mt'), off = -(contrast - 1) * 0.6;
-  const c = [1, 3, 5].map((i) => (parseInt(color.slice(i, i + 2), 16) / 255).toFixed(3));
-  s.def(`<filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="4" seed="${seed}"/><feColorMatrix type="matrix" values="0 0 0 0 ${c[0]}  0 0 0 0 ${c[1]}  0 0 0 0 ${c[2]}  ${contrast} 0 0 0 ${off}"/><feComposite in2="SourceGraphic" operator="in"/></filter>`);
-  return `url(#${id})`;
-}
-
-/** Tinted murk over a box, fading at its edges (the kit's fog comes out white whatever its colour). */
-function mist(s, { color, opacity = 0.3, freq = 0.006, seed = 1, x = 0, y = 0, w = 1024, h = 1024, contrast = 2.2 }) {
-  const m = s.mask(el('rect', { x, y, width: w, height: h, fill: s.rad([[0, '#fff', 1], [0.7, '#fff', 0.7], [1, '#fff', 0]], 0.5, 0.5, 0.6) }));
-  return g({ mask: m, opacity }, el('rect', { x, y, width: w, height: h, fill: color, filter: mottle(s, color, freq, contrast, seed) }));
-}
-
-/** The tiny broken ship, drawn around (0,0), about 120 px long. */
-function wreck(s, x, y, rot, k, hull = '#1a1030', sail = '#8f7aa8') {
-  const p = [];
-  // hull, snapped amidships
-  p.push(el('path', { d: 'M-62 -6 Q-58 16 -30 20 L-6 20 L-2 4 L-10 -4 Z', fill: hull }));
-  p.push(el('path', { d: 'M6 2 L12 22 L40 18 Q62 12 70 -12 L52 -6 L20 -2 Z', fill: hull, transform: 'rotate(14 10 10)' }));
-  // masts and rags of sail
-  p.push(el('path', { d: 'M-34 -4 L-40 -78', stroke: hull, 'stroke-width': 4, 'stroke-linecap': 'round' }));
-  p.push(el('path', { d: 'M34 -2 L52 -58', stroke: hull, 'stroke-width': 3.4, 'stroke-linecap': 'round' }));
-  p.push(el('path', { d: 'M-58 -52 L-20 -60', stroke: hull, 'stroke-width': 2.4 }));
-  p.push(el('path', { d: 'M-56 -52 Q-48 -30 -52 -14 L-40 -22 L-34 -10 Q-26 -34 -22 -59 Z', fill: sail, opacity: 0.85 }));
-  p.push(el('path', { d: 'M36 -44 Q44 -30 40 -14 L50 -20 L58 -12 Q62 -30 60 -50 Z', fill: sail, opacity: 0.7 }));
-  p.push(el('path', { d: 'M-62 -6 L-84 -20', stroke: hull, 'stroke-width': 2.6, 'stroke-linecap': 'round' }));
-  // lantern still burning
-  p.push(el('circle', { cx: -40, cy: -80, r: 9, fill: '#ffd070', opacity: 0.5, filter: 'url(#glow4)' }));
-  p.push(el('circle', { cx: -40, cy: -80, r: 2.6, fill: '#fff2c0' }));
-  // top light on the hull
-  p.push(el('path', { d: 'M-62 -6 L-10 -4', stroke: '#c9a6ff', 'stroke-width': 1.6, opacity: 0.7 }));
-  p.push(el('path', { d: 'M14 -3 L58 -14', stroke: '#c9a6ff', 'stroke-width': 1.4, opacity: 0.6 }));
-  return g({ transform: `translate(${x} ${y}) rotate(${rot}) scale(${k})` }, p);
-}
-
-// ------------------------------------------------------------------------------------------------ the scene
+const RED = '#e8394f', RED_SH = '#b22352', PINK = '#ffb9c6', VIOLET = '#8c52d9', GOLD = '#ffc93c', GOLD_SH = '#f0962e';
+const MID = '#7d2c68', MID_SH = '#5e2059', MID_SUCK = '#b86a8c';
 
 export function build(s) {
   const r = s.r;
 
-  // ---- 0: the trench
-  s.backdrop(s.lin([[0, '#1d3278'], [0.22, '#161c58'], [0.55, '#150a38'], [0.82, '#1f0628'], [1, '#090212']]));
-  // far surface light, and the hot breath of the trench below
-  s.add(0, el('ellipse', { cx: 470, cy: 20, rx: 640, ry: 340, fill: s.rad([[0, '#6f9cff', 0.6], [0.5, '#4458d8', 0.22], [1, '#4458d8', 0]]) }));
-  s.add(0, el('ellipse', { cx: 512, cy: 930, rx: 640, ry: 360, fill: s.rad([[0, '#ff3a5c', 0.6], [0.45, '#b0185e', 0.3], [1, '#7a1070', 0]]) }));
-  s.add(0, el('ellipse', { cx: 512, cy: 440, rx: 470, ry: 420, fill: s.rad([[0, '#8a3cff', 0.36], [0.6, '#5a2ad0', 0.14], [1, '#5a2ad0', 0]]) }));
-  s.add(0, mist(s, { color: '#6a5cff', opacity: 0.42, freq: 0.005, seed: 11 }));
-  s.add(0, mist(s, { color: '#ff3a6a', opacity: 0.4, freq: 0.007, seed: 23, y: 480, h: 660 }));
-  s.rays({ x: 430, y: -160, angle: 84, spread: 64, n: 9, color: '#a9c2ff', opacity: 0.15, width: 80, len: 1100 });
-  // the trench walls, far and soft
-  const wall = (side, depth, fill, op, blur) => {
-    const n = noise1b(r), pts = [];
-    const x0 = side < 0 ? -60 : 1084;
-    pts.push([x0, -60]);
-    for (let i = 0; i <= 24; i++) {
-      const t = i / 24, y = -60 + 1150 * t;
-      pts.push([x0 - side * (depth * (0.5 + 0.95 * t * t) + 70 * (n(t * 9) - 0.5) + 26 * (n(t * 37 + 5) - 0.5)), y]);
-    }
-    pts.push([x0, 1100]);
-    s.add(0, el('path', { d: poly(pts, true), fill, opacity: op, filter: s.blur(blur) }));
-  };
-  wall(-1, 150, '#0d0a36', 0.7, 10); wall(1, 170, '#0d0a36', 0.7, 10);
-  wall(-1, 80, '#07041c', 0.85, 5); wall(1, 95, '#07041c', 0.85, 5);
-  // countless arms further off still, no more than shadows in the murk
-  const ghost = [];
-  for (let i = 0; i < 9; i++) {
-    const x = 60 + i * 113 + r.range(-30, 30), top = r.range(120, 420), sw = r.range(40, 110) * r.sign();
-    const pts = curl([[x, 1100], [x + sw * 0.6, 800], [x - sw * 0.4, top + 200], [x + sw * 0.2, top]], r.range(24, 44), 1.1, r.sign());
-    ghost.push(el('path', { d: ribbon(pts, r.range(36, 60), 3, null, 8), fill: '#181452' }));
-  }
-  s.add(0, g({ opacity: 0.6, filter: s.blur(5) }, ghost));
-  s.motes({ n: 110, rmin: 0.6, rmax: 2.2, colors: ['#c9b8ff', '#ff9ab8', '#9fc0ff'], opacity: 0.5, glow: false, layer: 0 });
-  s.vignette({ strength: 0.78, cy: 0.42 });
-  s.grain({ opacity: 0.2 });
-
-  // ---- 1: the arms behind, hazed by distance, one of them holding what is left of a ship
-  const farStyle = (k) => ({
-    fill: s.lin([[0, k ? '#3d3a8c' : '#4a3488'], [0.5, '#30246c'], [1, '#180f3c']]),
-    belly: '#7a6cc0', bellyOp: 0.45, dark: '#120a30', light: '#7f84e0', lightOp: 0.3, rim: '#9aa0f0', rimOp: 0.5,
-    sucker: '#9a90d8', suckerEdge: '#30246c', edge: '#120a30', bellyW: 0.3,
-  });
-  const far = [];
-  const farArms = [
-    // [points, w0, w1, curl radius, turns, sign, side]
-    [[[300, 1100], [200, 800], [90, 520], [64, 340], [100, 250]], 96, 5, 60, 1.3, 1, -1],
-    [[[720, 1100], [830, 800], [930, 560], [950, 340], [905, 220]], 96, 5, 54, 1.3, -1, 1],
-    [[[400, 1100], [290, 760], [230, 520], [215, 400]], 60, 4, 36, 1.2, -1, 1],
-    [[[640, 1100], [760, 780], [820, 420], [800, 180], [740, 90]], 62, 4, 38, 1.15, -1, 1],
-    [[[180, 1100], [80, 900], [20, 700], [10, 560]], 60, 5, 40, 1.2, -1, 1],
-    [[[860, 1100], [960, 900], [1010, 700], [1012, 590]], 60, 5, 40, 1.2, 1, -1],
-    [[[560, 1100], [640, 860], [700, 700]], 50, 4, 30, 1.1, 1, -1],
-    [[[470, 1100], [400, 880], [340, 730]], 50, 4, 30, 1.1, -1, 1],
+  // ---- 0: the deep, in flat bands; far arms as plain darker shapes (no ink)
+  s.bands([[0, '#3d2c80'], [300, '#31236c'], [560, '#261b58'], [800, '#1d1446']], { amp: 18, waves: 3 });
+  s.shafts({ x: 520, y: -160, angle: 92, spread: 50, n: 4, color: '#c9a6ff', opacity: 0.1, width: 120 });
+  const far = [
+    [[[-100, 520], [60, 470], [150, 360], [120, 250]], 1, 90, 60],
+    [[[1130, 560], [960, 520], [880, 400], [930, 290]], -1, 90, 60],
+    [[[380, 1100], [330, 930], [250, 860], [170, 880]], 1, 80, 50],
+    [[[700, 1100], [740, 940], [830, 870], [900, 900]], -1, 80, 50],
   ];
-  // the ship is caught in the first arm's coil
-  farArms.forEach((a, i) => far.push(tentacle(s, curl(a[0], a[3], a[4], a[5]), a[1], a[2], { ...farStyle(i % 2), side: a[6] })));
-  // splinters around the wreck
-  for (let i = 0; i < 14; i++) {
-    const x = 176 + r.range(-120, 130), y = 180 + r.range(-130, 150);
-    far.push(el('rect', { x, y, width: r.range(4, 13), height: r.range(1.4, 3), fill: '#0e0a26', opacity: 0.8, transform: `rotate(${r.range(0, 180)} ${x} ${y})` }));
-  }
-  s.add(1, g({ opacity: 0.9, filter: s.blur(0.9) }, far.slice(1)));
-  s.add(1, el('circle', { cx: 170, cy: 150, r: 90, fill: '#8fb0ff', opacity: 0.3, filter: 'url(#glow32)' }), wreck(s, 176, 176, -22, 1.05, '#0e0a26', '#c8bce8'));
-  s.add(1, g({ opacity: 0.9, filter: s.blur(0.9) }, far[0]));
-  // a veil of haze over the far arms so the head separates from them
-  s.add(1, el('ellipse', { cx: 512, cy: 560, rx: 560, ry: 440, fill: s.rad([[0, '#5a3cd0', 0.4], [0.7, '#4a2ab0', 0.14], [1, '#4a2ab0', 0]]) }));
+  for (const [pts, dir, w0, r0] of far) s.add(0, flat(strip(spine(curl(pts, dir, r0, 1.05), w0, 22), -1, 1), '#2a1c62'));
+  s.specks({ n: 36, rmin: 2, rmax: 5, colors: ['#b79cff', '#ff9fc0'], opacity: 0.45, layer: 0 });
+  s.lumps({ y: 905, amp: 80, n: 7, fill: '#170f3a', layer: 0 });
+  s.paper();
 
-  // ---- 2: the head, the eye, and the near arms
-  const midStyle = () => ({
-    fill: s.lin([[0, '#c8243a'], [0.45, '#96143a'], [1, '#420c3c']]),
-    belly: '#f09a98', bellyOp: 0.85, dark: '#30062a', light: '#ff7a68', lightOp: 0.5, rim: '#ffb39a', rimOp: 0.8,
-    sucker: '#ffe0d4', suckerEdge: '#9a2848', edge: '#240520', glow: '#ff3a5c', glowOp: 0.16, spots: '#ffb0a0',
-  });
-  const arms = [];
-  const midArms = [
-    [[[400, 640], [320, 770], [200, 790], [130, 700], [140, 600]], 100, 6, 54, 1.35, 1, -1],
-    [[[630, 640], [720, 760], [840, 760], [905, 660], [880, 540]], 100, 6, 58, 1.4, -1, 1],
-    [[[450, 660], [430, 800], [350, 900], [270, 950]], 88, 8, 52, 1.25, 1, -1],
-    [[[580, 660], [600, 810], [690, 910], [780, 960]], 88, 8, 50, 1.2, -1, 1],
-    [[[350, 590], [250, 590], [190, 500], [205, 420]], 66, 5, 36, 1.3, 1, -1],
-    [[[680, 600], [770, 640], [830, 610]], 60, 5, 34, 1.2, -1, 1],
+  // ---- 1: arms behind, thinner line and quieter colour; the wreck on its rock
+  const back = [
+    arm(s, curl([[-140, 330], [30, 300], [150, 200], [215, 120]], 1, 56, 1.15), 120, 26, { side: 1, w: W_MID, fill: MID, shade: MID_SH, suck: MID_SUCK }),
+    arm(s, curl([[1160, 250], [1000, 250], [880, 170], [815, 95]], -1, 54, 1.15), 120, 26, { side: -1, w: W_MID, fill: MID, shade: MID_SH, suck: MID_SUCK }),
+    arm(s, curl([[1170, 640], [1010, 660], [925, 600], [935, 520]], 1, 44, 1.1), 104, 24, { side: 1, w: W_MID, fill: MID, shade: MID_SH, suck: MID_SUCK }),
+    arm(s, curl([[-150, 560], [-20, 590], [60, 540], [70, 470]], -1, 40, 1.1), 100, 24, { side: -1, w: W_MID, fill: MID, shade: MID_SH, suck: MID_SUCK }),
   ];
-  // two arms straight down into the dark, behind the rest
-  arms.push(tentacle(s, [[480, 650], [430, 790], [500, 900], [610, 990], [640, 1120]], 96, 40, { ...midStyle(), side: 1, pow: 0.9 }));
-  arms.push(tentacle(s, [[550, 650], [610, 780], [540, 900], [430, 1000], [400, 1120]], 92, 40, { ...midStyle(), side: -1, pow: 0.9 }));
-  midArms.forEach((a) => arms.push(tentacle(s, curl(a[0], a[3], a[4], a[5]), a[1], a[2], { ...midStyle(), side: a[6] })));
-  // the arms sink into shadow under the head
-  arms.push(el('ellipse', { cx: 512, cy: 700, rx: 260, ry: 100, fill: '#1a0428', opacity: 0.8, filter: 'url(#glow32)' }));
-  s.add(2, g({}, arms));
+  s.add(1, g({ opacity: 0.95 }, back.map((a) => a.markup)));
+  s.add(1, ink(spline([[-60, 1100], [-60, 800], [60, 760], [200, 752], [330, 790], [400, 860], [420, 1100]], true), '#2c1f66', { w: W_MID }));
+  s.add(1, flat(spline([[40, 800], [150, 778], [250, 790], [200, 812], [90, 818]], true), '#3d2c80'));
+  s.add(1, wreck(196, 716, 1.15, -13));
+  s.weed({ x: 60, y: 800, h: 150, fill: '#3a4a9c', sway: 16, width: 30 });
+  s.lumps({ y: 975, amp: 60, n: 6, fill: '#22164f', layer: 1, w: W_MID });
 
-  const cx = 512, ey = 462, R = 110;
-  const mir = (pts) => pts.concat(pts.slice(1, -1).reverse().map((p) => [1024 - p[0], p[1]]));
-  const headPts = mir([[512, -6], [566, 30], [626, 116], [672, 228], [694, 330], [692, 404], [744, 488], [716, 596], [634, 668], [512, 694]]);
-  const head = spline(headPts, true);
-  const tilt = `rotate(7 512 500)`;
+  // ---- 2: Old Thousand-Arms
   const body = [];
-
-  // the arrowhead fins of the mantle, behind it
-  const finL = spline([[506, -24], [396, 52], [290, 160], [214, 292], [262, 318], [318, 322], [366, 372], [424, 250], [474, 100]], true);
-  const finFill = s.lin([[0, '#3a1c78'], [0.55, '#501662'], [1, '#7a1848']], 0, 0.3, 1, 0.5);
-  const finIn = [];
-  for (let i = 0; i < 11; i++) {
-    const y0 = 30 + i * 32, x0 = 500 - i * 15;
-    finIn.push(el('path', { d: `M${x0} ${y0}Q${x0 - 90} ${y0 + 20} ${x0 - 230} ${y0 + 110}`, fill: 'none', stroke: '#d6a0ff', 'stroke-width': 1.6, opacity: 0.07 + 0.08 * (i % 2) }));
-  }
-  finIn.push(el('path', { d: spline([[474, 100], [424, 250], [350, 378]]), fill: 'none', stroke: '#1c0530', 'stroke-width': 70, opacity: 0.65, filter: 'url(#glow16)' }));
-  const fin = [
-    el('path', { d: finL, fill: finFill, filter: s.rough(14, 0.018, 5) }),
-    g({ 'clip-path': s.clip(el('path', { d: finL })) }, finIn),
-    el('path', { d: spline([[506, -24], [396, 52], [290, 160], [214, 292]]), fill: 'none', stroke: '#d0a8ff', 'stroke-width': 2.4, opacity: 0.6, 'stroke-linecap': 'round' }),
+  const arms = [
+    arm(s, curl([[410, 500], [300, 570], [200, 520], [165, 400], [185, 310]], 1, 58, 1.2), 96, 22, { side: 1 }),
+    arm(s, curl([[614, 500], [730, 575], [840, 540], [880, 430], [862, 345]], -1, 56, 1.2), 96, 22, { side: -1 }),
+    arm(s, curl([[440, 520], [390, 640], [330, 690], [270, 660]], 1, 46, 1.1), 90, 22, { side: 1 }),
+    arm(s, curl([[584, 520], [650, 650], [740, 720], [830, 700]], -1, 50, 1.15), 90, 22, { side: -1 }),
+    arm(s, curl([[490, 530], [470, 690], [420, 800], [445, 900]], -1, 44, 1.0), 86, 24, { side: -1 }),
+    arm(s, curl([[540, 530], [570, 700], [640, 830], [610, 930]], 1, 44, 1.0), 86, 24, { side: 1 }),
   ];
-  body.push(g({ transform: tilt }, [g({}, fin), g({ transform: 'translate(1024 0) scale(-1 1)', opacity: 0.86 }, fin)]));
-
-  body.push(el('path', { d: head, fill: '#ff2a55', opacity: 0.28, filter: 'url(#glow32)', transform: tilt }));
-  const flesh = [];
-  flesh.push(el('path', { d: head, fill: s.rad([[0, '#ea4430'], [0.22, '#c21c36'], [0.52, '#8a1038'], [0.8, '#4a0c42'], [1, '#220734']], 0.38, 0.22, 0.85) }));
-  const hClip = s.clip(el('path', { d: head }));
-  const skin = [];
-  skin.push(el('rect', { x: 230, y: -20, width: 570, height: 730, fill: '#2a0428', opacity: 0.7, filter: mottle(s, '#2a0428', 0.012, 3.2, 7) }));
-  skin.push(el('rect', { x: 230, y: -20, width: 570, height: 730, fill: '#ff7a5a', opacity: 0.3, filter: mottle(s, '#ff8a5a', 0.045, 3.6, 19) }));
-  // pale ring spots
-  for (let i = 0; i < 90; i++) {
-    const x = r.range(260, 770), y = r.range(10, 680);
-    if (Math.hypot(x - cx, y - ey) < R * 1.75) continue;
-    const rr = r.range(3, 12) * (1.1 - y / 1100);
-    skin.push(el('circle', { cx: x, cy: y, r: rr, fill: '#ffc8b0', 'fill-opacity': 0.07, stroke: '#ffb09a', 'stroke-width': rr * 0.26, 'stroke-opacity': 0.24 }));
-  }
-  // form shadows: right flank, underside, the pinch between mantle and face
-  skin.push(el('ellipse', { cx: 790, cy: 340, rx: 130, ry: 420, fill: '#1c0534', opacity: 0.85, filter: 'url(#glow32)' }));
-  skin.push(el('ellipse', { cx: 512, cy: 740, rx: 330, ry: 130, fill: '#160428', opacity: 0.9, filter: 'url(#glow32)' }));
-  skin.push(el('path', { d: 'M300 392Q512 318 724 392', fill: 'none', stroke: '#22062e', 'stroke-width': 40, opacity: 0.45, filter: 'url(#glow16)' }));
-  // sheen from the surface light
-  skin.push(el('ellipse', { cx: 432, cy: 150, rx: 90, ry: 56, fill: '#ffc0b0', opacity: 0.32, filter: 'url(#glow32)', transform: 'rotate(-50 432 150)' }));
-  // red light from the trench under the chin
-  skin.push(el('ellipse', { cx, cy: 690, rx: 190, ry: 34, fill: '#ff4a4a', opacity: 0.3, filter: 'url(#glow16)' }));
-  // gold light from the eye spilling over the face
-  skin.push(el('circle', { cx, cy: ey, r: 190, fill: s.rad([[0, '#ffc060', 0.55], [0.6, '#ff5a2a', 0.2], [1, '#ff3a2a', 0]]) }));
-  // bags under the eye, furrows over the brow
-  for (let i = 0; i < 3; i++) {
-    const a = R * 1.34 + i * 22, b = R * 1.02 + i * 20;
-    skin.push(el('path', { d: `M${cx - a} ${ey + 26}A${a} ${b} 0 0 0 ${cx + a} ${ey + 26}`, fill: 'none', stroke: '#2a0626', 'stroke-width': 3.6 - i * 0.5, opacity: 0.5 - i * 0.08, 'stroke-linecap': 'round' }));
-    skin.push(el('path', { d: `M${cx - a} ${ey + 22}A${a} ${b} 0 0 0 ${cx + a} ${ey + 22}`, fill: 'none', stroke: '#ffa070', 'stroke-width': 1.4, opacity: 0.25, 'stroke-linecap': 'round' }));
-  }
-  for (let i = 0; i < 2; i++) {
-    const a = R * 1.6 + i * 30, b = R * 1.6 + i * 26;
-    skin.push(el('path', { d: `M${cx - a} ${ey - 40}A${a} ${b} 0 0 1 ${cx + a} ${ey - 40}`, fill: 'none', stroke: '#2a0626', 'stroke-width': 3, opacity: 0.32 - i * 0.1, 'stroke-linecap': 'round' }));
-  }
-  // rows of violet photophores sweeping down the mantle
-  for (let row = 0; row < 7; row++) {
-    const k = (row - 3) / 3;
-    const line = sample([[512 + k * 20, 12], [512 + k * 96, 100], [512 + k * 146, 220], [512 + k * 164, 318]], 6);
-    line.forEach((p, i) => {
-      if (i % 2) return;
-      const rr = 1.5 + 2.4 * Math.sin(Math.PI * i / line.length) * (1 - Math.abs(k) * 0.35);
-      skin.push(el('circle', { cx: p[0], cy: p[1], r: rr * 2.8, fill: '#b06cff', opacity: 0.3 }));
-      skin.push(el('circle', { cx: p[0], cy: p[1], r: rr, fill: '#ecd8ff', opacity: 0.9 }));
-    });
-  }
-  flesh.push(g({ 'clip-path': hClip }, skin));
-  body.push(g({ transform: tilt, filter: s.emboss({ color: '#ffd9cf', az: 232, elev: 30, depth: 16, k: 0.75, exp: 30, blur: 13 }) }, flesh));
-  // rim light along the crown
-  body.push(el('path', { d: spline([[330, 330], [352, 228], [398, 116], [458, 30], [512, -6]]), fill: 'none', stroke: '#ffe0d6', 'stroke-width': 3, opacity: 0.7, 'stroke-linecap': 'round', filter: 'url(#glow2)', transform: tilt }));
-
-  // the eye
-  const eye = [];
-  eye.push(el('circle', { cx, cy: ey, r: R * 1.25, fill: '#ffb030', opacity: 0.45, filter: 'url(#glow16)' }));
-  eye.push(el('ellipse', { cx, cy: ey + 2, rx: R * 1.22, ry: R * 1.12, fill: '#14031c', opacity: 0.95, filter: 'url(#glow4)' }));
-  eye.push(el('circle', { cx, cy: ey, r: R, fill: s.rad([[0, '#fffbe0'], [0.2, '#ffe884'], [0.48, '#ffc02e'], [0.75, '#f07a14'], [0.93, '#8a2a08'], [1, '#3a0c08']]) }));
-  const iris = [];
-  for (let i = 0; i < 110; i++) {
-    const a = (i / 110) * Math.PI * 2 + r.range(-0.02, 0.02), r0 = R * r.range(0.2, 0.42), r1 = R * r.range(0.8, 0.99);
-    iris.push(el('path', { d: `M${cx + Math.cos(a) * r0} ${ey + Math.sin(a) * r0}L${cx + Math.cos(a) * r1} ${ey + Math.sin(a) * r1}`, stroke: i % 3 ? '#8a3406' : '#fff6b8', 'stroke-width': r.range(0.8, 2.4), opacity: i % 3 ? 0.42 : 0.55 }));
-  }
-  iris.push(el('circle', { cx, cy: ey, r: R * 0.66, fill: 'none', stroke: '#fff3a0', 'stroke-width': 3, opacity: 0.35 }));
-  iris.push(el('circle', { cx, cy: ey, r: R * 0.93, fill: 'none', stroke: '#5a1404', 'stroke-width': 7, opacity: 0.5 }));
-  eye.push(g({}, iris));
-  // the pupil: a horizontal slit, pinched at the ends
-  const pw = R * 0.8, ph = R * 0.15, py = ey + R * 0.06;
-  const pupil = `M${cx - pw} ${py}C${cx - pw * 0.5} ${py - ph * 1.7} ${cx + pw * 0.5} ${py - ph * 1.7} ${cx + pw} ${py}C${cx + pw * 0.5} ${py + ph * 1.7} ${cx - pw * 0.5} ${py + ph * 1.7} ${cx - pw} ${py}Z`;
-  eye.push(el('path', { d: pupil, fill: '#7a2a04', opacity: 0.7, filter: 'url(#glow4)' }));
-  eye.push(el('path', { d: pupil, fill: '#0a0210' }));
-  // shadow cast by the brow, then highlights on the wet surface
-  eye.push(g({ 'clip-path': s.clip(el('circle', { cx, cy: ey, r: R })) }, [
-    el('ellipse', { cx, cy: ey - R * 0.9, rx: R * 1.3, ry: R * 0.62, fill: '#3a0810', opacity: 0.85, filter: 'url(#glow8)' }),
-    el('ellipse', { cx, cy: ey + R * 1.25, rx: R * 1.2, ry: R * 0.4, fill: '#5a1408', opacity: 0.5, filter: 'url(#glow8)' }),
+  const mantle = spline([[516, 58], [640, 112], [706, 250], [698, 372], [736, 468], [688, 545], [512, 566], [336, 545], [288, 468], [326, 372], [318, 250], [388, 112]], true, 12);
+  // one fat contour round the whole silhouette, then each part with its inner line
+  body.push(g({}, [...arms.map((a) => a.d), mantle].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' }))));
+  body.push(...arms.map((a) => a.markup));
+  body.push(ink(mantle, RED, { w: W_INNER }));
+  const clip = s.clip(el('path', { d: mantle }));
+  body.push(g({ 'clip-path': clip }, [
+    // one hard shadow tone: down the right side and under the brow
+    flat('M560 0C700 150 640 330 650 420C660 500 620 560 560 600L800 600L800 0Z', RED_SH),
+    flat('M250 520Q512 590 780 520L780 620L250 620Z', RED_SH),
+    // spots on the mantle
+    inkEllipse(470, 150, 34, 24, VIOLET, { w: W_DETAIL, rot: -18 }),
+    inkEllipse(560, 215, 26, 19, VIOLET, { w: W_DETAIL, rot: 12 }),
+    inkEllipse(420, 250, 20, 15, VIOLET, { w: W_DETAIL, rot: -8 }),
+    inkEllipse(600, 120, 17, 13, VIOLET, { w: W_DETAIL, rot: 20 }),
+    inkEllipse(505, 285, 14, 11, VIOLET, { w: W_DETAIL }),
+    // hard highlights
+    flat('M352 300C344 210 372 140 428 104C396 170 384 230 384 300Z', '#ffffff', { opacity: 0.9 }),
+    el('circle', { cx: 366, cy: 338, r: 12, fill: '#fff', opacity: 0.9 }),
   ]));
-  eye.push(el('ellipse', { cx: cx - 46, cy: ey - 8, rx: 21, ry: 11, fill: '#fff', opacity: 0.95, transform: `rotate(-28 ${cx - 46} ${ey - 8})` }));
-  eye.push(el('circle', { cx: cx + 44, cy: ey + 46, r: 6, fill: '#fff', opacity: 0.6 }));
-  eye.push(el('circle', { cx, cy: ey, r: R, fill: 'none', stroke: '#ffe9a0', 'stroke-width': 2.2, opacity: 0.6 }));
-  // the brow: a heavy hood of flesh lowered over the eye in a scowl
-  const browIn = `Q${cx + R * 0.7} ${ey - R * 0.62} ${cx} ${ey - R * 0.3}Q${cx - R * 0.7} ${ey - R * 0.62} ${cx - R * 1.66} ${ey + R * 0.12}`;
-  const brow = `M${cx - R * 1.66} ${ey + R * 0.12}C${cx - R * 1.5} ${ey - R * 1.75} ${cx + R * 1.5} ${ey - R * 1.75} ${cx + R * 1.66} ${ey + R * 0.12}${browIn}Z`;
-  const lidL = `M${cx - R * 1.44} ${ey + R * 0.4}C${cx - R * 0.8} ${ey + R * 1.42} ${cx + R * 0.8} ${ey + R * 1.42} ${cx + R * 1.44} ${ey + R * 0.4}C${cx + R * 0.7} ${ey + R * 1.2} ${cx - R * 0.7} ${ey + R * 1.2} ${cx - R * 1.44} ${ey + R * 0.4}Z`;
-  eye.push(el('path', { d: brow, fill: s.lin([[0, '#9a1838', 0], [0.34, '#8a1438', 0.9], [0.72, '#4a0c30', 1], [1, '#22061e', 1]]) }));
-  eye.push(el('path', { d: `M${cx - R * 1.2} ${ey - R * 0.56}Q${cx} ${ey - R * 1.22} ${cx + R * 1.2} ${ey - R * 0.56}`, fill: 'none', stroke: '#ff7a5a', 'stroke-width': 10, opacity: 0.28, 'stroke-linecap': 'round', filter: 'url(#glow8)' }));
-  // gold light catching the lid edges
-  eye.push(el('path', { d: `M${cx + R * 1.6} ${ey + R * 0.06}${browIn.replace(`${cx - R * 1.66} ${ey + R * 0.12}`, `${cx - R * 1.6} ${ey + R * 0.06}`)}`, fill: 'none', stroke: '#ffcf70', 'stroke-width': 3, opacity: 0.85, filter: 'url(#glow2)' }));
-  // warts along the brow ridge
-  for (let i = 0; i < 9; i++) {
-    const t = (i + r.range(0.2, 0.8)) / 9, a = Math.PI * (1.1 + 0.8 * t), k = r.range(1.3, 1.62);
-    const x = cx + Math.cos(a) * R * k, y = ey - 4 + Math.sin(a) * R * k * 0.84, rr = r.range(3, 8);
-    eye.push(el('circle', { cx: x, cy: y, r: rr, fill: s.rad([[0, '#e86a58'], [0.5, '#8a1836'], [1, '#3a0a2c']], 0.35, 0.3, 0.7) }));
-  }
-  body.push(g({ transform: tilt }, eye));
-  s.add(2, g({}, body));
+  body.push(stroke(mantle, { w: W_INNER }));
+  // the face: two gold slit eyes under heavy old lids, a furrowed brow and a small sour mouth
+  body.push(slitEye(s, 424, 440, 60, 13), slitEye(s, 600, 440, 60, -13));
+  body.push(stroke('M492 366q10 14 6 30', { w: W_DETAIL + 1 }), stroke('M532 366q-10 14 -6 30', { w: W_DETAIL + 1 }));
+  body.push(stroke('M476 526q36 -24 72 0', { w: W_INNER }));
+  body.push(inkEllipse(350, 500, 22, 13, '#ff8fb0', { w: 0, stroke: 'none', opacity: 0.85 }), inkEllipse(674, 500, 22, 13, '#ff8fb0', { w: 0, stroke: 'none', opacity: 0.85 }));
+  s.add(2, g({ filter: s.wobble(5) }, body));
 
-  // ---- 3: the nearest arms, almost touching the glass, and the drift
-  const nearStyle = () => ({
-    fill: s.lin([[0, '#5a0c34'], [0.5, '#36082a'], [1, '#16041a']]),
-    belly: '#c8607a', bellyOp: 0.8, dark: '#0a020e', light: '#b02a4a', lightOp: 0.45, rim: '#ff7a8a', rimOp: 0.9,
-    sucker: '#ffc8c0', suckerEdge: '#5a1034', edge: '#0a020e', bellyW: 0.36, suckR: 0.12, spots: '#ff8a9a',
-  });
-  const near = [];
-  near.push(tentacle(s, curl([[-150, 1100], [-60, 900], [50, 790], [180, 790], [250, 870]], 84, 1.3, 1), 250, 10, { ...nearStyle(), side: -1, per: 14, rimFrom: 0.66 }));
-  near.push(tentacle(s, curl([[1180, 1030], [1080, 840], [980, 730], [890, 770]], 74, 1.25, -1), 230, 10, { ...nearStyle(), side: 1, per: 14 }));
-  near.push(tentacle(s, curl([[1150, 250], [1050, 130], [960, 56], [880, 80]], 50, 1.2, -1), 150, 8, { ...nearStyle(), side: 1, per: 14 }));
-  s.add(3, g({ filter: s.blur(1.3) }, near));
-  s.add(3, el('rect', { x: -60, y: 760, width: 1144, height: 330, fill: s.lin([[0, '#12031c', 0], [0.6, '#12031c', 0.5], [1, '#0a0212', 0.8]]) }));
-  s.rays({ x: 380, y: -200, angle: 80, spread: 40, n: 5, color: '#c9d6ff', opacity: 0.09, width: 70, len: 1000, layer: 3, blur: 18 });
-  s.motes({ n: 50, rmin: 1.2, rmax: 5, colors: ['#ffb0c0', '#d9c2ff', '#ffe0a0', '#ffffff'], opacity: 0.8 });
-  s.bubbles({ n: 16, x0: 120, x1: 900, y0: 60, y1: 800, rmin: 3, rmax: 17, color: '#ffd9e6', opacity: 0.55 });
-  s.add(3, glint(478, 428, 26, '#fff6d0'), glint(700, 150, 14, '#e9d2ff', 0.8), glint(300, 560, 12, '#ffd0c0', 0.7));
+  // ---- 3: two big arm tips in front, bubbles, sparkles
+  const front = [
+    arm(s, curl([[1180, 930], [1010, 930], [900, 850], [905, 740]], -1, 78, 1.2), 190, 44, { side: -1, w: W_SUBJECT, wi: W_INNER, big: true }),
+    arm(s, curl([[-190, 960], [-40, 1000], [80, 950], [130, 860]], -1, 60, 1.05), 170, 44, { side: -1, w: W_SUBJECT, wi: W_INNER, big: true }),
+  ];
+  s.add(3, g({ filter: s.wobble(5, 0.012, 7) }, front.map((a) => a.markup)));
+  s.inkBubbles({ n: 8, y0: 120, y1: 760, rmin: 9, rmax: 24, fill: '#d9c4ff' });
+  s.add(3, star4(250, 160, 30), star4(770, 250, 22, '#ffe9a8'), star4(742, 610, 20, '#ffd1ef'), star4(120, 620, 18));
+  s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffd1ef', '#d9c4ff'], opacity: 0.9 });
 }
 
-/** A small noise function for the trench walls. */
-function noise1b(r) {
-  const v = Array.from({ length: 80 }, () => r());
-  return (x) => { const f = ((x % 78) + 78) % 78, i = Math.floor(f), t = f - i, u = t * t * (3 - 2 * t); return v[i] * (1 - u) + v[i + 1] * u; };
+// ---------------------------------------------------------------------------------------------------- helpers
+
+/** Add a spiral to the end of a point list: `dir` +1 turns clockwise on screen, -1 anticlockwise. */
+function curl(pts, dir, r0, turns = 0.85, n = 9, shrink = 0.6) {
+  turns = Math.min(turns, 0.9);
+  const [px, py] = pts[pts.length - 1], [qx, qy] = pts[pts.length - 2];
+  const h = Math.atan2(py - qy, px - qx);
+  const cx = px - r0 * dir * Math.sin(h), cy = py + r0 * dir * Math.cos(h);
+  const a0 = Math.atan2(py - cy, px - cx);
+  const out = pts.slice();
+  for (let k = 1; k <= n; k++) {
+    const a = a0 + dir * (k / n) * turns * Math.PI * 2, rad = r0 * (1 - (k / n) * shrink);
+    out.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]);
+  }
+  return out;
+}
+
+/** A centreline with normals and half-widths, tapering by arc length, with a rounded tip. */
+function spine(pts, w0, w1, per = 10) {
+  const sm = sample(pts, per);
+  const acc = [0];
+  for (let i = 1; i < sm.length; i++) acc.push(acc[i - 1] + Math.hypot(sm[i][0] - sm[i - 1][0], sm[i][1] - sm[i - 1][1]));
+  const total = acc[acc.length - 1];
+  return sm.map((p, i) => {
+    const a = sm[Math.max(0, i - 1)], b = sm[Math.min(sm.length - 1, i + 1)];
+    let dx = b[0] - a[0], dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+    const t = acc[i] / total;
+    let hw = (w0 + (w1 - w0) * Math.pow(t, 0.85)) * 0.5;
+    const end = (total - acc[i]) / (w1 * 0.6);
+    if (end < 1) hw *= Math.sqrt(Math.max(0.02, 1 - (1 - end) * (1 - end)));
+    return { x: p[0], y: p[1], nx: -dy, ny: dx, hw, t, at: acc[i] };
+  });
+}
+/** The strip of a spine between two offsets (fractions of the half-width, -1..1), as a closed path. */
+function strip(sp, a, b) {
+  const L = sp.map((q) => [q.x + q.nx * q.hw * a, q.y + q.ny * q.hw * a]);
+  const R = sp.map((q) => [q.x + q.nx * q.hw * b, q.y + q.ny * q.hw * b]);
+  return poly(L.concat(R.reverse()), true);
+}
+
+/** One chunky arm: flat base, a hard shadow down the outer side, round suckers down the inner side (`side`). */
+function arm(s, pts, w0, w1, { side = 1, w = W_INNER, wi = W_DETAIL, fill = RED, shade = RED_SH, suck = PINK, big = false } = {}) {
+  const sp = spine(pts, w0, w1);
+  const d = strip(sp, -1, 1);
+  const inner = [flat(strip(sp, -side * 1.2, -side * 0.3), shade)];
+  if (big) inner.push(flat(strip(sp, side * 0.1, side * 1.2), suck));
+  let next = sp[sp.length - 1].at * 0.1;
+  for (const q of sp) {
+    if (q.at < next || q.t > 0.95) continue;
+    const rr = q.hw * (big ? 0.3 : 0.3), off = big ? 0.56 : 0.5;
+    inner.push(inkCircle(q.x + q.nx * q.hw * off * side, q.y + q.ny * q.hw * off * side, rr, big ? '#fff0f3' : suck, { w: rr < 7 ? 3 : wi }));
+    if (big) inner.push(el('circle', { cx: q.x + q.nx * q.hw * off * side, cy: q.y + q.ny * q.hw * off * side, r: rr * 0.36, fill: RED_SH }));
+    next = q.at + rr * 2.7;
+  }
+  const clip = s.clip(el('path', { d }));
+  const markup = g({}, [ink(d, fill, { w }), g({ 'clip-path': clip }, inner), stroke(d, { w })]);
+  return { d, markup };
+}
+
+/** A gold eye with a slit pupil and a heavy lid, tilted `rot` degrees. */
+function slitEye(s, x, y, r, rot) {
+  const clip = s.clip(el('circle', { cx: x, cy: y, r }));
+  return g({}, [
+    inkCircle(x, y, r, GOLD, { w: W_INNER }),
+    g({ 'clip-path': clip }, [
+      el('circle', { cx: x + r * 0.3, cy: y + r * 0.42, r: r * 1.02, fill: 'none', stroke: GOLD_SH, 'stroke-width': r * 0.34 }),
+      flat(`M${x} ${y - r * 0.7}Q${x + r * 0.34} ${y + r * 0.1} ${x} ${y + r * 0.86}Q${x - r * 0.34} ${y + r * 0.1} ${x} ${y - r * 0.7}Z`, INK),
+      el('circle', { cx: x - r * 0.4, cy: y + r * 0.02, r: r * 0.17, fill: '#fff' }),
+      el('rect', { x: x - r * 1.6, y: y - r * 2.4, width: r * 3.2, height: r * 1.95, fill: RED_SH, stroke: INK, 'stroke-width': W_INNER, transform: `rotate(${rot} ${x} ${y})` }),
+    ]),
+    el('circle', { cx: x, cy: y, r, fill: 'none', stroke: INK, 'stroke-width': W_INNER }),
+  ]);
+}
+
+/** The tiny shipwreck: a holed hull, a snapped mast and a rag of sail. Mid-distance line. */
+function wreck(x, y, k, rot) {
+  const W = W_MID / k;
+  return g({ transform: `translate(${x} ${y}) rotate(${rot}) scale(${k})` }, [
+    stroke('M-6 -4L2 -86', { w: 13 }), stroke('M-6 -4L2 -86', { w: 5, stroke: '#a8716f' }),
+    stroke('M-30 -62L34 -70', { w: 11 }), stroke('M-30 -62L34 -70', { w: 4, stroke: '#a8716f' }),
+    ink('M-26 -60L30 -67L24 -34L10 -40L0 -22L-12 -36L-22 -28Z', '#eadfd6', { w: W }),
+    ink('M-70 -8L74 -14Q70 30 36 40L-34 40Q-62 30 -70 -8Z', '#a8716f', { w: W }),
+    flat('M-60 14Q0 26 66 8Q62 30 36 37L-34 37Q-54 30 -60 14Z', '#84526a'),
+    stroke('M-70 -8L74 -14Q70 30 36 40L-34 40Q-62 30 -70 -8Z', { w: W }),
+    inkEllipse(18, 12, 13, 9, INK, { w: 0, stroke: 'none' }),
+    stroke('M-46 4L-12 2', { w: 4 }), stroke('M40 0L60 -2', { w: 4 }),
+  ]);
 }
