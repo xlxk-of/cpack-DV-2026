@@ -63,6 +63,7 @@ export function build(s) {
     ]),
     // the dark of the hood, a magenta lining, and her face: lamp eyes and a small sure smile
     inkEll(512, 356, 116, 104, MAG), inkEll(512, 362, 98, 88, FACE),
+    el('circle', { cx: 472, cy: 364, r: 44, fill: '#7fd8ff', opacity: 0.22 }), el('circle', { cx: 552, cy: 364, r: 44, fill: '#7fd8ff', opacity: 0.22 }),
     eye(472, 362, 30, { look: [0, 0.35], white: '#c9fdff', lid: 0.26, lidRot: 12, lidFill: FACE, pupil: 0.5 }),
     eye(552, 362, 30, { look: [0, 0.35], white: '#c9fdff', lid: 0.26, lidRot: -12, lidFill: FACE, pupil: 0.5 }),
     stroke(`M494 414q18 13 36 0`, { w: W_DETAIL + 1, stroke: '#ff9fd6' }),
@@ -80,7 +81,7 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, fig));
 
   // ---- 3: drops flung off the orb, sparkles, bubbles, and dark weed at the near corners
-  s.add(3, g({ filter: s.wobble(4, 0.014, 7) }, [drop(392, 560, 15, -40), drop(642, 548, 13, 40), drop(430, 498, 10, -20), drop(600, 500, 9, 24), drop(512, 506, 11, 0)]));
+  s.add(3, g({ filter: s.wobble(4, 0.014, 7) }, [drop(404, 548, 13, -40), drop(622, 540, 12, 40), drop(452, 506, 9, -20), drop(574, 504, 9, 24)]));
   s.add(3, star4(250, 520, 32, '#ffffff'), star4(790, 500, 24, '#ffd1ef'), star4(690, 130, 22, '#ffffff'), star4(180, 250, 20, ORB), star4(830, 700, 18, '#ffffff'), star4(OX - 2, OY - 92, 18, '#ffffff'));
   s.add(3, ink(ribbon([[-20, 1060], [50, 900], [10, 780], [70, 690]], 70, 22), '#1b1650', { w: W_INNER }), ink(ribbon([[1044, 1060], [980, 910], [1020, 800], [960, 720]], 70, 22), '#1b1650', { w: W_INNER }));
   s.inkBubbles({ n: 5, x0: 130, x1: 300, y0: 600, y1: 900, rmin: 8, rmax: 22 });

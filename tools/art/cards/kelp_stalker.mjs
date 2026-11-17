@@ -56,8 +56,8 @@ export function build(s) {
     const up = (i, h) => { const f = fr[i], b = at(i, sd * 0.4); return [b[0] + sd * f.nx * (hw(f.t) * 0.2 + h) + f.dx * h * 0.7, b[1] + sd * f.ny * (hw(f.t) * 0.2 + h) + f.dy * h * 0.7]; };
     for (let i = i0; i <= i1; i++) base.push(at(i, sd * 0.4));
     for (let k = 0; k < n; k++) {
-      const ia = Math.round(i0 + (i1 - i0) * k / n), ib = Math.round(i0 + (i1 - i0) * (k + 0.55) / n), h = H * (1 - 0.5 * k / n);
-      top.push(up(ia, k ? h * 0.3 : 0), up(ib, h));
+      const ia = Math.round(i0 + (i1 - i0) * k / n), ib = Math.round(i0 + (i1 - i0) * (k + 0.55) / n), h = H * (1 - 0.45 * k / n);
+      top.push(up(ia, k ? h * 0.42 : 0), up(ib, h));
     }
     return poly([...top, ...base.reverse()], true);
   };
@@ -65,7 +65,7 @@ export function build(s) {
   const tailD = poly([[ep[0] - e.dx * 26 - e.nx * 14, ep[1] - e.dy * 26 - e.ny * 14], [ep[0] + e.dx * 96 - e.nx * 76, ep[1] + e.dy * 96 - e.ny * 76],
     [ep[0] + e.dx * 44, ep[1] + e.dy * 44], [ep[0] + e.dx * 78 + e.nx * 62, ep[1] + e.dy * 78 + e.ny * 62], [ep[0] - e.dx * 26 + e.nx * 14, ep[1] - e.dy * 26 + e.ny * 14]], true);
   const fish = [];
-  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.33, 0.7, -1, 74, 4), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }]));
+  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.32, 0.78, -1, 80, 3), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }]));
 
   // inside the body: pale belly, dark bars over the back, one hard shadow along the underside, a hard highlight
   const band = (k0, k1, t0 = 0, t1 = 1) => { const a = [], b = []; for (let i = I(t0); i <= I(t1); i++) { a.push(at(i, k0)); b.push(at(i, k1)); } return poly([...a, ...b.reverse()], true); };

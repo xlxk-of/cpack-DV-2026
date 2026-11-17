@@ -54,13 +54,13 @@ export function build(s) {
   const form = (d, fill, inside = [], w = W_INNER) => g({}, [flat(d, fill), inside.length ? g({ 'clip-path': s.clip(el('path', { d })) }, inside) : '', stroke(d, { w })]);
   const contour = (ds, w = W_SUBJECT) => g({}, ds.map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': w * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })));
   const body = [];
-  const rockC = 'M366 900L380 700Q390 624 450 608Q512 590 574 608Q634 624 644 700L658 900Z';
-  const rockL = 'M160 900L184 730Q196 672 250 660Q312 644 360 668Q400 692 402 746L410 900Z';
-  const rockR = 'M864 900L840 730Q828 672 774 660Q712 644 664 668Q624 692 622 746L614 900Z';
+  const rockC = 'M360 1010L380 700Q390 624 450 608Q512 590 574 608Q634 624 644 700L664 1010Z';
+  const rockL = 'M150 1010L184 730Q196 672 250 660Q312 644 360 668Q400 692 402 746L414 1010Z';
+  const rockR = 'M874 1010L840 730Q828 672 774 660Q712 644 664 668Q624 692 622 746L610 1010Z';
   body.push(contour([rockL, rockR, rockC]));
-  body.push(form(rockL, ROCK, [flat('M140 640h110q-34 120 -6 280h-104z', ROCK_D), flat('M140 800h300v120h-300z', ROCK_D), flat('M262 672q40 -14 80 2q-40 0 -80 14z', ROCK_L), stroke('M330 740l22 30l-10 34', { w: W_DETAIL })]));
-  body.push(form(rockR, ROCK, [flat('M600 640h90q-30 120 -6 280h-84z', ROCK_D), flat('M600 800h300v120h-300z', ROCK_D), flat('M700 668q40 -12 76 4q-40 0 -76 12z', ROCK_L), stroke('M800 736l-20 32l12 30', { w: W_DETAIL })]));
-  body.push(form(rockC, ROCK, [flat('M350 580h100q-34 140 -6 340h-94z', ROCK_D), flat('M350 800h330v120h-330z', ROCK_D), flat('M556 620q40 8 58 44q-30 -22 -58 -26z', ROCK_L), stroke('M596 716l14 34l-12 28', { w: W_DETAIL })]));
+  body.push(form(rockL, ROCK, [flat('M120 640h130q-34 120 -6 400h-124z', ROCK_D), flat('M120 800h320v230h-320z', ROCK_D), flat('M262 672q40 -14 80 2q-40 0 -80 14z', ROCK_L), stroke('M330 740l22 30l-10 34', { w: W_DETAIL })]));
+  body.push(form(rockR, ROCK, [flat('M590 640h100q-30 120 -6 400h-94z', ROCK_D), flat('M590 800h320v230h-320z', ROCK_D), flat('M700 668q40 -12 76 4q-40 0 -76 12z', ROCK_L), stroke('M800 736l-20 32l12 30', { w: W_DETAIL })]));
+  body.push(form(rockC, ROCK, [flat('M340 580h110q-34 140 -6 460h-104z', ROCK_D), flat('M340 800h350v230h-350z', ROCK_D), flat('M556 620q40 8 58 44q-30 -22 -58 -26z', ROCK_L), stroke('M596 716l14 34l-12 28', { w: W_DETAIL })]));
 
   // one siren, drawn round her head at (0,0) with a head 78 across; `flip` mirrors her, `open` = eyes open, arms wide
   const siren = (x, y, k, flip, hair, hairD, open) => {

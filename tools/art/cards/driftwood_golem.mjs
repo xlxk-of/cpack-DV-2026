@@ -46,7 +46,7 @@ export function build(s) {
 
   // ---- 2: the golem
   const body = [];
-  const legL = 'M398 610L494 610L500 860L388 860Z', legR = 'M530 610L626 610L636 860L524 860Z';
+  const legL = 'M398 610L494 610L502 980L386 980Z', legR = 'M530 610L626 610L638 980L522 980Z';
   const torso = 'M392 328L632 328Q680 338 676 400L666 592Q660 646 610 646L414 646Q364 646 358 592L348 400Q344 338 392 328Z';
   // the head is a short log with one snapped end
   const head = 'M404 196L606 188Q642 188 642 224L642 308Q642 342 608 342L410 342L384 318L402 296L378 270L400 246L380 222Z';
@@ -59,8 +59,8 @@ export function build(s) {
 
   const grain = (d) => stroke(d, { w: W_DETAIL });
   const knot = (x, y, q, rot = 0) => g({}, [inkEllipse(x, y, q, q * 0.62, WOOD_D, { w: W_DETAIL, rot }), el('circle', { cx: x, cy: y, r: q * 0.24, fill: INK })]);
-  body.push(form(legL, WOOD, [flat('M380 600h46l-6 270h-46z', WOOD_D), grain('M462 660v64M446 744v40')]));
-  body.push(form(legR, WOOD, [flat('M516 600h44l-4 270h-44z', WOOD_D), grain('M596 650v70M582 742v40')]));
+  body.push(form(legL, WOOD, [flat('M376 600h50l-8 400h-50z', WOOD_D), grain('M462 660v64M446 744v40')]));
+  body.push(form(legR, WOOD, [flat('M512 600h48l-6 400h-48z', WOOD_D), grain('M596 650v70M582 742v40')]));
   body.push(form(armL, WOOD, [flat(ribbon([[330, 356], [280, 460], [258, 590]], 50, 44), WOOD_D), grain('M340 450q-12 40 -16 80')]));
   body.push(form(armR, WOOD, [flat(ribbon([[650, 414], [730, 396], [770, 310]], 44, 40), WOOD_D), grain('M690 366q24 -4 36 -22')]));
   body.push(form(torso, WOOD, [

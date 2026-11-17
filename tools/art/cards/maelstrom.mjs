@@ -21,10 +21,10 @@ export function build(s) {
   s.paper();
 
   // ---- 1: the sea already turning round the hole, and the storm cloud: thinner line, quiet colour
-  const outer = ribbon(arc(-1.3, 0.04, 0, 90), 86, 86, (u) => 1 + 0.7 * Math.max(0, 1.3 - 1.34 * u), 1);
-  s.add(1, ink(outer, '#4a70aa', { w: W_MID }));
-  s.add(1, ...[[-1.02, -0.9], [-0.76, -0.66], [-0.5, -0.41], [-0.27, -0.19], [-0.08, -0.02]].map(([a0, a1]) => flat(ribbon(arc(a0, a1, -GAP * (1 - a0 * 0.3), 14), 20, 20, (u) => Math.sin(Math.PI * u), 1), '#86a8dc')));
-  s.add(1, ...[[-0.9, -0.8], [-0.6, -0.52], [-0.36, -0.29], [-0.14, -0.08]].map(([a0, a1]) => stroke(poly(arc(a0, a1, 8, 10)), { w: W_DETAIL })));
+  const outer = ribbon(arc(-1.95, 0.04, 0, 130), 86, 86, (u) => 1 + 0.5 * Math.max(0, 1.95 - 1.99 * u), 1);
+  s.add(1, ink(outer, '#466aa2', { w: W_MID }));
+  s.add(1, ...[[-1.3, -1.2], [-1.02, -0.9], [-0.76, -0.66], [-0.5, -0.41], [-0.27, -0.19], [-0.08, -0.02]].map(([a0, a1]) => flat(ribbon(arc(a0, a1, -GAP * (1 - a0 * 0.3), 14), 20, 20, (u) => Math.sin(Math.PI * u), 1), '#86a8dc')));
+  s.add(1, ...[[-1.16, -1.08], [-0.9, -0.8], [-0.6, -0.52], [-0.36, -0.29], [-0.14, -0.08]].map(([a0, a1]) => stroke(poly(arc(a0, a1, 8, 10)), { w: W_DETAIL })));
   const cloud = [[40, 40, 110], [200, 6, 120], [380, 30, 110], [560, 0, 120], [740, 24, 120], [900, 10, 110], [1020, 60, 90], [-30, 110, 80]];
   s.add(1, g({}, [...cloud.map(([x, y, rr]) => inkCircle(x, y, rr, INK, { w: W_MID * 2 })), ...cloud.map(([x, y, rr]) => el('circle', { cx: x, cy: y, r: rr, fill: '#414c80' })),
     ...cloud.map(([x, y, rr]) => flat(`M${x - rr * 0.7} ${y + rr * 0.5}Q${x} ${y + rr * 1.02} ${x + rr * 0.7} ${y + rr * 0.5}Q${x} ${y + rr * 0.8} ${x - rr * 0.7} ${y + rr * 0.5}Z`, '#59659c'))]));
@@ -47,7 +47,7 @@ export function build(s) {
     el('ellipse', { cx: CX, cy: CY, rx: 56, ry: 56 * SQ, fill: CORE, stroke: INK, 'stroke-width': W_INNER }),
     star4(CX, CY, 38, '#ffffff', W_DETAIL),
   ];
-  const b1 = [[810, -20], [704, 136], [800, 168], [676, 296], [752, 324], [668, 404]], b2 = [[226, -10], [312, 140], [232, 166], [336, 300]];
+  const b1 = [[900, -160], [704, 136], [800, 168], [676, 296], [752, 324], [668, 404]], b2 = [[146, -150], [312, 140], [232, 166], [336, 300]];
   const bolts = [
     ink(zap(b1, 104), BOLT, { w: W_SUBJECT * 2, stroke: INK }), flat(zap(b1, 104), BOLT), flat(zap(b1.map(([x, y]) => [x - 8, y + 6]), 30), '#ffffff'), stroke(zap(b1, 104), { w: W_INNER }),
     ink(zap(b2, -80), BOLT, { w: W_SUBJECT * 2, stroke: INK }), flat(zap(b2, -80), BOLT), flat(zap(b2.map(([x, y]) => [x + 6, y + 5]), -24), '#ffffff'), stroke(zap(b2, -80), { w: W_INNER }),

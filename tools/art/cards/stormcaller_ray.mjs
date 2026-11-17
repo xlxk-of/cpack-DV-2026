@@ -70,9 +70,9 @@ export function build(s) {
 
   // ---- 3: sparks jumping off the wing tips, bubbles
   s.add(3, bolt(858, 176, -150, 0.72, { w: W_DETAIL }), bolt(876, 262, -74, 0.6, { w: W_DETAIL }), mirror([bolt(858, 176, -150, 0.72, { w: W_DETAIL }), bolt(876, 262, -74, 0.6, { w: W_DETAIL })]));
-  s.add(3, bolt(720, 640, -20, 0.55, { w: W_DETAIL }), mirror(bolt(730, 620, -24, 0.45, { w: W_DETAIL })));
-  s.add(3, star4(770, 190, 26, ZAP_L), star4(244, 176, 22, ZAP_L), star4(880, 380, 18), star4(150, 360, 20), star4(650, 180, 16, '#ffffff'), star4(330, 640, 18, ZAP_L));
-  s.inkBubbles({ n: 8, y0: 600, rmin: 8, rmax: 22 });
+  s.add(3, bolt(720, 640, -20, 0.55, { w: W_DETAIL }), mirror(bolt(770, 560, -30, 0.45, { w: W_DETAIL })));
+  s.add(3, star4(770, 190, 26, ZAP_L), star4(244, 176, 22, ZAP_L), star4(880, 380, 18), star4(150, 360, 20), star4(650, 180, 16, '#ffffff'), star4(300, 680, 18, ZAP_L));
+  s.inkBubbles({ n: 7, y0: 700, rmin: 8, rmax: 22 });
   [[300, 250, 12], [322, 204, 8], [716, 236, 10]].forEach(([x, y, q]) => s.add(3, inkCircle(x, y, q, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - q * 0.34, cy: y - q * 0.36, r: q * 0.22, fill: '#fff' })));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', ZAP_L, '#b9f3ff'], opacity: 0.9 });
 }

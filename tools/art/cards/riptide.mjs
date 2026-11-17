@@ -23,9 +23,9 @@ export function build(s) {
 
   // ---- 0: flat sea from above, the current as broad flat spiral bands (no ink)
   s.backdrop(SEA);
-  s.add(0, flat(ribbon(arc(-0.05, 2.6, GAP / 2), 70, 330, null, 3), SEA_D));
-  s.add(0, flat(ribbon(arc(0.98, 2.6, 0), 90, 200, null, 3), SEA_L, { opacity: 0.55 }));
-  s.add(0, flat(ribbon(arc(1.25, 2.9, GAP / 2), 40, 150, null, 3), SEA_DD, { opacity: 0.7 }));
+  s.add(0, flat(ribbon(arc(-0.22, 2.6, GAP / 2), 60, 330, (u) => Math.min(1, u * 14), 3), SEA_D));
+  s.add(0, flat(ribbon(arc(0.9, 2.6, 0), 90, 200, (u) => Math.min(1, u * 14), 3), SEA_L, { opacity: 0.55 }));
+  s.add(0, flat(ribbon(arc(1.25, 2.9, GAP / 2), 40, 150, (u) => Math.min(1, u * 14), 3), SEA_DD, { opacity: 0.7 }));
   s.add(0, el('circle', { cx: CX, cy: CY, r: 96, fill: SEA_D }), el('circle', { cx: CX, cy: CY, r: 58, fill: SEA_DD }));
   s.specks({ n: 46, rmin: 2, rmax: 5, colors: ['#bff5ec', '#ffffff'], opacity: 0.5, layer: 0 });
   s.paper();
