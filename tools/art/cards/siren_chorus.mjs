@@ -46,7 +46,7 @@ export function build(s) {
     notes.push(kind === 0 ? star4(x, y, 22 - k * 2, '#fff3c4', W_DETAIL) : kind === 1 ? diamond(x, y, 15 - k, '#ffd1ef') : inkCircle(x, y, 9, '#ffffff', { w: W_DETAIL }));
   } });
   s.add(1, ...notes);
-  const farRock = (x, y, k) => g({ transform: `translate(${x} ${y}) scale(${k})` }, [
+  const farRock = (x, y, k) => g({ transform: `translate(${x} ${y}) scale(${k} ${Math.abs(k)})` }, [
     ink('M-90 30Q-96 -40 -40 -62Q-6 -92 34 -60Q92 -44 92 30Z', '#43348c', { w: W_MID / Math.abs(k) }), flat('M-60 4Q-50 -34 -22 -44Q-40 -20 -40 6Z', ROCK_L), bar(0, 34, 230, 14, '#6a55b8')]);
   s.add(1, farRock(70, 716, 0.7), farRock(968, 722, -0.6));
 
@@ -66,17 +66,17 @@ export function build(s) {
   const siren = (x, y, k, flip, hair, hairD, open) => {
     const W = (w) => w / k, p = [];
     const hairB = 'M-92 -10C-100 -92 -50 -114 0 -114C50 -114 100 -92 92 -10C96 60 122 110 104 196C76 176 62 150 58 120L-58 120C-62 150 -76 176 -104 196C-122 110 -96 60 -92 -10Z';
-    const torso = 'M-34 56L34 56Q48 120 46 196L-46 196Q-48 120 -34 56Z';
+    const torso = 'M-40 56L40 56Q56 120 52 196L-52 196Q-56 120 -40 56Z';
     const tailPts = open ? [[0, 168], [-6, 240], [10, 296], [62, 316]] : [[0, 168], [2, 244], [40, 306], [110, 306]];
     const [fx, fy] = tailPts[3];
-    const tail = ribbon(tailPts, 96, 36);
+    const tail = ribbon(tailPts, 108, 38);
     const fluke = `M${fx - 10} ${fy}q22 -62 76 -66q-2 34 -24 58q30 10 36 46q-52 6 -88 -38z`;
     const head = circ(0, 0, 78);
     const cap = (u) => (u < 0.2 ? Math.sqrt(1 - (1 - u / 0.2) ** 2) : 1);
     const arms = open
-      ? [ribbon([[-30, 80], [-84, 112], [-120, 70]], 32, 26, cap), ribbon([[30, 80], [84, 112], [120, 70]], 32, 26, cap)]
-      : [ribbon([[-34, 80], [-56, 124], [-14, 134]], 32, 26, cap), ribbon([[34, 80], [56, 124], [14, 134]], 32, 26, cap)];
-    const hands = open ? [circ(-122, 64, 20), circ(122, 64, 20)] : [circ(0, 134, 22)];
+      ? [ribbon([[-34, 82], [-88, 112], [-122, 70]], 38, 30, cap), ribbon([[34, 82], [88, 112], [122, 70]], 38, 30, cap)]
+      : [ribbon([[-40, 82], [-62, 126], [-14, 136]], 38, 30, cap), ribbon([[40, 82], [62, 126], [14, 136]], 38, 30, cap)];
+    const hands = open ? [circ(-124, 62, 23), circ(124, 62, 23)] : [circ(0, 136, 25)];
     p.push(contour([hairB, tail, fluke, torso, ...arms, ...hands, head], W(W_SUBJECT)));
     p.push(form(hairB, hair, [flat('M-130 90h260v120h-260z', hairD), stroke('M-80 130q-6 30 -14 44M80 130q6 30 14 44', { w: W(W_DETAIL) })], W(W_INNER)));
     p.push(form(fluke, FIN, [stroke(`M${fx + 6} ${fy - 6}q30 -20 48 -44M${fx + 10} ${fy + 6}q30 4 50 22`, { w: W(W_DETAIL) })], W(W_INNER)));
@@ -90,7 +90,7 @@ export function build(s) {
     hands.forEach((d) => p.push(form(d, SKIN, [], W(W_INNER))));
     p.push(form(head, SKIN_D, [flat(circ(8, -6, 78), SKIN)], W(W_INNER)));
     // the fringe covers the top of the head's line, so hair and fringe are one mass
-    const fringe = 'Q54 -44 22 -24Q-8 -56 -40 -20Q-64 -40 -77 -8';
+    const fringe = 'Q64 -48 14 -46Q-8 -18 -40 -26Q-66 -30 -77 -8';
     p.push(flat(`M-77 -8A77 77 0 0 1 77 -8L85 -8A85 85 0 0 0 -85 -8Z`, hair), flat(`M77 -8${fringe}A77 77 0 0 1 77 -8Z`, hair), stroke(`M77 -8${fringe}`, { w: W(W_DETAIL + 1) }));
     p.push(flat('M-46 -84h52q8 0 8 7t-8 7h-52q-8 0 -8 -7t8 -7z', '#ffffff', { opacity: 0.85 }));
     if (open) {
@@ -110,13 +110,14 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: the near swell with foam at the foot of the rocks, the song's sparkles
-  s.add(3, ink(waveBand(1024, 1024, 846, 10, 5, 0.6), '#5445b2', { w: W_INNER }));
-  s.add(3, flat(waveBand(1024, 1024, 930, 10, 4, 2), '#3b2f92'));
+
   const foam = (x, y, k) => {
     const ds = [[-60, 2, 20], [-24, -8, 28], [20, -6, 25], [58, 4, 19]].map(([dx, dy, q]) => circ(dx, dy, q)).concat([rr(-84, -6, 168, 36, 18)]);
-    return g({ transform: `translate(${x} ${y}) scale(${k})` }, [contour(ds, W_DETAIL / Math.abs(k)), ...ds.map((d) => flat(d, '#ffffff')), stroke('M-34 2q10 -12 22 -4M14 4q10 -12 22 -4', { w: W_DETAIL / Math.abs(k) })]);
+    return g({ transform: `translate(${x} ${y}) scale(${k} ${Math.abs(k)})` }, [contour(ds, W_DETAIL / Math.abs(k)), ...ds.map((d) => flat(d, '#ffffff')), stroke('M-34 2q10 -12 22 -4M14 4q10 -12 22 -4', { w: W_DETAIL / Math.abs(k) })]);
   };
-  s.add(3, foam(270, 850, -0.9), foam(512, 856, 1.3), foam(752, 850, 1));
+  s.add(3, foam(270, 838, -0.9), foam(512, 842, 1.3), foam(752, 838, 1));
+  s.add(3, ink(waveBand(1024, 1024, 846, 10, 5, 0.6), '#5445b2', { w: W_INNER }));
+  s.add(3, flat(waveBand(1024, 1024, 930, 10, 4, 2), '#3b2f92'));
   s.add(3, bar(150, 890, 160, 12, '#8f7bd6'), bar(880, 886, 180, 12, '#8f7bd6'));
   s.add(3, star4(236, 250, 30), star4(800, 300, 24, '#ffd1ef'), star4(392, 130, 18, '#fff3c4'), star4(668, 110, 22), diamond(180, 420, 13, '#ffd1ef'), diamond(856, 440, 12, '#fff3c4'));
   s.specks({ n: 14, y1: 700, rmin: 3, rmax: 6, colors: ['#ffffff', '#ffd1ef', '#fff3c4'], opacity: 0.9 });

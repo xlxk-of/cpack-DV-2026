@@ -86,7 +86,7 @@ export function build(s) {
   for (const [x, y, rr] of [[850, 548, 22], [884, 470, 12], [806, 720, 16], [612, 742, 14], [226, 640, 15], [262, 584, 9], [180, 740, 11], [700, 196, 10]]) {
     s.add(3, inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
   }
-  s.add(3, star4(LX + 96, LY - 62, 28, '#ffe9a8'), star4(LX - 92, LY + 40, 20, '#fff'), star4(LX - 48, LY - 104, 16, '#ffe9a8'), star4(770, 690, 20, '#ffe9a8'));
+  s.add(3, star4(LX + 126, LY + 16, 24, '#ffe9a8'), star4(LX - 92, LY + 40, 20, '#fff'), star4(LX - 48, LY - 104, 16, '#ffe9a8'), star4(770, 690, 20, '#ffe9a8'));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffd98a', '#fff3cf', '#8fe6d6'], opacity: 0.9 });
 }
 

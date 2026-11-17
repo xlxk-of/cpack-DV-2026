@@ -68,9 +68,11 @@ export function build(s) {
   const lockL = spine([[430, 330], [372, 420], [352, 510], [306, 590], [316, 700]], 108, 64);
   const lockR = spine([[594, 330], [652, 420], [672, 510], [718, 590], [708, 700]], 108, 64);
   const lockLd = strip(lockL, -1, 1), lockRd = strip(lockR, -1, 1);
+  const flowSp = spine([[400, 372], [336, 430], [286, 516], [226, 566], [166, 548], [150, 500]], 84, 22);
+  const flow = strip(flowSp, -1, 1);
 
   // tail and fin
-  const tailSp = spine([[512, 560], [515, 650], [590, 720], [706, 700], [778, 612], [800, 520]], 124, 54);
+  const tailSp = spine([[512, 560], [515, 650], [590, 724], [700, 706], [772, 620], [800, 520]], 124, 66);
   const tail = strip(tailSp, -1, 1);
   const fin = 'M776 540C724 500 700 440 716 376C766 400 800 436 814 474C838 432 880 408 926 414C916 478 872 530 812 548Z';
 
@@ -93,10 +95,11 @@ export function build(s) {
   let crown = 'M434 250L428 196L462 214L472 166L498 200L512 140L526 200L552 166L562 214L596 196L590 250Q512 222 434 250Z';
 
   const body = [];
-  body.push(g({}, [fan, hairBack, lockLd, lockRd, tail, fin, bowl, crown].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' }))));
+  body.push(g({}, [fan, hairBack, flow, lockLd, lockRd, tail, fin, bowl, crown].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' }))));
   // shell back
   body.push(ink(fan, SHELL_A, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d: fan })) }, fanIn), stroke(fan, { w: W_INNER }));
   // hair behind
+  body.push(ink(flow, ROSE, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d: flow })) }, [flat(strip(flowSp, 0.2, 1.2), ROSE_SH)]), stroke(flow, { w: W_INNER }));
   body.push(ink(hairBack, ROSE, { w: W_INNER }));
   for (const [sp, d, side] of [[lockL, lockLd, -1], [lockR, lockRd, 1]]) {
     body.push(ink(d, ROSE, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d })) }, [
@@ -104,13 +107,13 @@ export function build(s) {
       flat(strip(sp.slice(8, 30), side * 0.5, side * 0.72), '#ffc2d6'),
     ]), stroke(d, { w: W_INNER }));
   }
-  body.push(flat('M400 330L624 330L650 470L374 470Z', ROSE_SH));
+  body.push(g({ 'clip-path': s.clip(el('path', { d: hairBack })) }, [flat('M330 372Q512 452 694 372L694 500L330 500Z', ROSE_SH)]), stroke(hairBack, { w: W_INNER }));
   // tail
   body.push(ink(fin, ROSE, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d: fin })) }, [flat('M700 580L960 580L960 400C890 440 850 500 800 530Z', ROSE_SH)]), stroke(fin, { w: W_INNER }),
     stroke('M786 520Q748 470 738 420', { w: W_DETAIL }), stroke('M822 524Q852 474 892 446', { w: W_DETAIL }));
   body.push(ink(tail, GOLD, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d: tail })) }, [
     flat(strip(tailSp, 0.25, 1.2), GOLD_SH),
-    ...[[716, 676], [752, 640], [770, 590], [690, 706]].map(([x, y]) => stroke(`M${x - 13} ${y - 6}q13 16 26 0`, { w: W_DETAIL })),
+    ...[[744, 668], [768, 628], [750, 618], [786, 586], [770, 574]].map(([x, y]) => stroke(`M${x - 9} ${y - 4}q9 12 18 0`, { w: W_DETAIL - 1 })),
     flat(strip(tailSp.slice(32, 48), -0.72, -0.5), '#fff3c4'),
   ]), stroke(tail, { w: W_INNER }));
   // torso and arms
@@ -119,7 +122,7 @@ export function build(s) {
   body.push(g({ 'clip-path': s.clip(el('path', { d: torso })) }, [flat('M440 420L584 420L584 462Q512 476 440 462Z', SKIN_SH)]));
   body.push(inkEllipse(490, 500, 24, 19, PEARL, { w: W_DETAIL }), inkEllipse(534, 500, 24, 19, PEARL, { w: W_DETAIL }));
   body.push(ink(`M452 606Q512 570 572 606L574 640L450 640Z`, GOLD, { w: W_INNER }));
-  const armL = strip(spine([[468, 456], [438, 512], [452, 556], [486, 574]], 32, 28), -1, 1), armR = strip(spine([[556, 456], [586, 512], [572, 556], [538, 574]], 32, 28), -1, 1);
+  const armL = strip(spine([[470, 458], [444, 512], [458, 556], [488, 576]], 28, 26), -1, 1), armR = strip(spine([[554, 458], [580, 512], [566, 556], [536, 576]], 28, 26), -1, 1);
   body.push(ink(armL, SKIN, { w: W_INNER }), ink(armR, SKIN, { w: W_INNER }));
   // the lower shell in front of her tail
   body.push(ink(bowl, PEARL, { w: W_INNER }), g({ 'clip-path': s.clip(el('path', { d: bowl })) }, bowlIn), stroke(bowl, { w: W_INNER }));
@@ -144,7 +147,8 @@ export function build(s) {
 
   // ---- 3: pearls and bubbles drifting in front
   s.add(3, g({ filter: s.wobble(4, 0.012, 5) }, [pearl(s, 96, 600, 44, W_SUBJECT - 2), pearl(s, 940, 520, 36, W_SUBJECT - 2), pearl(s, 900, 884, 54, W_SUBJECT - 2), pearl(s, 150, 930, 40, W_SUBJECT - 2)]));
-  s.inkBubbles({ n: 8, y0: 200, y1: 780, rmin: 9, rmax: 22, fill: '#bff5ee' });
+  s.inkBubbles({ n: 4, x0: 30, x1: 230, y0: 250, y1: 780, rmin: 9, rmax: 22, fill: '#bff5ee' });
+  s.inkBubbles({ n: 4, x0: 800, x1: 1000, y0: 200, y1: 780, rmin: 9, rmax: 22, fill: '#bff5ee' });
   s.add(3, star4(236, 196, 32), star4(806, 250, 24, '#ffe9a8'), star4(200, 500, 20, '#ffd1ef'), star4(846, 690, 22), star4(690, 120, 16, '#ffe9a8'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffe9a8', '#ffd1ef'], opacity: 0.9 });
 }

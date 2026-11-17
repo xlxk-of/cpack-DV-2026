@@ -79,7 +79,7 @@ export function build(s) {
       ink('M38 10a5 6 0 1 0 0.1 0Z', INK, { w: W(2) }),
     ]);
   };
-  body.push(fish(0.27, GAP / 2 + 4, 0.9, '#ffb347', '#f08a3c', 8), fish(0.11, GAP / 2, 0.74, '#ff8fb0', '#e8648f', 10), fish(0.6, GAP / 2 + 24, 0.86, '#ffd75e', '#f5a83a', 6));
+  body.push(fish(0.26, GAP / 2 - 8, 0.9, '#ffb347', '#f08a3c', 8), fish(0.11, GAP / 2, 0.74, '#ff8fb0', '#e8648f', 10), fish(0.6, GAP / 2 + 24, 0.86, '#ffd75e', '#f5a83a', 6));
   // driftwood
   const wood = (t, dr, k, turn) => {
     const [x, y] = sp(t, dr), W = (w) => w / k;
@@ -95,6 +95,8 @@ export function build(s) {
 
   // ---- 3: spray: foam bubbles, sparkles, flecks
   s.inkBubbles({ n: 11, rmin: 8, rmax: 22, fill: '#ffffff' });
+  // droplets flung off the tail of the foam
+  [[1.05, 30, 15], [1.09, -6, 10], [1.1, 44, 8], [1.14, 14, 6]].forEach(([t, dr, q]) => { const [x, y] = sp(t, dr); s.add(3, inkCircle(x, y, q, '#ffffff', { w: W_DETAIL })); });
   s.add(3, star4(236, 236, 30), star4(840, 560, 24, '#fff6c0'), star4(330, 830, 20), star4(800, 250, 18, '#bff5ec'));
   s.specks({ n: 18, rmin: 3, rmax: 7, colors: ['#ffffff', '#d9fbf5'], opacity: 0.9 });
 }

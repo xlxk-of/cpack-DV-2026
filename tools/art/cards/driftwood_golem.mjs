@@ -113,13 +113,14 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: the shallows in front of his feet, foam, sparks off the core
-  s.add(3, ink(waveBand(1024, 1024, 812, 8, 5, 0.6), '#4a3b93', { w: W_INNER }));
-  s.add(3, flat(waveBand(1024, 1024, 900, 10, 4, 2), '#382d7c'));
+
   const foam = (x, y) => {
     const ds = [[-60, 2, 20], [-24, -8, 28], [20, -6, 25], [58, 4, 19]].map(([dx, dy, q]) => circ(x + dx, y + dy, q)).concat([rr(x - 84, y - 6, 168, 36, 18)]);
     return g({}, [contour(ds, W_DETAIL), ...ds.map((d) => flat(d, '#ffffff')), stroke(`M${x - 34} ${y + 2}q10 -12 22 -4M${x + 14} ${y + 4}q10 -12 22 -4`, { w: W_DETAIL })]);
   };
-  s.add(3, foam(446, 812), foam(578, 814));
+  s.add(3, foam(446, 804), foam(578, 806));
+  s.add(3, ink(waveBand(1024, 1024, 812, 8, 5, 0.6), '#4a3b93', { w: W_INNER }));
+  s.add(3, flat(waveBand(1024, 1024, 900, 10, 4, 2), '#382d7c'));
   s.add(3, bar(230, 850, 180, 12, '#7f66c4'), bar(800, 846, 200, 12, '#7f66c4'), bar(520, 884, 240, 12, '#6a55b4'));
   s.add(3, star4(404, 148, 26, '#bff3ff'), star4(300, 300, 18, '#ffffff'), star4(736, 500, 24, '#bff3ff'), star4(244, 470, 14, '#fff3c4'));
   s.specks({ n: 14, y0: 120, y1: 700, rmin: 3, rmax: 6, colors: ['#bff3ff', '#fff3c4', '#ffffff'], opacity: 0.9 });

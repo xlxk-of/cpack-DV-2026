@@ -70,7 +70,7 @@ export function build(s) {
     [[tx - 176, ty - 44], 16, -60], [[tx + 150, ty - 70], 18, 50], [[tx - 96, ty - 96], 12, -25], [[tx + 62, ty - 112], 13, 20], [[tx + 214, ty - 22], 10, 70],
   ];
   s.add(3, drops.map(([p, k, a]) => drop(p[0], p[1], k, a)));
-  s.add(3, star4(742, 232, 32), star4(232, 384, 22, '#fff3a8'), star4(858, 506, 20), star4(408, 760, 18, '#fff3a8'), star4(560, 150, 16));
+  s.add(3, star4(742, 232, 32), star4(170, 300, 22, '#fff3a8'), star4(858, 506, 20), star4(408, 760, 18, '#fff3a8'), star4(560, 150, 16));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffffff', '#bfefff', '#fff3a8'], opacity: 0.9 });
   s.add(3, ink(waveBand(1024, 1024, 978, 18, 2.5, 4), '#0e1d5a', { w: W_INNER }));
 }

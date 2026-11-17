@@ -32,8 +32,8 @@ export function build(s) {
   ]));
   s.add(1, stroke(`M${mx - 196} ${my}a196 196 0 1 1 392 0a196 196 0 1 1 -392 0`, { w: W_MID }));
   s.add(1, star4(150, 240, 22, '#ffe9a8', W_DETAIL), star4(930, 470, 18, '#ffe9a8', W_DETAIL), star4(400, 70, 16, '#ffe9a8', W_DETAIL));
-  s.add(1, ink(cloud(-120, 905, 460, 150, 5), '#3d4ba8', { w: W_MID }), flat(cloud(-90, 900, 330, 70, 4), '#5262c4'));
-  s.add(1, ink(cloud(640, 890, 520, 170, 6), '#3d4ba8', { w: W_MID }), flat(cloud(700, 884, 360, 80, 5), '#5262c4'));
+  s.add(1, ink(cloud(-140, 985, 520, 230, 5), '#3d4ba8', { w: W_MID }), flat(cloud(-90, 985, 360, 150, 4), '#5262c4'));
+  s.add(1, ink(cloud(600, 985, 600, 260, 6), '#3d4ba8', { w: W_MID }), flat(cloud(690, 985, 400, 170, 5), '#5262c4'));
   s.lumps({ y: 985, amp: 50, n: 6, fill: '#252c78', layer: 1, w: W_MID });
 
   // ---- 2: the Leviathan

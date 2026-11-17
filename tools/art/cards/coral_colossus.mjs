@@ -13,15 +13,17 @@ export function build(s) {
   s.shafts({ x: 400, y: -140, angle: 84, spread: 44, n: 4, color: '#bfeaff', opacity: 0.12, width: 110 });
   s.add(0, g({}, [farCoral(120, 940, 1.5), farCoral(900, 930, 1.7), farCoral(250, 950, 0.9), farCoral(770, 950, 1.0)].flat()));
   s.specks({ n: 40, rmin: 2, rmax: 5, colors: ['#9fd4ff', '#ffd1c4', '#ffffff'], opacity: 0.45, layer: 0 });
-  s.lumps({ y: 905, amp: 80, n: 7, fill: '#15336f', layer: 0 });
+  s.lumps({ y: 850, amp: 90, n: 7, fill: '#173a7c', layer: 0 });
   s.paper();
 
   // ---- 1: the reef it walks through, and a far shoal: thinner line, quiet colour
   s.add(1, g({ opacity: 0.85 }, [[150, 250, 1], [196, 282, 0.8], [116, 300, 0.8], [880, 196, 1], [924, 232, 0.8], [840, 236, 0.8], [900, 600, 0.9]].map(([x, y, k], i) => minnow(x, y, 15 * k, i < 3 ? 1 : -1, '#8fc4f2', W_DETAIL))));
-  s.add(1, branch(96, 1000, 1.25, '#c0649c'), branch(936, 1000, 1.4, '#c0649c'));
-  s.add(1, dome(232, 950, 74, '#6f6fc8'), dome(800, 960, 86, '#6f6fc8'));
-  s.add(1, tubes(700, 940, '#d08a70'), tubes(330, 950, '#d08a70'));
-  s.lumps({ y: 968, amp: 56, n: 6, fill: '#22367c', layer: 1, w: W_MID });
+  s.add(1, branch(96, 960, 1.25, '#a068b8'), branch(936, 960, 1.4, '#a068b8'));
+  s.add(1, dome(226, 900, 74, '#5f6cc4'), dome(812, 900, 86, '#5f6cc4'));
+  s.add(1, tubes(742, 900, '#8a8ad4'), tubes(160, 930, '#8a8ad4'));
+  // the rise of sea floor it stands on
+  s.add(1, ink(`M-60 1100L-60 900C100 870 240 892 340 836C420 800 604 800 690 836C790 892 920 868 1084 896L1084 1100Z`, '#22367c', { w: W_MID }));
+  s.add(1, flat(`M360 850Q512 818 664 850Q512 836 360 850Z`, '#3a55a8'));
 
   // ---- 2: the colossus
   const torso = `M344 324Q512 298 680 324Q702 500 668 684Q512 712 356 684Q322 500 344 324Z`;
@@ -36,8 +38,8 @@ export function build(s) {
   const golem = figure(s, [
     ...antler(-1).map((d) => ({ d, fill: ORANGE })), ...antler(1).map((d) => ({ d, fill: ORANGE, in: [flat(`M0 0H1024V1024H0Z`, ORANGE_SH)] })),
     // legs of stone
-    { d: rr(388, 664, 118, 142, 30), fill: STONE, in: [shadeBlock(388, 664, 118, 142, STONE_SH)] },
-    { d: rr(518, 664, 118, 142, 30), fill: STONE_SH },
+    { d: rr(388, 664, 118, 170, 30), fill: STONE, in: [shadeBlock(388, 664, 118, 170, STONE_SH)] },
+    { d: rr(518, 664, 118, 170, 30), fill: STONE_SH },
     {
       d: torso, fill: CORAL, in: [
         flat(`M580 280C640 400 640 600 590 720L720 720L720 280Z`, CORAL_SH),
@@ -58,17 +60,18 @@ export function build(s) {
     { d: rr(438, 222, 148, 132, 40), fill: CORAL, in: [flat(`M540 200C566 260 566 320 540 370L620 370L620 200Z`, CORAL_SH), el('circle', { cx: 480, cy: 306, r: 34, fill: LAMP, opacity: 0.45 }), el('circle', { cx: 544, cy: 306, r: 34, fill: LAMP, opacity: 0.45 })] },
     { d: rr(426, 226, 172, 50, 22), fill: STONE, in: [flat(`M540 200H620V300H530Z`, STONE_SH)] },
   ]);
+  const plate = `M436 448Q512 420 588 448L588 540Q582 612 512 644Q442 612 436 540Z`;
   const details = [
     // lamp eyes, a flat little mouth
     eye(480, 306, 19, { look: [0, 0.5], white: LAMP, w: W_DETAIL + 1, pupil: 0.5 }), eye(544, 306, 19, { look: [0, 0.5], white: LAMP, w: W_DETAIL + 1, pupil: 0.5 }),
     stroke(`M498 336h28`, { w: W_DETAIL + 1 }),
     // a pale chest plate with a crack, knuckles, toes, coral pores
-    ink(rr(440, 440, 144, 176, 44), CREAM, { w: W_INNER }),
-    g({ 'clip-path': s.clip(el('path', { d: rr(440, 440, 144, 176, 44) })) }, [flat(`M536 420C560 500 556 580 530 640L620 640L620 420Z`, '#f5b89a')]),
-    stroke(rr(440, 440, 144, 176, 44), { w: W_INNER }),
-    stroke(`M486 444L500 484L480 510L502 548M500 484L524 498`, { w: W_DETAIL }),
+    ink(plate, CREAM, { w: W_INNER }),
+    g({ 'clip-path': s.clip(el('path', { d: plate })) }, [flat(`M536 400C560 500 556 580 530 660L620 660L620 400Z`, '#f5b89a')]),
+    stroke(plate, { w: W_INNER }),
+    stroke(`M486 438L500 484L480 510L502 548M500 484L524 498`, { w: W_DETAIL }),
     stroke(`M236 690v24M276 694v26M312 690v24M712 690v24M750 694v26M788 690v24`, { w: W_DETAIL }),
-    stroke(`M426 782v20M466 784v20M556 784v20M596 782v20`, { w: W_DETAIL }),
+    stroke(`M426 806v22M466 808v22M556 808v22M596 806v22`, { w: W_DETAIL }),
     ...[[612, 380, 9, 6], [636, 440, 7, 5], [622, 520, 9, 6], [392, 560, 7, 5], [640, 610, 7, 5], [320, 360, 8, 5], [770, 372, 8, 5], [338, 430, 6, 4]].map(([x, y, a, b]) => inkEllipse(x, y, a, b, '#b8405f', { w: 4 })),
     // round coral tips on the antlers
     ...[[-136, 132], [-78, 122], [-178, 160], [136, 132], [78, 122], [178, 160]].map(([dx, y]) => inkCircle(512 + dx, y, 15, dx < 0 ? '#ffd27a' : ORANGE, { w: W_INNER })),
@@ -76,13 +79,13 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, [golem, ...details]));
 
   // ---- 3: tiny fish round its shoulders, bubbles, sparkles, dark coral at the near corners
-  const shoal = [[214, 282, 1, 1], [262, 252, 0.85, 1], [176, 330, 0.8, 1], [330, 232, 0.7, 1], [150, 392, 0.9, 1],
-    [806, 270, 1, -1], [760, 236, 0.8, -1], [850, 322, 0.85, -1], [704, 224, 0.7, -1], [876, 390, 0.75, -1], [600, 150, 0.7, -1]];
+  const shoal = [[196, 270, 1, 1], [176, 330, 0.8, 1], [340, 214, 0.7, 1], [150, 392, 0.9, 1],
+    [826, 262, 1, -1], [850, 322, 0.85, -1], [690, 200, 0.7, -1], [876, 390, 0.75, -1], [600, 150, 0.7, -1]];
   s.add(3, g({ filter: s.wobble(3, 0.02, 9) }, shoal.map(([x, y, k, dir], i) => minnow(x, y, 20 * k, dir, ['#ffe27a', '#ffffff', '#9fe8ff'][i % 3], W_DETAIL))));
   s.add(3, ink(nearCoral(-10, 1050, 1), '#16296a', { w: W_INNER }), ink(nearCoral(1034, 1050, -1), '#16296a', { w: W_INNER }));
-  s.inkBubbles({ n: 5, x0: 120, x1: 200, y0: 440, y1: 860, rmin: 8, rmax: 22 });
-  s.inkBubbles({ n: 5, x0: 836, x1: 910, y0: 430, y1: 860, rmin: 8, rmax: 22 });
-  s.add(3, star4(360, 172, 22, '#ffffff'), star4(690, 148, 18, '#ffe9a8'), star4(170, 560, 22, '#ffffff'), star4(868, 640, 18, '#ffd1c4'), star4(260, 800, 16, '#ffffff'));
+  s.inkBubbles({ n: 4, x0: 120, x1: 190, y0: 440, y1: 800, rmin: 8, rmax: 22 });
+  s.inkBubbles({ n: 4, x0: 840, x1: 910, y0: 430, y1: 800, rmin: 8, rmax: 22 });
+  s.add(3, star4(300, 150, 22, '#ffffff'), star4(740, 140, 18, '#ffe9a8'), star4(170, 560, 22, '#ffffff'), star4(868, 640, 18, '#ffd1c4'), star4(260, 800, 16, '#ffffff'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffd1c4', '#b9f3ff'], opacity: 0.9 });
   void r;
 }
