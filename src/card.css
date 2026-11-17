@@ -1,0 +1,187 @@
+/* THE CARD. Sized in cqw (1cqw = 1% of the card's width), so one set of rules draws it at any size.
+   Layout on a 100 x 140 card: art window on top, a name banner across its foot, rules text below, the cost pearl
+   top-left, attack bottom-left, health bottom-right. Legendary and Mythic cards are "full": the picture runs to the
+   edges and fades into the text.
+   The foil layers (.fx) are driven by --mx/--my/--px/--py/--o, which card.js writes while a card is live. */
+
+.card {
+  --cw: 200px;
+  --mx: 50%; --my: 50%; --px: 0; --py: 0; --o: 0;
+  --rim-a: #aebccb; --rim-b: #4b5b70; --rim-c: #dfe7ee; --rim-d: #37445a; --line: #7f90a6; --ink: #e9eefc;
+  position: relative; width: var(--cw); aspect-ratio: 5 / 7; container-type: inline-size; perspective: 900px;
+  flex: none; user-select: none; -webkit-user-select: none; touch-action: none;
+}
+.card.r-rare      { --rim-a: #c9efff; --rim-b: #2f78c4; --rim-c: #e9f9ff; --rim-d: #1d4f8f; --line: #6fc4ff; }
+.card.r-epic      { --rim-a: #ecd2ff; --rim-b: #8246d6; --rim-c: #f7e9ff; --rim-d: #4f2599; --line: #c58bff; }
+.card.r-legendary { --rim-a: #fff3c2; --rim-b: #d2912a; --rim-c: #fffae0; --rim-d: #9a5f10; --line: #ffcf6a; }
+.card.r-mythic    { --rim-a: #ffd0f3; --rim-b: #7ad8ff; --rim-c: #fff6c9; --rim-d: #b58cff; --line: #ffb3ec; }
+
+.card-tilt { position: absolute; inset: 0; transform: rotateY(calc(var(--px) * 11deg)) rotateX(calc(var(--py) * -11deg)); }
+.card.live .card-tilt { will-change: transform; }
+.card-face { position: absolute; inset: 0; border-radius: 5cqw; isolation: isolate; box-shadow: 0 1.5cqw 5cqw rgba(0, 0, 0, .55); }
+.card.live .card-face { box-shadow: calc(var(--px) * -4cqw) calc(4cqw + var(--py) * -4cqw) 12cqw rgba(0, 0, 0, .6), 0 0 calc(var(--o) * 10cqw) color-mix(in srgb, var(--line) 45%, transparent); }
+
+.card .rim { position: absolute; inset: 0; border-radius: 5cqw;
+  background: linear-gradient(140deg, var(--rim-a) 0%, var(--rim-b) 22%, var(--rim-c) 46%, var(--rim-b) 62%, var(--rim-d) 80%, var(--rim-a) 100%); }
+.card.r-mythic .rim { background: conic-gradient(from var(--ang, 0deg), #ff9be4, #ffe27a, #8dffd2, #7ab8ff, #c78cff, #ff9be4); }
+.card.r-mythic.live .rim { animation: rim-spin 5s linear infinite; }
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes rim-spin { to { --ang: 360deg; } }
+
+.card .body { position: absolute; inset: 2.2cqw; border-radius: 3.4cqw;
+  background:
+    radial-gradient(120% 60% at 50% 100%, color-mix(in srgb, var(--line) 22%, transparent), transparent 70%),
+    linear-gradient(180deg, #0c1530 0%, #0a1027 55%, #070b1c 100%);
+  box-shadow: inset 0 0 0 .5cqw rgba(0, 0, 0, .55), inset 0 0 6cqw rgba(0, 0, 0, .6); }
+
+/* ---- the picture */
+.card .art { position: absolute; left: 5.2cqw; right: 5.2cqw; top: 5.2cqw; height: 75cqw; border-radius: 2.6cqw; overflow: hidden;
+  background: #050a1a; box-shadow: 0 0 0 .55cqw var(--line), 0 0 0 1.1cqw rgba(0, 0, 0, .6); }
+.card .art::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 5cqw rgba(0, 0, 10, .75), inset 0 -8cqw 9cqw -6cqw rgba(0, 0, 10, .8); }
+.card .art-l { position: absolute; left: -7%; top: -7%; width: 114%; height: 114%; object-fit: cover; object-position: 50% 40%; display: block; }
+.card .art-l.l0 { transform: translate(calc(var(--px) * 2.4cqw), calc(var(--py) * 2.4cqw)); }
+.card .art-l.l1 { transform: translate(calc(var(--px) * 1.1cqw), calc(var(--py) * 1.1cqw)); }
+.card .art-l.l2 { transform: translate(calc(var(--px) * -.7cqw), calc(var(--py) * -.7cqw)); }
+.card .art-l.l3 { transform: translate(calc(var(--px) * -3cqw), calc(var(--py) * -3cqw)); }
+.card.full .art { left: 2.2cqw; right: 2.2cqw; top: 2.2cqw; height: 95.6cqw; border-radius: 3.4cqw 3.4cqw 0 0; box-shadow: none; background: none;
+  -webkit-mask-image: linear-gradient(#000 76%, transparent 99%); mask-image: linear-gradient(#000 76%, transparent 99%); }
+.card.full .art::after { box-shadow: inset 0 0 4cqw rgba(0, 0, 10, .5); }
+.card.full .art-l { object-position: 50% 50%; }
+
+/* ---- the name banner */
+.card .plate { position: absolute; left: 2.6cqw; right: 2.6cqw; top: 75.5cqw; height: 12.6cqw;
+  clip-path: polygon(3.5% 0, 96.5% 0, 100% 50%, 96.5% 100%, 3.5% 100%, 0 50%);
+  background:
+    linear-gradient(180deg, var(--line) 0, var(--line) 5%, transparent 5.5%, transparent 94.5%, var(--line) 95%),
+    linear-gradient(180deg, #1b2750 0%, #0d1533 55%, #131d42 100%); }
+.card.full .plate { top: 80cqw; background:
+    linear-gradient(180deg, var(--line) 0, var(--line) 5%, transparent 5.5%, transparent 94.5%, var(--line) 95%),
+    linear-gradient(180deg, rgba(27, 34, 70, .92), rgba(10, 14, 36, .94)); }
+.card .name { position: absolute; left: 6cqw; right: 6cqw; top: 75.5cqw; height: 12.6cqw; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 700; color: var(--ink); letter-spacing: .02em; white-space: nowrap;
+  text-shadow: 0 .4cqw .8cqw #000, 0 0 2cqw rgba(0, 0, 0, .8); }
+.card.full .name { top: 80cqw; }
+.card.r-legendary .name { color: #ffe9a8; }
+.card.r-mythic .name { background: linear-gradient(90deg, #ffb3ec, #fff0b0, #a8ffe0, #a9d0ff, #dab4ff); -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: none; filter: drop-shadow(0 .4cqw .6cqw #000); }
+
+/* ---- the words */
+.card .text { position: absolute; left: 8cqw; right: 8cqw; top: 89.5cqw; bottom: 9.5cqw; display: flex; align-items: center; justify-content: center; text-align: center;
+  font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; line-height: 1.08; color: #dfe6f7; text-wrap: balance; }
+.card .text i { opacity: .62; font-size: .82em; }
+.card .text b { color: #fff; font-weight: 700; }
+.card.full .text { top: 93.5cqw; bottom: 8.5cqw; }
+.card .kind { position: absolute; left: 0; right: 0; bottom: 3.4cqw; text-align: center; font-family: 'Cinzel', serif; font-weight: 700; font-size: 3.1cqw;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--line); opacity: .9; }
+.card .gem { display: inline-block; width: 2.6cqw; height: 2.6cqw; margin-right: 1.4cqw; transform: rotate(45deg) translateY(-.2cqw); background: linear-gradient(135deg, #fff, var(--line) 45%, var(--rim-d)); box-shadow: 0 0 1.5cqw var(--line); }
+
+/* ---- cost, attack, health */
+.card .cost, .card .atk, .card .hp { position: absolute; isolation: isolate; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; }
+.card .cost { left: -.6cqw; top: -.6cqw; width: 21cqw; height: 21cqw; border-radius: 50%; font-size: 13cqw; color: #0b1a3a;
+  background: radial-gradient(circle at 34% 28%, #fff 0%, #e8f6ff 18%, #a9d8ff 42%, #5f8fe0 68%, #b79cf0 88%, #ffd3ee 100%);
+  box-shadow: 0 0 0 .6cqw #0a1027, 0 0 0 1.1cqw var(--line), 0 1cqw 2.5cqw rgba(0, 0, 0, .7), inset -1.2cqw -1.6cqw 3cqw rgba(40, 30, 120, .45); }
+.card .cost span { text-shadow: 0 .3cqw 0 rgba(255, 255, 255, .7); transform: translateY(-.3cqw); }
+.card .atk, .card .hp { bottom: -.6cqw; width: 19.5cqw; height: 19.5cqw; font-size: 11.5cqw; color: #fff; }
+.card .atk { left: -.6cqw; }
+.card .hp { right: -.6cqw; }
+.card .atk::before, .card .hp::before { content: ''; position: absolute; inset: 0; z-index: -1; filter: drop-shadow(0 .8cqw 1.2cqw rgba(0, 0, 0, .7)); }
+.card .atk::before { clip-path: polygon(50% 0, 96% 22%, 86% 78%, 50% 100%, 14% 78%, 4% 22%);
+  background: radial-gradient(circle at 35% 25%, #fff3c4, #f0b233 40%, #b86a12 78%, #6e3706); }
+.card .hp::before { border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%;
+  background: radial-gradient(circle at 35% 25%, #ffd9df, #f0506e 40%, #a81a3c 78%, #5c0a22); }
+.card .atk span, .card .hp span { text-shadow: 0 .5cqw 0 rgba(0, 0, 0, .6), 0 0 1.4cqw #000, 0 0 .6cqw #000; transform: translateY(-.2cqw); }
+
+.card .count { position: absolute; right: 2cqw; top: 2cqw; padding: .6cqw 3cqw; border-radius: 4cqw; font-family: 'Cinzel', serif; font-weight: 700; font-size: 6cqw;
+  color: #fff; background: rgba(8, 12, 30, .86); box-shadow: 0 0 0 .4cqw var(--line); }
+
+/* resting hint of rarity, so a foil reads as one before it is touched (cheap: no blending) */
+.card.r-rare .card-face::after, .card.r-epic .card-face::after, .card.r-legendary .card-face::after, .card.r-mythic .card-face::after {
+  content: ''; position: absolute; inset: 0; border-radius: 5cqw; pointer-events: none;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, .13) 44%, rgba(255, 255, 255, .02) 52%, transparent 64%); }
+.card.r-legendary .card-face::after { background: linear-gradient(120deg, rgba(255, 120, 220, .0) 15%, rgba(255, 215, 120, .16) 38%, rgba(140, 255, 220, .12) 52%, rgba(160, 170, 255, .14) 66%, transparent 85%); }
+.card.r-mythic .card-face::after { background: linear-gradient(120deg, rgba(255, 120, 220, .16), rgba(255, 230, 120, .14) 30%, rgba(120, 255, 220, .14) 52%, rgba(120, 170, 255, .16) 74%, rgba(220, 140, 255, .16)); }
+.card.live .card-face::after { display: none; }
+
+/* ============================================================================================ THE FOILS */
+.card .fx { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
+.card:not(.live) .fx { display: none; }
+.card .fxs { position: absolute; inset: 2.2cqw; border-radius: 3.4cqw; overflow: hidden; pointer-events: none; }
+
+/* SHINE (rare and up): a band of light that crosses the card against the tilt */
+.card .fx.shine { border-radius: 5cqw;
+  background: linear-gradient(115deg, transparent 34%, rgba(120, 215, 255, .5) 44%, rgba(255, 255, 255, .95) 50%, rgba(255, 160, 235, .5) 56%, transparent 66%);
+  background-size: 300% 300%; background-position: var(--mx) var(--my);
+  mix-blend-mode: color-dodge; opacity: calc(var(--o) * .5); }
+/* GLARE (every card, when held): the lamp itself */
+.card .fx.glare { border-radius: 5cqw;
+  background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .6) 0%, rgba(255, 255, 255, .14) 26%, rgba(0, 0, 10, .34) 92%);
+  mix-blend-mode: overlay; opacity: calc(var(--o) * .75); }
+
+/* HOLO (epic and up): rainbow bars sliding over the picture, broken into fine foil lines */
+.card .fx.holo {
+  background-image:
+    repeating-linear-gradient(118deg, #ff5fa2 0%, #ffd36b 6%, #6bffb8 12%, #6bb6ff 18%, #b98bff 24%, #ff5fa2 30%),
+    repeating-linear-gradient(-62deg, rgba(0, 0, 0, .1) 0, rgba(0, 0, 0, .42) .55cqw, rgba(0, 0, 0, .1) 1.1cqw);
+  background-size: 320% 320%, 100% 100%;
+  background-position: calc(50% + var(--px) * 55%) calc(50% + var(--py) * 55%), 0 0;
+  background-blend-mode: multiply;
+  mix-blend-mode: color-dodge; filter: brightness(.85) contrast(1.4) saturate(1.2); opacity: calc(var(--o) * .4);
+  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .25) 100%);
+  mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .25) 100%); }
+.card.full .fx.holo { opacity: calc(var(--o) * .22); }
+
+/* OIL (legendary and up): two copies of an oil slick slid against each other, so the colours crawl as the card turns.
+   Laid on twice: once as a tint that keeps the picture's own light and dark (overlay), once as light (colour-dodge)
+   in a band near the lamp, which is where a real slick flares. */
+.card .fx.oil, .card .fx.oil2 {
+  background-image: url(../fx/oil.webp), url(../fx/oil.webp);
+  background-size: 150cqw 150cqw, 230cqw 230cqw;
+  background-position: calc(var(--px) * 45cqw) calc(var(--py) * 45cqw), calc(40cqw - var(--px) * 70cqw) calc(90cqw - var(--py) * 70cqw);
+  background-blend-mode: difference; }
+.card .fx.oil { mix-blend-mode: overlay; filter: saturate(1.3); opacity: calc(var(--o) * .36); }
+.card .fx.oil2 { mix-blend-mode: color-dodge; filter: saturate(1.3) brightness(.8); opacity: calc(var(--o) * .42);
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .35) 34%, transparent 68%);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .35) 34%, transparent 68%); }
+.card.r-mythic .fx.oil { opacity: calc(var(--o) * .46); }
+
+/* GLITTER (legendary and up): two sheets of fine sparkle multiplied together and slid past each other; a flake only
+   fires where the sheets agree, so the whole card twinkles as it moves. Coloured by a rainbow underneath. */
+.card .fx.glitter {
+  background-image: url(../fx/glitter.png), url(../fx/glitter.png), linear-gradient(125deg, #ff7ad9, #ffe27a 25%, #7dffcf 50%, #7ab8ff 75%, #c78cff);
+  background-size: 62cqw 62cqw, 47cqw 47cqw, 300% 300%;
+  background-position: calc(var(--px) * 10cqw) calc(var(--py) * 10cqw), calc(11cqw - var(--px) * 14cqw) calc(5cqw - var(--py) * 14cqw), var(--mx) var(--my);
+  background-blend-mode: multiply, multiply, normal;
+  mix-blend-mode: color-dodge; filter: brightness(3.4) contrast(1.9); opacity: calc(var(--o) * .85);
+  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .6) 40%, rgba(0, 0, 0, .22) 100%);
+  mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .6) 40%, rgba(0, 0, 0, .22) 100%); }
+/* the big flakes and star glints, lit only near the lamp */
+.card .fx.flakes {
+  background-image: url(../fx/flakes.png); background-size: 78cqw 78cqw;
+  background-position: calc(var(--px) * -6cqw) calc(var(--py) * -6cqw);
+  mix-blend-mode: plus-lighter; opacity: calc(var(--o) * .95);
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .5) 30%, transparent 62%);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .5) 30%, transparent 62%); }
+
+/* PRISM (mythic): a hard band of split light, and rays fanning from the lamp */
+.card .fx.prism {
+  background-image: repeating-linear-gradient(100deg, #ff2d95 0%, #ff9a2d 5%, #fff12d 10%, #3dff8b 15%, #2dd9ff 20%, #5a6bff 25%, #c22dff 30%, #ff2d95 35%);
+  background-size: 260% 100%; background-position: calc(50% + var(--px) * 70%) 0;
+  mix-blend-mode: plus-lighter; filter: saturate(1.3); opacity: calc(var(--o) * .22);
+  -webkit-mask-image: linear-gradient(115deg, transparent 30%, rgba(0, 0, 0, .5) 40%, #000 50%, rgba(0, 0, 0, .5) 60%, transparent 70%);
+  mask-image: linear-gradient(115deg, transparent 30%, rgba(0, 0, 0, .5) 40%, #000 50%, rgba(0, 0, 0, .5) 60%, transparent 70%);
+  -webkit-mask-size: 300% 300%; mask-size: 300% 300%; -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
+.card .fx.rays {
+  background-image: repeating-conic-gradient(from calc(var(--px) * 80deg) at var(--mx) var(--my),
+    rgba(255, 80, 180, .0) 0deg, rgba(255, 80, 180, .55) 3deg, rgba(255, 230, 90, .55) 6deg, rgba(90, 255, 190, .55) 9deg, rgba(90, 170, 255, .55) 12deg, rgba(200, 110, 255, .0) 15deg, transparent 30deg);
+  mix-blend-mode: color-dodge; opacity: calc(var(--o) * .3);
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), transparent 6%, #000 22%, transparent 70%);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), transparent 6%, #000 22%, transparent 70%); }
+
+/* ---- face-down and turning over */
+.flip { --cw: 200px; position: relative; width: var(--cw); aspect-ratio: 5 / 7; container-type: inline-size; perspective: 1100px; flex: none; }
+.flip-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .75s cubic-bezier(.2, .85, .25, 1.05); }
+.flip.up .flip-inner { transform: rotateY(180deg); }
+.flip .card-back, .flip .flip-front { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip .flip-front { transform: rotateY(180deg); width: 100%; }
+.card-back { border-radius: 5cqw; background: #0a1027 url(../ui/card_back.webp) center / cover; box-shadow: 0 1.5cqw 5cqw rgba(0, 0, 0, .55), inset 0 0 0 .5cqw rgba(255, 255, 255, .12); }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NACRE · Duels of the Drowned Stars</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="theme-color" content="#060a18">
+<meta name="description" content="A card duelling game: open foil packs, build a deck, trade, and duel the lords of a drowned sea.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NACRE">
+<link rel="apple-touch-icon" href="icons/icon_180.png">
+<link rel="icon" href="icons/icon_192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/cinzel-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="src/card.css">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+
+<!-- the bar every screen but the title and the duel shares -->
+<header id="bar" hidden>
+  <button id="bar-back" class="btn mini">‹ Home</button>
+  <h1 id="bar-title"></h1>
+  <div id="bar-purse">
+    <span class="purse gold" title="gold"><i class="coin"></i><b id="bar-gold">0</b></span>
+    <span class="purse packs" title="unopened packs"><i class="packicon"></i><b id="bar-packs">0</b></span>
+  </div>
+</header>
+
+<main id="home" class="screen"></main>
+<main id="duels" class="screen" hidden></main>
+<main id="battle" class="screen" hidden></main>
+<main id="collection" class="screen" hidden></main>
+<main id="packs" class="screen" hidden></main>
+<main id="trade" class="screen" hidden></main>
+
+<div id="inspect" hidden></div>
+<div id="toasts"></div>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
