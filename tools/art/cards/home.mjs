@@ -10,7 +10,7 @@ export const size = [1920, 1200];
 export const noThumb = true;
 
 const SEA = 664;            // the waterline
-const LX = 1228, LY = 334;  // the lamp
+const LX = 1204, LY = 334;  // the lamp
 const TY = 362 - LY;        // the tower is drawn with its lamp at y 362, then lifted by this much
 const GOLD = '#f6c544', PALE = '#fff3a8';
 
@@ -114,9 +114,8 @@ export function build(s) {
     sea.push(el('path', { d: `M${x} ${y}h${l}`, stroke: x > 1100 && x < 1300 || x < 300 ? PALE : '#c8f6ff', 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.85 }));
   }
   // the drowned city: far ruins (flat, close to the water's colour), then nearer and darker
-  const FAR = '#1a6088', MIDC = '#144a72', NEAR = '#0f3559';
+  const FAR = '#1a6088', MIDC = '#124268', NEAR = '#0f3559';
   sea.push(flat(spline([[1020, 700], [1236, 720], [1470, 700], [1500, 860], [1470, 1000], [1560, 1260], [1000, 1260], [1080, 1000], [1040, 860]], true), FAR)); // the rock's foot
-  sea.push(flat('M1150 800q40 -20 70 6q-10 34 -44 30q-30 -8 -26 -36Z', MIDC), flat('M1330 900q30 -10 44 14q-14 22 -36 14q-14 -10 -8 -28Z', MIDC));
   sea.push(column(420, 1100, 250, 40, FAR), column(520, 1100, 190, 40, FAR), flat('M380 842L470 800L470 842Z', FAR));
   sea.push(flat('M1560 1100L1560 860Q1650 760 1740 860L1740 1100L1690 1100L1690 900Q1650 850 1610 900L1610 1100Z', FAR), column(1830, 1100, 300, 44, FAR));
   sea.push(flat('M700 1100L700 930L730 930L730 900L760 900L760 930L790 930L790 1100Z', FAR));
@@ -135,12 +134,12 @@ export function build(s) {
   s.weed({ x: 110, y: H + 20, h: 300, fill: '#1c7a78', sway: 30, width: 48, layer: 2 });
   s.weed({ x: 190, y: H + 20, h: 200, fill: '#17625f', sway: 22, width: 40, layer: 2 });
   s.weed({ x: 1790, y: H + 20, h: 280, fill: '#1c7a78', sway: 28, width: 46, layer: 2, lean: -0.06 });
-  s.weed({ x: 620, y: H + 20, h: 150, fill: '#17625f', sway: 18, width: 34, layer: 2 });
+  s.weed({ x: 540, y: H + 20, h: 150, fill: '#17625f', sway: 18, width: 34, layer: 2 });
   s.weed({ x: 1310, y: H + 20, h: 170, fill: '#17625f', sway: 18, width: 34, layer: 2 });
   s.lumps({ y: 1196, amp: 44, n: 10, fill: '#0a1e42', layer: 2, w: W_MID });
 
   // the small whale
-  const wx = 720, wy = 800, wh = [];
+  const wx = 830, wy = 800, wh = [];
   const wbody = `M${wx - 150} ${wy - 6}C${wx - 110} ${wy - 76} ${wx + 40} ${wy - 96} ${wx + 120} ${wy - 40}C${wx + 160} ${wy - 10} ${wx + 150} ${wy + 40} ${wx + 90} ${wy + 56}C${wx + 10} ${wy + 76} ${wx - 90} ${wy + 50} ${wx - 150} ${wy - 6}Z`;
   const fluke = `M${wx - 140} ${wy - 6}C${wx - 180} ${wy - 20} ${wx - 196} ${wy - 60} ${wx - 232} ${wy - 62}C${wx - 226} ${wy - 30} ${wx - 206} ${wy - 6} ${wx - 190} ${wy + 2}C${wx - 214} ${wy + 14} ${wx - 232} ${wy + 36} ${wx - 228} ${wy + 62}C${wx - 190} ${wy + 54} ${wx - 172} ${wy + 20} ${wx - 136} ${wy + 10}Z`;
   const fin = `M${wx + 10} ${wy + 40}C${wx - 10} ${wy + 70} ${wx - 50} ${wy + 86} ${wx - 76} ${wy + 78}C${wx - 60} ${wy + 60} ${wx - 50} ${wy + 40} ${wx - 30} ${wy + 30}Z`;
@@ -157,8 +156,8 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(4, 0.012, 7) }, wh));
 
   // ---- 3: the stars that fell in, bubbles, a glint or two
-  s.add(3, drowned(650, 1110, 40, 10), drowned(1000, 1140, 32), drowned(1236, 1040, 38, -8), drowned(1030, 770, 26, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1530, 800, 26), drowned(130, 860, 26, -10));
+  s.add(3, drowned(650, 1110, 40, 10), drowned(1000, 1140, 32), drowned(1236, 1040, 38, -8), drowned(1100, 800, 26, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1530, 800, 26), drowned(130, 860, 26, -10));
   const bub = (x, y, rr) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })]);
-  s.add(3, bub(850, 720, 12), bub(872, 690, 7), bub(1020, 716, 6), bub(1040, 700, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9), bub(760, 760, 7));
+  s.add(3, bub(960, 720, 12), bub(982, 690, 7), bub(1130, 730, 6), bub(1150, 712, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9), bub(760, 760, 7));
   s.specks({ n: 40, y0: SEA + 60, rmin: 2, rmax: 5, colors: ['#bfefff', '#ffe9a8', '#8fd0ff'], opacity: 0.6 });
 }
