@@ -136,6 +136,8 @@ export function build(s) {
   s.weed({ x: 1790, y: H + 20, h: 280, fill: '#1c7a78', sway: 28, width: 46, layer: 2, lean: -0.06 });
   s.weed({ x: 540, y: H + 20, h: 150, fill: '#17625f', sway: 18, width: 34, layer: 2 });
   s.weed({ x: 1310, y: H + 20, h: 170, fill: '#17625f', sway: 18, width: 34, layer: 2 });
+  // the stars that fell in, half sunk in the sea bed
+  s.add(2, drowned(650, 1110, 40, 10), drowned(1000, 1140, 32), drowned(1236, 1040, 38, -8), drowned(1100, 800, 26, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1530, 800, 26), drowned(130, 860, 26, -10));
   s.lumps({ y: 1196, amp: 44, n: 10, fill: '#0a1e42', layer: 2, w: W_MID });
 
   // the small whale
@@ -155,9 +157,8 @@ export function build(s) {
   wh.push(el('ellipse', { cx: wx + 60, cy: wy + 12, rx: 13, ry: 8, fill: '#ff9fc8', opacity: 0.85 }));
   s.add(2, g({ filter: s.wobble(4, 0.012, 7) }, wh));
 
-  // ---- 3: the stars that fell in, bubbles, a glint or two
-  s.add(3, drowned(650, 1110, 40, 10), drowned(1000, 1140, 32), drowned(1236, 1040, 38, -8), drowned(1100, 800, 26, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1530, 800, 26), drowned(130, 860, 26, -10));
+  // ---- 3: bubbles and plankton
   const bub = (x, y, rr) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })]);
-  s.add(3, bub(960, 720, 12), bub(982, 690, 7), bub(1130, 730, 6), bub(1150, 712, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9), bub(760, 760, 7));
+  s.add(3, bub(960, 720, 12), bub(982, 690, 7), bub(1130, 730, 6), bub(1150, 712, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9)));
   s.specks({ n: 40, y0: SEA + 60, rmin: 2, rmax: 5, colors: ['#bfefff', '#ffe9a8', '#8fd0ff'], opacity: 0.6 });
 }
