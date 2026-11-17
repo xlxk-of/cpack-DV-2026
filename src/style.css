@@ -404,7 +404,7 @@ textarea { border: 2.5px solid var(--ink); }
 #inspect { background: rgba(16, 20, 52, .96); backdrop-filter: none; -webkit-backdrop-filter: none; }
 
 /* the title */
-.logo-mark { filter: drop-shadow(0 6px 0 rgba(26, 18, 48, .7)); }
+.logo-mark { display: block; margin: 0 auto 6px; filter: drop-shadow(0 6px 0 rgba(26, 18, 48, .7)); }
 .logo h1 { position: relative; display: inline-block; letter-spacing: .06em; margin-right: -.06em; background: none; color: var(--ink); -webkit-text-stroke: .16em var(--ink); filter: drop-shadow(0 .07em 0 var(--ink)); }
 .logo h1::after { content: attr(data-t); position: absolute; left: 0; top: 0; -webkit-text-stroke: 0; background: linear-gradient(180deg, #ffffff 0 50%, #c9ecff 50% 74%, #ffc9ec 74% 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .logo p { letter-spacing: .2em; color: #fff; text-shadow: 0 2px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink), 0 -2px 0 var(--ink); }
@@ -417,13 +417,16 @@ textarea { border: 2.5px solid var(--ink); }
 .rip-grade[data-kind='good'] { color: #8dffd2; } .rip-grade[data-kind='perfect'] { color: #ffd45e; }
 
 /* the duel */
-.bt-bg { background: radial-gradient(90% 70% at 50% 50%, rgba(20, 28, 68, 0) 45%, rgba(16, 18, 48, .6) 100%), url(../ui/arena.webp) center / cover no-repeat, #1b2450; }
+/* the board picture fills everything above the hand, so its own centre line falls between the two rows; the hand
+   sits on a plain shelf below it */
+.bt-bg { inset: 0 0 calc(var(--hc) * .86 + var(--safe-b)) 0; border-bottom: 4px solid var(--ink); background: url(../ui/arena.webp) center / cover no-repeat, #1b2450; }
+#battle { background: #1b2450; }
+.bt-line { display: none; }
 .hero-pic { border-radius: 24%; border: calc(var(--hero) * .05) solid #ffcf52; box-shadow: 0 0 0 3px var(--ink), inset 0 0 0 3px var(--ink), 0 6px 0 3px rgba(26, 18, 48, .6); }
 .hero.opp .hero-pic { border-color: #ff7d95; }
 .hero-hp { background: radial-gradient(circle at 32% 26%, #fff 0 9%, transparent 10%), linear-gradient(150deg, #ff7d95 0 58%, #e0406a 58% 100%); box-shadow: 0 0 0 3px var(--ink); text-shadow: none; -webkit-text-stroke: .22em var(--ink); paint-order: stroke fill; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; }
 .hero-name { text-shadow: none; -webkit-text-stroke: .28em var(--ink); paint-order: stroke fill; color: #fff; }
 .bt-meta, .mana, .deckpile, .tok-zz { text-shadow: none; -webkit-text-stroke: .26em var(--ink); paint-order: stroke fill; color: #fff; }
-.bt-line { height: 4px; background: repeating-linear-gradient(90deg, rgba(26, 18, 48, .75) 0 18px, transparent 18px 30px); }
 .pearl { background: #2a356e; box-shadow: 0 0 0 2px var(--ink); }
 .pearl.full { background: radial-gradient(circle at 32% 28%, #fff 0 16%, transparent 17%), linear-gradient(150deg, #9fdcff 0 60%, #5fa6ee 60%); box-shadow: 0 0 0 2px var(--ink); }
 .power { background: linear-gradient(150deg, #6f8cff 0 58%, #4a62d0 58%); border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); }
