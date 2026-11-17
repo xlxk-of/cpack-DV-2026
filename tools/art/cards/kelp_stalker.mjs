@@ -65,7 +65,7 @@ export function build(s) {
   const tailD = poly([[ep[0] - e.dx * 26 - e.nx * 14, ep[1] - e.dy * 26 - e.ny * 14], [ep[0] + e.dx * 96 - e.nx * 76, ep[1] + e.dy * 96 - e.ny * 76],
     [ep[0] + e.dx * 44, ep[1] + e.dy * 44], [ep[0] + e.dx * 78 + e.nx * 62, ep[1] + e.dy * 78 + e.ny * 62], [ep[0] - e.dx * 26 + e.nx * 14, ep[1] - e.dy * 26 + e.ny * 14]], true);
   const fish = [];
-  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.33, 0.86, -1, 74, 5), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }]));
+  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.33, 0.7, -1, 74, 4), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }]));
 
   // inside the body: pale belly, dark bars over the back, one hard shadow along the underside, a hard highlight
   const band = (k0, k1, t0 = 0, t1 = 1) => { const a = [], b = []; for (let i = I(t0); i <= I(t1); i++) { a.push(at(i, k0)); b.push(at(i, k1)); } return poly([...a, ...b.reverse()], true); };

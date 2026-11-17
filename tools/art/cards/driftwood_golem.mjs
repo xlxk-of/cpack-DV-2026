@@ -68,7 +68,7 @@ export function build(s) {
     flat('M330 598h360v60h-360z', WOOD_D),
     // the core's light on the wood, drawn
     el('circle', { cx: 512, cy: 488, r: 114, fill: '#c9f1ff', opacity: 0.6 }),
-    grain('M404 560v40M560 612h44'),
+    grain('M404 560v40M560 612h44M640 420q8 60 0 120M388 420q-6 40 0 80'),
     // growth rings round the core
     stroke('M512 386a102 102 0 0 1 96 68M614 520a102 102 0 0 1 -68 64M470 581a102 102 0 0 1 -56 -62', { w: W_DETAIL }),
     knot(622, 590, 17, -10),

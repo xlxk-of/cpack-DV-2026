@@ -89,7 +89,7 @@ export function build(s) {
 
   // ---- 3: plus-shaped sparks drifting up, bubbles, a near frond at each edge
   s.weed({ x: 20, y: 1080, h: 430, fill: '#3fa878', sway: 30, lean: 0.08, width: 88, layer: 3, w: W_INNER });
-  s.weed({ x: 1006, y: 1080, h: 400, fill: '#3fa878', sway: 30, lean: -0.1, width: 88, layer: 3, w: W_INNER });
+  s.weed({ x: 1000, y: 1080, h: 400, fill: '#3fa878', sway: 22, lean: -0.03, width: 88, layer: 3, w: W_INNER });
   s.add(3, plus(160, 372, 20, GOLD, W_DETAIL, 12), plus(206, 122, 16, '#ffffff', W_DETAIL, -8), plus(352, 112, 14, '#fff3a0', W_DETAIL, 20),
     plus(868, 300, 18, '#ffffff', W_DETAIL, 10), plus(884, 470, 14, GOLD, W_DETAIL, -14), plus(196, 700, 14, '#ffffff', W_DETAIL, 8));
   for (const [x, y, rr] of [[600, 118, 16], [646, 70, 9], [124, 480, 12], [872, 610, 16], [668, 706, 10], [430, 92, 10]]) {

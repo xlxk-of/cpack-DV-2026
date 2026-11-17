@@ -75,7 +75,7 @@ export function build(s) {
   const torso = rr(332, 486, 202, 196, 72);
   const collar = 'M336 470L528 470Q566 500 548 536L316 536Q298 500 336 470Z';
   const helmet = circ(CX, CY, R);
-  const armF = ribbon([[486, 540], [556, 570], [604, 592]], 64, 56, (t) => (t < 0.25 ? Math.sqrt(1 - (1 - t / 0.25) ** 2) : 1));
+  const armF = ribbon([[490, 520], [552, 566], [604, 592]], 66, 56);
   const gloveF = circ(608, 596, 37), thumb = circ(596, 560, 16);
   body.push(contour([hose, nub, armB, gloveB, legL, legR, bootL, bootR, torso, collar, helmet, armF, gloveF, thumb]));
   body.push(form(hose, SUIT, [flat(ribbon([[336, 222], [282, 120], [342, 10], [286, -160]], 14, 14), SUIT_D)]));
@@ -90,6 +90,8 @@ export function build(s) {
     stroke('M320 606h230M320 640h230', { w: W_DETAIL }),
     ink(rr(410, 598, 50, 50, 12), GOLD, { w: W_DETAIL }),
   ]));
+  body.push(form(armF, SUIT, [flat(ribbon([[480, 560], [552, 598], [596, 618]], 26, 22), SUIT_D)]));
+  body.push(form(thumb, BOOT), form(gloveF, BOOT, [flat(circ(600, 612, 37), BOOT_D), el('circle', { cx: 620, cy: 580, r: 7, fill: '#fff', opacity: 0.8 })]));
   body.push(form(collar, GOLD, [flat('M300 512h270v40h-270z', GOLD_D), ...[352, 404, 456, 508].map((x) => el('circle', { cx: x, cy: 498, r: 7, fill: INK }))]));
   body.push(form(helmet, GOLD_D, [
     flat(circ(CX + 34, CY - 30, R), GOLD),
@@ -108,8 +110,6 @@ export function build(s) {
   ]));
   body.push(eye(QX - 36, QY + 2, 31, { look: [0.75, 0.5] }), eye(QX + 38, QY + 2, 31, { look: [0.75, 0.5] }));
   body.push(stroke(`M${QX - 14} ${QY + 46}q16 14 32 0`, { stroke: '#bfefff', w: W_DETAIL + 1 }));
-  body.push(form(armF, SUIT, [flat(ribbon([[480, 572], [552, 598], [596, 618]], 26, 22), SUIT_D)]));
-  body.push(form(thumb, BOOT), form(gloveF, BOOT, [flat(circ(600, 612, 37), BOOT_D), el('circle', { cx: 620, cy: 580, r: 7, fill: '#fff', opacity: 0.8 })]));
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: his breath going up, the pearl's sparkle, a near ledge
