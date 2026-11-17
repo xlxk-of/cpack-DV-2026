@@ -350,3 +350,153 @@ const STD_DEFS = `
 <filter id="bloomS" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="18"/><feOffset dy="16"/><feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 `;
+
+// ==================================================================================================== THE DOODLE KIT
+// NACRE's pictures are DOODLES: chunky shapes, flat colour, one hard shadow tone, and a fat dark ink line round
+// everything, as if drawn with a marker and coloured in. No soft gradients or blurry glows on anything drawn.
+// The rules (every scene follows them, so the set reads as one hand):
+//   * INK is the only outline colour. Line weights on the 1024 canvas: 14 round the subject, 8 for its inner lines,
+//     5 for small details; mid-distance things 7; the far backdrop has no ink at all (flat shapes, darker tone).
+//   * a form is: flat base + at most one hard-edged shadow shape + small hard-edged highlights. Nothing else.
+//   * light is drawn, not blurred: stepped flat halos (halo), hard light wedges (shafts), four-point stars (star4).
+//   * shapes are simple, rounded and a little wonky; faces are big and readable; round caps and joins always.
+
+export const INK = '#1a1230';
+export const W_SUBJECT = 14, W_INNER = 8, W_DETAIL = 5, W_MID = 7;
+
+/** A flat shape with an ink line round it. o: { w, stroke, opacity, extra attrs... }. `fill: 'none'` for a bare line. */
+export function ink(d, fill, o = {}) {
+  const { w = W_INNER, stroke = INK, ...rest } = o;
+  return el('path', { d, fill, stroke, 'stroke-width': w, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', ...rest });
+}
+/** A bare ink stroke (a mouth, a crease, a whisker). */
+export const stroke = (d, o = {}) => ink(d, 'none', o);
+export function inkCircle(cx, cy, r, fill, o = {}) {
+  const { w = W_INNER, stroke: st = INK, ...rest } = o;
+  return el('circle', { cx, cy, r, fill, stroke: st, 'stroke-width': w, ...rest });
+}
+export function inkEllipse(cx, cy, rx, ry, fill, o = {}) {
+  const { w = W_INNER, stroke: st = INK, rot = 0, ...rest } = o;
+  return el('ellipse', { cx, cy, rx, ry, fill, stroke: st, 'stroke-width': w, transform: rot ? `rotate(${rot} ${n2(cx)} ${n2(cy)})` : undefined, ...rest });
+}
+/** A flat shape with no line (backdrop shapes, shadow and highlight patches). */
+export const flat = (d, fill, o = {}) => el('path', { d, fill, ...o });
+
+/** A character built from several parts with ONE fat contour round the whole silhouette and thinner lines inside:
+ *  parts = [{ d, fill, inner? }]. Every part is first stamped in ink, fattened by `outer`; then the fills are laid
+ *  on top, each with the thin `inner` line. Put parts back-to-front. Returns markup. */
+export function sticker(parts, { outer = W_SUBJECT, inner = W_INNER } = {}) {
+  const back = parts.map((p) => el('path', { d: p.d, fill: INK, stroke: INK, 'stroke-width': outer * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+  const front = parts.map((p) => el('path', { d: p.d, fill: p.fill, stroke: INK, 'stroke-width': p.inner ?? inner, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+  return g({}, [g({}, back), g({}, front)]);
+}
+
+/** A doodle eye: white ball, big pupil looking along `look` ([-1..1, -1..1]), one square-ish glint. `lid` (0..1)
+ *  drops an angry/sleepy lid from the top; `lidRot` tilts it (degrees). */
+export function eye(x, y, r, { look = [0, 0], iris = INK, white = '#fff', lid = 0, lidRot = 0, lidFill = INK, w = W_INNER, pupil = 0.56 } = {}) {
+  const px = x + look[0] * r * 0.34, py = y + look[1] * r * 0.34, pr = r * pupil;
+  const parts = [inkCircle(x, y, r, white, { w }), el('circle', { cx: px, cy: py, r: pr, fill: iris }),
+    el('circle', { cx: px - pr * 0.36, cy: py - pr * 0.4, r: pr * 0.3, fill: '#fff' })];
+  if (lid > 0) {
+    const id = 'eyc' + Math.round(x * 7 + y * 13 + r * 3);
+    parts.push(`<clipPath id="${id}"><circle cx="${n2(x)}" cy="${n2(y)}" r="${n2(r)}"/></clipPath>`);
+    parts.push(el('rect', { x: x - r * 1.6, y: y - r * 2.2, width: r * 3.2, height: r * (1.2 + lid * 2), fill: lidFill, 'clip-path': `url(#${id})`, transform: `rotate(${lidRot} ${n2(x)} ${n2(y)})` }));
+    parts.push(el('circle', { cx: x, cy: y, r, fill: 'none', stroke: INK, 'stroke-width': w }));
+  }
+  return g({}, parts);
+}
+
+/** A four-point doodle sparkle, flat, with an ink line (w = 0 for none). */
+export function star4(x, y, s, fill = '#fff', w = W_DETAIL, rot = 0) {
+  const k = s * 0.24;
+  const d = `M${n2(x)} ${n2(y - s)}L${n2(x + k)} ${n2(y - k)}L${n2(x + s)} ${n2(y)}L${n2(x + k)} ${n2(y + k)}L${n2(x)} ${n2(y + s)}L${n2(x - k)} ${n2(y + k)}L${n2(x - s)} ${n2(y)}L${n2(x - k)} ${n2(y - k)}Z`;
+  return el('path', { d, fill, stroke: w ? INK : undefined, 'stroke-width': w || undefined, 'stroke-linejoin': 'round', transform: rot ? `rotate(${rot} ${n2(x)} ${n2(y)})` : undefined });
+}
+
+/** Drawn light: flat rings stepping outward from (x, y). No blur. `steps` rings out to radius r. */
+export function halo(x, y, r, color = '#fff6c0', steps = 3, opacity = 0.5) {
+  const out = [];
+  for (let i = steps; i >= 1; i--) out.push(el('circle', { cx: x, cy: y, r: r * i / steps, fill: color, opacity: opacity / steps * (steps - i + 1) * 0.9 }));
+  return g({}, out);
+}
+
+/** A wavy closed band edge from the left of the canvas to the right at height y (for flat water/sky/ground bands):
+ *  returns a path `d` that fills from that wavy line down to the bottom. */
+export function waveBand(w, h, y, amp = 14, waves = 5, phase = 0) {
+  const pts = [];
+  for (let i = 0; i <= 48; i++) { const t = i / 48; pts.push([-40 + (w + 80) * t, y + Math.sin(t * Math.PI * 2 * waves + phase) * amp]); }
+  return poly([[-40, h + 40], ...pts, [w + 40, h + 40]], true);
+}
+
+Object.assign(Scene.prototype, {
+  /** The hand-drawn wobble: put the returned filter on a whole group so every line in it shivers the same way. */
+  wobble(scale = 5, freq = 0.012, seed = 2) { return this.rough(scale, freq, seed); },
+
+  /** A flat backdrop made of horizontal colour bands with wavy edges: bands = [[y, color], ...] top to bottom
+   *  (the first colour fills from the top; each later one from its y down). */
+  bands(bands, { amp = 16, waves = 4, layer = 0 } = {}) {
+    this.add(layer, el('rect', { x: 0, y: 0, width: this.w, height: this.h, fill: bands[0][1] }));
+    bands.slice(1).forEach((b, i) => this.add(layer, flat(waveBand(this.w, this.h, b[0], amp, waves + i * 0.7, i * 1.9), b[1])));
+    return this;
+  },
+
+  /** Hard-edged light wedges fanning from (x, y): flat, translucent, no blur. */
+  shafts({ x = this.w / 2, y = -120, angle = 90, spread = 44, n = 4, len = 1500, width = 90, color = '#ffffff', opacity = 0.1, layer = 0 } = {}) {
+    const r = this.r, parts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (angle - spread / 2 + spread * (n === 1 ? 0.5 : i / (n - 1)) + r.range(-2, 2)) * Math.PI / 180;
+      const wv = width * r.range(0.55, 1.3), ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len, px = -Math.sin(a), py = Math.cos(a);
+      parts.push(flat(poly([[x - px * wv * 0.2, y - py * wv * 0.2], [x + px * wv * 0.2, y + py * wv * 0.2], [ex + px * wv, ey + py * wv], [ex - px * wv, ey - py * wv]], true), color, { opacity: opacity * r.range(0.7, 1.2) }));
+    }
+    return this.add(layer, g({}, parts));
+  },
+
+  /** Flat specks (plankton, dust, far stars): plain dots, optionally with an ink line. */
+  specks({ n = 40, x0 = 0, y0 = 0, x1 = this.w, y1 = this.h, rmin = 2, rmax = 6, colors = ['#ffffff'], opacity = 0.8, layer = 3, w = 0 } = {}) {
+    const r = this.r, parts = [];
+    for (let i = 0; i < n; i++) {
+      const rr = rmin + (rmax - rmin) * Math.pow(r(), 2);
+      parts.push(el('circle', { cx: r.range(x0, x1), cy: r.range(y0, y1), r: rr, fill: r.pick(colors), opacity: opacity * r.range(0.5, 1), stroke: w ? INK : undefined, 'stroke-width': w || undefined }));
+    }
+    return this.add(layer, g({}, parts));
+  },
+
+  /** Doodle bubbles: an ink ring, a pale fill and one glint. */
+  inkBubbles({ n = 10, x0 = 0, y0 = 0, x1 = this.w, y1 = this.h, rmin = 8, rmax = 24, fill = '#bfefff', layer = 3, w = W_DETAIL, opacity = 1 } = {}) {
+    const r = this.r, parts = [];
+    for (let i = 0; i < n; i++) {
+      const x = r.range(x0, x1), y = r.range(y0, y1), rr = rmin + (rmax - rmin) * Math.pow(r(), 1.6);
+      parts.push(inkCircle(x, y, rr, fill, { w, 'fill-opacity': 0.35 }));
+      parts.push(el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
+    }
+    return this.add(layer, g({ opacity }, parts));
+  },
+
+  /** Scattered four-point sparkles. */
+  sparkles({ n = 6, x0 = 0, y0 = 0, x1 = this.w, y1 = this.h, smin = 14, smax = 34, fill = '#fff', layer = 3, w = W_DETAIL } = {}) {
+    const r = this.r, parts = [];
+    for (let i = 0; i < n; i++) parts.push(star4(r.range(x0, x1), r.range(y0, y1), r.range(smin, smax), fill, w));
+    return this.add(layer, g({}, parts));
+  },
+
+  /** A flat lumpy silhouette across the canvas (reef, rocks, far hills), filled to the bottom, with an optional ink
+   *  line (w = 0 for the far backdrop). Lumps are round, not jagged. */
+  lumps({ y = 820, amp = 70, n = 9, fill = '#123', layer = 1, w = 0, opacity = 1 } = {}) {
+    const r = this.r, pts = [];
+    for (let i = -1; i <= n + 1; i++) pts.push([(this.w / n) * i + r.range(-18, 18), y - amp * r.range(0.1, 1)]);
+    const top = sample(pts, 10);
+    const d = poly([[-60, this.h + 60], ...top, [this.w + 60, this.h + 60]], true);
+    this.add(layer, el('path', { d, fill, opacity, stroke: w ? INK : undefined, 'stroke-width': w || undefined, 'stroke-linejoin': 'round' }));
+    return d;
+  },
+
+  /** Doodle weed: a fat wavy frond with an ink line. */
+  weed({ x = 100, y = this.h + 30, h = 420, width = 34, fill = '#1f7a6a', layer = 1, w = W_MID, lean = 0, sway = 30 } = {}) {
+    const ph = this.r.range(0, 6), pts = [];
+    for (let i = 0; i <= 6; i++) { const t = i / 6; pts.push([x + Math.sin(t * 4.2 + ph) * sway * (0.3 + t) + lean * t * h, y - h * t]); }
+    return this.add(layer, ink(ribbon(pts, width, width * 0.35, (t) => 1 - t * 0.15), fill, { w }));
+  },
+
+  /** The faintest paper tooth over a layer, so flat colour does not look like plastic. */
+  paper({ opacity = 0.1, layer = 0 } = {}) { return this.grain({ opacity, layer, freq: 0.8 }); },
+});

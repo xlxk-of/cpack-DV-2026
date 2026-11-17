@@ -35,7 +35,7 @@ function home() {
       h('button.btn.mini.ghost', { onclick: () => { sfx.setOn(!sfx.on); home(); } }, sfx.on ? 'Sound on' : 'Sound off')),
     h('div.logo', {},
       h('img.logo-mark', { src: 'ui/emblem.webp', alt: '' }),
-      h('h1', {}, 'NACRE'),
+      h('h1', { 'data-t': 'NACRE' }, 'NACRE'),
       h('p', {}, 'Duels of the Drowned Stars')),
     h('nav.menu', {},
       btn('Duel', () => go('duels'), 'big'),
