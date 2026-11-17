@@ -1,8 +1,8 @@
-// BRINE BOLT (common spell) — a fat zig-zag spear of water-lightning thrown down across the dark, rings of spray
-// burst round it. No creature: one bold graphic shape with the same ink line as everything else.
+// BRINE BOLT (common spell) — a fat zig-zag spear of water-lightning thrown down across the dark from off the top
+// of the picture, crowns of spray bursting off it. No creature: one bold graphic shape with the same ink line as everything else.
 import { el, g, poly, ink, stroke, flat, inkCircle, star4, halo, waveBand, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
-const CYAN = '#62defc', CYAN_D = '#2f9be8', PALE = '#dcf8ff';
+const CYAN = '#62defc', CYAN_D = '#2f9be8', AQUA = '#86f2dc', AQUA_D = '#3cc2bd', HOT = '#fff0a6';
 // The bolt is drawn standing up (tail at the top, point at the bottom) and tipped over into place.
 const ANG = -35, SC = 0.95, OX = 520, OY = 505;
 const TF = `translate(${OX} ${OY}) rotate(${ANG}) scale(${SC})`;
@@ -33,10 +33,10 @@ export function build(s) {
   s.add(1, ink(waveBand(1024, 1024, 914, 14, 4.5, 2.4), '#15307c', { w: W_MID }));
 
   // ---- 2: the bolt
-  const A = [-70, -370], B = [60, -370];
-  const pts = [B, [-5, -120], [110, -145], [46, 100], [156, 75], [50, 395], [-18, 190], [-123, 215], [-61, -25], [-166, 0], A];
-  // its tail is still water: three tongues of spray where a bolt would be cut square
-  const boltD = poly(pts) + 'Q-80 -432 -46 -446Q-40 -404 -22 -386Q-18 -442 10 -454Q14 -410 30 -392Q38 -426 58 -434Q68 -402 60 -370Z';
+  // it comes in from beyond the top-left corner: A and B are far off the canvas, so the bolt has no upper end
+  const A = [-68, -760], B = [56, -760];
+  const pts = [B, [-55, -340], [60, -365], [-5, -120], [110, -145], [46, 100], [156, 75], [50, 395], [-18, 190], [-123, 215], [-61, -25], [-166, 0], [-104, -240], [-209, -215], A];
+  const boltD = poly(pts) + 'Z';
   const bolt = [];
   // drawn light: flat steps of glow hugging the shape
   bolt.push(g({ transform: TF }, [
@@ -44,23 +44,26 @@ export function build(s) {
     el('path', { d: boltD, fill: '#7fdcff', stroke: '#7fdcff', 'stroke-width': 60, 'stroke-linejoin': 'round', opacity: 0.2 }),
   ]));
   // splash rings: far halves behind the bolt
-  const rings = [[-44, -236, 172, 48], [-5, 32, 150, 42]];
+  // crowns of spray, not hoops: the far half of each passes behind the bolt, the near half is burst open where the
+  // bolt goes through and breaks into droplets there. [cx, cy, rx, ry, left piece ends at, right piece ends at (deg),
+  // droplets across the gap [deg, size, tilt]]
+  const rings = [[-82, -470, 140, 40, 138, 48, [[108, 9, -24], [78, 10, 20]]], [-5, 32, 150, 42, 141, 33, [[110, 10, -24], [80, 9, 18], [49, 9, 50]]]];
+  const hit = [tx - 6, ty - 4, 150, 40, 116, 64, []];
   bolt.push(g({ transform: TF }, rings.map((q) => ring(...q, 'back'))));
-  bolt.push(ring(tx - 6, ty - 4, 150, 40, 'back'));
+  bolt.push(ring(...hit, 'back'));
   // the shape itself: flat cyan, one hard shadow down its right-hand edges, a white-hot core
   bolt.push(g({ transform: TF }, [
     ink(boltD, CYAN_D, { w: W_SUBJECT }),
     g({ 'clip-path': s.clip(el('path', { d: boltD })) }, [
       el('path', { d: boltD, fill: CYAN, transform: 'translate(-36 -8)' }),
-      el('path', { d: 'M-20 -340L-90 -72L16 -98L-48 150L54 126L46 292', fill: 'none', stroke: '#ffffff', 'stroke-width': 26, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
-      el('circle', { cx: -40, cy: -402, r: 10, fill: '#fff' }), el('circle', { cx: 10, cy: -412, r: 8, fill: '#fff' }),
+      el('path', { d: 'M-8 -770L-126 -314L-20 -340L-90 -72L16 -98L-48 150L54 126L46 292', fill: 'none', stroke: HOT, 'stroke-width': 26, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
     ]),
     stroke(boltD, { w: W_SUBJECT }),
     ...rings.map((q) => ring(...q, 'front')),
   ]));
-  bolt.push(ring(tx - 6, ty - 4, 150, 40, 'front'));
-  // the strike
-  bolt.push(star4(tx, ty - 6, 62, '#fff', W_INNER), star4(tx, ty - 6, 26, '#fff3a8', 0, 45));
+  bolt.push(ring(...hit, 'front'));
+  // the strike: a big warm star, the one hot thing in all the blue
+  bolt.push(star4(tx, ty - 6, 93, '#ffe27a', W_INNER), star4(tx, ty - 6, 39, '#fffbe4', 0, 45));
   s.add(2, g({ filter: s.wobble(5) }, bolt));
 
   // ---- 3: thrown droplets, sparks, the near swell
@@ -70,18 +73,25 @@ export function build(s) {
     [[tx - 176, ty - 44], 16, -60], [[tx + 150, ty - 70], 18, 50], [[tx - 96, ty - 96], 12, -25], [[tx + 62, ty - 112], 13, 20], [[tx + 214, ty - 22], 10, 70],
   ];
   s.add(3, drops.map(([p, k, a]) => drop(p[0], p[1], k, a)));
-  s.add(3, star4(742, 232, 32), star4(170, 300, 22, '#fff3a8'), star4(858, 506, 20), star4(408, 760, 18, '#fff3a8'), star4(560, 150, 16));
+  s.add(3, star4(742, 232, 32), star4(112, 404, 22, '#fff3a8'), star4(858, 506, 20), star4(408, 760, 18, '#fff3a8'), star4(560, 150, 16));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffffff', '#bfefff', '#fff3a8'], opacity: 0.9 });
   s.add(3, ink(waveBand(1024, 1024, 978, 18, 2.5, 4), '#0e1d5a', { w: W_INNER }));
 }
 
-/** Half of a ring of spray seen nearly edge-on: 'back' is the far (upper) arc, 'front' the near one. */
-function ring(cx, cy, rx, ry, half) {
-  const d = `M${cx - rx} ${cy}A${rx} ${ry} 0 0 ${half === 'back' ? 1 : 0} ${cx + rx} ${cy}`;
-  return g({}, [
+/** Half of a crown of spray seen nearly edge-on. 'back' is the far (upper) arc, whole. 'front' is the near one,
+ *  burst open in the middle: two side pieces that stop at `aL` and `aR` degrees (0 = right end, 90 = nearest point,
+ *  180 = left end), and `beads` ([deg, size, tilt]) are the droplets it has broken into across the gap. */
+function ring(cx, cy, rx, ry, aL, aR, beads, half) {
+  const P = (deg, k = 1) => [cx + rx * k * Math.cos(deg * Math.PI / 180), cy + ry * k * Math.sin(deg * Math.PI / 180)];
+  const f = (p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  const band = (d, color) => [
     el('path', { d, fill: 'none', stroke: INK, 'stroke-width': 16 + W_INNER * 2, 'stroke-linecap': 'round' }),
-    el('path', { d, fill: 'none', stroke: half === 'back' ? '#9fdcf6' : PALE, 'stroke-width': 16, 'stroke-linecap': 'round' }),
-  ]);
+    el('path', { d, fill: 'none', stroke: color, 'stroke-width': 16, 'stroke-linecap': 'round' }),
+  ];
+  if (half === 'back') return g({}, band(`M${cx - rx} ${cy}A${rx} ${ry} 0 0 1 ${cx + rx} ${cy}`, AQUA_D));
+  const out = band(`M${cx - rx} ${cy}A${rx} ${ry} 0 0 0 ${f(P(aL))}M${cx + rx} ${cy}A${rx} ${ry} 0 0 1 ${f(P(aR))}`, AQUA);
+  for (const [deg, k, rot] of beads) { const p = P(deg); out.push(drop(p[0], p[1], k, rot, AQUA)); }
+  return g({}, out);
 }
 
 /** A far fork of lightning: a zig-zag line with the mid-distance ink round it. */
@@ -94,9 +104,9 @@ function fork(pts, color) {
 }
 
 /** A doodle droplet at (x, y), size k, its point trailing at `rot` degrees. */
-function drop(x, y, k, rot) {
+function drop(x, y, k, rot, fill = CYAN) {
   return g({ transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot})` }, [
-    ink(`M0 ${-k * 1.5}C${k * 0.5} ${-k * 0.6} ${k} ${-k * 0.1} ${k} ${k * 0.3}A${k} ${k} 0 0 1 ${-k} ${k * 0.3}C${-k} ${-k * 0.1} ${-k * 0.5} ${-k * 0.6} 0 ${-k * 1.5}Z`, CYAN, { w: W_DETAIL }),
+    ink(`M0 ${-k * 1.5}C${k * 0.5} ${-k * 0.6} ${k} ${-k * 0.1} ${k} ${k * 0.3}A${k} ${k} 0 0 1 ${-k} ${k * 0.3}C${-k} ${-k * 0.1} ${-k * 0.5} ${-k * 0.6} 0 ${-k * 1.5}Z`, fill, { w: W_DETAIL }),
     el('circle', { cx: -k * 0.32, cy: k * 0.2, r: k * 0.26, fill: '#fff' }),
   ]);
 }

@@ -11,17 +11,18 @@ const CX = 512, CY = 336;
 export function build(s) {
   const r = s.r;
 
-  // ---- 0: near-black indigo in flat bands; hard rainbow-striped light wedges fanning from the star
+  // ---- 0: near-black indigo in flat bands; hard light wedges fanning from the star in two close dark tones (the
+  // star and the ring carry the colour)
   s.bands([[0, '#1d1654'], [300, '#181247'], [570, '#130e3a'], [810, '#0d0a2c']], { amp: 18, waves: 3 });
   const wedges = [];
   for (let i = 0; i < 8; i++) {
-    const a0 = i * 45 + 12.5, span = 20;
-    SPECTRUM.forEach((c, k) => {
-      const a = (a0 + k * span / 5) * Math.PI / 180, b = (a0 + (k + 1) * span / 5) * Math.PI / 180;
-      wedges.push(flat(poly([[CX, CY], [CX + Math.cos(a) * 1300, CY + Math.sin(a) * 1300], [CX + Math.cos(b) * 1300, CY + Math.sin(b) * 1300]], true), c));
+    const a0 = i * 45 + 12.5;
+    [[0, 20, 0.13], [6, 14, 0.1]].forEach(([d0, d1, o]) => {
+      const a = (a0 + d0) * Math.PI / 180, b = (a0 + d1) * Math.PI / 180;
+      wedges.push(flat(poly([[CX, CY], [CX + Math.cos(a) * 1300, CY + Math.sin(a) * 1300], [CX + Math.cos(b) * 1300, CY + Math.sin(b) * 1300]], true), '#8a78ff', { opacity: o }));
     });
   }
-  s.add(0, g({ opacity: 0.42 }, wedges));
+  s.add(0, g({}, wedges));
   s.add(0, el('circle', { cx: CX, cy: CY, r: 520, fill: 'none', stroke: '#ffffff', 'stroke-width': 60, opacity: 0.05 }));
   s.specks({ n: 60, rmin: 2, rmax: 5, colors: ['#ffffff', '#ffe9a8', '#c9b6ff', '#9fe8ff'], opacity: 0.6, layer: 0 });
   s.lumps({ y: 900, amp: 80, n: 7, fill: '#0a0824', layer: 0 });
@@ -29,7 +30,7 @@ export function build(s) {
 
   // ---- 1: concentric flat halos, the rainbow ring, the big corona of pointed rays; the watchers on the floor
   const mid = [];
-  mid.push(halo(CX, CY, 372, '#fff3c4', 3, 0.22));
+  mid.push(halo(CX, CY, 372, ['#2b2468', '#463c82', '#463c82']));
   [VIOLET, SKY, MINT, GOLD, PINK].forEach((c, i) => mid.push(el('circle', { cx: CX, cy: CY, r: 446 - i * 15, fill: 'none', stroke: c, 'stroke-width': 15.6 })));
   mid.push(el('circle', { cx: CX, cy: CY, r: 454, fill: 'none', stroke: INK, 'stroke-width': W_MID }), el('circle', { cx: CX, cy: CY, r: 378, fill: 'none', stroke: INK, 'stroke-width': W_MID }));
   mid.push(ink(burst(CX, CY, 8, 346, 282, 214, 0), GOLD, { w: W_MID }));
@@ -37,12 +38,12 @@ export function build(s) {
   mid.push(el('circle', { cx: CX, cy: CY, r: 190, fill: '#fff6c0' }), el('circle', { cx: CX, cy: CY, r: 150, fill: '#fffbe0' }));
   s.add(1, g({}, mid));
   // the floor rises at both sides, with the watchers on it
-  s.add(1, ink(spline([[-90, 1100], [-90, 790], [30, 756], [150, 770], [260, 820], [330, 900], [370, 1100]], true), '#2c2678', { w: W_MID }));
-  s.add(1, flat(spline([[-30, 800], [60, 778], [160, 790], [230, 826], [130, 818], [40, 822]], true), '#3e3796'));
+  s.add(1, ink(spline([[-90, 1100], [-90, 790], [30, 756], [150, 764], [250, 784], [322, 860], [370, 1100]], true), '#2c2678', { w: W_MID }));
+  s.add(1, flat(spline([[-30, 800], [60, 778], [160, 786], [240, 812], [130, 816], [40, 822]], true), '#3e3796'));
   s.add(1, ink(spline([[1110, 1100], [1110, 770], [1000, 738], [880, 752], [770, 810], [700, 900], [660, 1100]], true), '#2c2678', { w: W_MID }));
   s.add(1, flat(spline([[1050, 782], [960, 760], [870, 772], [800, 812], [900, 800], [990, 806]], true), '#3e3796'));
-  s.add(1, fishy(132, 650, 1, '#5f82e6', '#4563c0', [0.75, -0.65]), fishy(912, 610, -1, '#56bcd0', '#3b93ae', [-0.75, -0.6]));
-  s.add(1, crab(232, 786, '#e86a98', '#bf4c82', [0.6, -0.8]), octo(868, 716, '#9a78ea', '#7658c4', [-0.6, -0.8]));
+  s.add(1, fishy(118, 630, 1, '#5f82e6', '#4563c0', [0.75, -0.65]), fishy(912, 610, -1, '#56bcd0', '#3b93ae', [-0.75, -0.6]));
+  s.add(1, crab(204, 756, '#e86a98', '#bf4c82', [0.6, -0.8]), octo(868, 716, '#9a78ea', '#7658c4', [-0.6, -0.8]));
   s.weed({ x: 40, y: 800, h: 190, fill: '#2f6fa8', sway: 18, width: 34 });
   s.weed({ x: 990, y: 780, h: 210, fill: '#2f6fa8', sway: 18, width: 34, lean: -0.05 });
   s.lumps({ y: 980, amp: 60, n: 6, fill: '#1c1858', layer: 1, w: W_MID });
@@ -54,8 +55,13 @@ export function build(s) {
   const width = (t) => (t < 0.4 ? 70 + 170 * Math.sin((t / 0.4) * Math.PI / 2) : 240 - 222 * Math.pow((t - 0.4) / 0.6, 0.9));
   const gownSp = spine([[512, 430], [516, 530], [524, 620], [490, 704], [412, 754], [316, 764]], width);
   const gown = strip(gownSp, -1, 1);
-  const armL = strip(spine([[484, 486], [424, 548], [372, 560]], () => 32), -1, 1), armR = strip(spine([[540, 486], [600, 548], [652, 560]], () => 32), -1, 1);
-  out.push(g({}, [gown, armL, armR, headD].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' })))) ;
+  // the arms: chunky tubes with round mitten ends, rooted at the shoulders of the gown just below the head
+  const ARM_W = 54;
+  const armL = spline([[470, 540], [408, 566], [362, 566], [334, 548]]), armR = spline([[554, 540], [616, 566], [662, 566], [690, 548]]);
+  const tube = (d, stroke, w) => el('path', { d, fill: 'none', stroke, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  out.push(g({}, [...[armL, armR].map((d) => tube(d, INK, ARM_W + W_SUBJECT * 2)), ...[gown, headD].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' }))]));
+  out.push(...[armL, armR].flatMap((d) => [tube(d, INK, ARM_W + W_INNER), tube(d, CORE, ARM_W - W_INNER)]));
+  out.push(star4(334, 492, 20, GOLD, W_DETAIL), star4(690, 492, 20, GOLD, W_DETAIL));
   out.push(ink(gown, CORE, { w: W_INNER }));
   out.push(g({ 'clip-path': s.clip(el('path', { d: gown })) }, [
     ...SPECTRUM.map((c, k) => flat(strip(gownSp, 1 - k * 0.4 + 0.02, 1 - (k + 1) * 0.4 - 0.02), c)),
@@ -63,10 +69,6 @@ export function build(s) {
     flat('M380 420L650 420L650 492Q512 520 380 492Z', INK, { opacity: 0.22 }),
   ]));
   out.push(stroke(gown, { w: W_INNER }));
-  // little arms, open
-  out.push(ink(armL, CORE, { w: W_INNER }), ink(armR, CORE, { w: W_INNER }));
-  out.push(inkCircle(364, 560, 21, CORE, { w: W_INNER }), inkCircle(660, 560, 21, CORE, { w: W_INNER }));
-  out.push(star4(364, 512, 20, GOLD, W_DETAIL), star4(660, 512, 20, GOLD, W_DETAIL));
   // the star head: white-gold, one hard shadow, hard highlights
   out.push(ink(headD, CORE, { w: W_INNER }));
   out.push(g({ 'clip-path': s.clip(el('path', { d: headD })) }, [
@@ -76,7 +78,7 @@ export function build(s) {
   ]));
   out.push(stroke(headD, { w: W_INNER }));
   // the face: wide gentle eyes looking down at the watchers, a small smile, a blush
-  out.push(eye(CX - 54, CY + 6, 33, { look: [0, 0.45] }), eye(CX + 54, CY + 6, 33, { look: [0, 0.45] }));
+  out.push(eye(CX - 54, CY + 6, 35, { look: [0, 0.45] }), eye(CX + 54, CY + 6, 35, { look: [0, 0.45] }));
   out.push(stroke(`M${CX - 18} ${CY + 54}q18 16 36 0`, { w: W_INNER }));
   out.push(inkEllipse(CX - 98, CY + 46, 20, 12, PINK, { w: 0, stroke: 'none', opacity: 0.85 }), inkEllipse(CX + 98, CY + 46, 20, 12, PINK, { w: 0, stroke: 'none', opacity: 0.85 }));
   out.push(star4(CX, CY - 62, 17, GOLD, W_DETAIL - 1));
@@ -84,20 +86,17 @@ export function build(s) {
 
   // ---- 3: star fragments drifting, sparkles, a near reef
   const frag = [];
-  const shards = [[140, 330, 44, PINK, 20], [872, 214, 40, MINT, -15], [246, 524, 30, SKY, 40], [776, 500, 32, GOLD, 10], [90, 120, 36, GOLD, -30], [936, 430, 30, VIOLET, 25],
-    [330, 104, 22, '#ffffff', 0], [706, 92, 28, PINK, 30], [610, 770, 26, MINT, -20], [300, 694, 22, GOLD, 15], [52, 520, 26, VIOLET, -10], [826, 676, 22, '#ffffff', 35],
-    [960, 640, 34, PINK, -25], [36, 700, 30, MINT, 30], [560, 40, 20, SKY, 15]];
-  shards.forEach(([x, y, sz, c, rot], i) => frag.push(i % 3 === 2
+  // a few fragments only, all outside the rainbow ring and above the text plate: [x, y, size, colour, rot, isStar]
+  const shards = [[74, 88, 36, GOLD, -30, 0], [960, 100, 30, MINT, 20, 0], [52, 520, 26, VIOLET, -10, 0], [984, 504, 20, PINK, 15, 1]];
+  shards.forEach(([x, y, sz, c, rot, isStar]) => frag.push(isStar
     ? ink(starPath(x, y, sz, sz * 0.5, 5, rot - 90, 0.2), c, { w: W_DETAIL })
     : ink(shard(x, y, sz * 1.25, rot), c, { w: W_DETAIL })));
-  frag.push(ink(starPath(70, 900, 80, 44, 5, -70, 0.26), GOLD, { w: W_SUBJECT }), flat('M40 868L62 850L58 888Z', '#fff'));
-  frag.push(ink(shard(960, 880, 90, 28), SKY, { w: W_SUBJECT }), flat('M936 850L952 832L950 876Z', '#fff'));
   s.add(3, g({ filter: s.wobble(4, 0.012, 6) }, frag));
   s.lumps({ y: 1000, amp: 44, n: 5, fill: '#120e3c', layer: 3, w: W_SUBJECT });
-  s.inkBubbles({ n: 4, x0: 30, x1: 300, y0: 380, y1: 760, rmin: 8, rmax: 18, fill: '#cfe6ff' });
-  s.inkBubbles({ n: 4, x0: 720, x1: 1000, y0: 300, y1: 760, rmin: 8, rmax: 18, fill: '#cfe6ff' });
-  s.add(3, star4(236, 220, 34), star4(800, 330, 26, '#ffe9a8'), star4(180, 620, 20, '#ffd1ef'), star4(716, 640, 22), star4(430, 60, 18, '#ffe9a8'), star4(900, 90, 22), star4(600, 866, 16));
-  s.specks({ n: 18, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffe9a8', '#ffd1ef', '#bff3ff'], opacity: 0.95 });
+  s.inkBubbles({ n: 4, x0: 30, x1: 300, y0: 380, y1: 740, rmin: 8, rmax: 18, fill: '#cfe6ff' });
+  s.inkBubbles({ n: 4, x0: 720, x1: 1000, y0: 300, y1: 740, rmin: 8, rmax: 18, fill: '#cfe6ff' });
+  s.add(3, star4(236, 220, 34), star4(800, 330, 26, '#ffe9a8'), star4(180, 620, 20, '#ffd1ef'), star4(716, 640, 22), star4(430, 60, 18, '#ffe9a8'), star4(900, 90, 22));
+  s.specks({ n: 18, y1: 790, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffe9a8', '#ffd1ef', '#bff3ff'], opacity: 0.95 });
 }
 
 // ---------------------------------------------------------------------------------------------------- helpers

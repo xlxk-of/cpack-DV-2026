@@ -26,11 +26,12 @@ export function build(s) {
   const hood = spline([[505, 96], [660, 126], [792, 248], [830, 420], [798, 595], [700, 722], [512, 760], [324, 722], [226, 595], [194, 420], [232, 248], [364, 126]], true);
   const cloak = spline([[130, 1100], [150, 880], [270, 752], [512, 700], [754, 752], [874, 880], [894, 1100], [512, 1160]], true);
   const tip = ribbon([[470, 190], [400, 84], [316, 60], [262, 104]], 200, 30);
-  const sleeve = ribbon([[1040, 940], [980, 700], [852, 508]], 190, 112);
+  // the lantern arm: out of the right shoulder, bent at the elbow, up to the hand
+  const sleeve = ribbon([[690, 850], [860, 826], [934, 722], [910, 610], [852, 508]], 150, 112);
   body.push(sticker([
     { d: tip, fill: '#1b6876' },
-    { d: cloak, fill: '#1b6876' },
     { d: sleeve, fill: '#24909a' },
+    { d: cloak, fill: '#1b6876' },
     { d: hood, fill: '#24909a' },
   ]));
   // one hard shadow tone on the hood (the side away from the lantern) and the cloak under the chin
@@ -42,7 +43,12 @@ export function build(s) {
     flat('M100 700L540 700C400 800 360 930 380 1100L100 1100Z', '#155563'),
     flat('M250 730Q512 880 774 730L774 690L250 690Z', '#155563'),
   ]));
-  body.push(g({ 'clip-path': s.clip(el('path', { d: sleeve })) }, flat('M880 500L1100 760L1100 1000L1000 1000C1000 800 950 650 880 500Z', '#1b6876')));
+  const offCloak = s.clip(el('path', { d: 'M-200 -200H1300V1400H-200Z' + cloak, 'clip-rule': 'evenodd' }));
+  body.push(g({ 'clip-path': offCloak }, [
+    g({ 'clip-path': s.clip(el('path', { d: sleeve })) }, flat(ribbon([[700, 912], [884, 884], [998, 744], [972, 596], [908, 480]], 56, 56), '#1b6876')),
+    stroke(sleeve, { w: W_INNER }),
+  ]));
+  body.push(stroke(cloak, { w: W_INNER }));
   body.push(stroke(hood, { w: W_INNER }));
   body.push(stroke('M512 800Q500 900 440 1040', { w: W_INNER }), stroke('M300 800Q290 880 300 960', { w: W_DETAIL }));
   // cuff on the sleeve
@@ -80,7 +86,6 @@ export function build(s) {
   body.push(star4(512, 760, 24, '#fff6c0', W_DETAIL));
 
   // the lantern's light on her, then the lantern
-  body.push(halo(LX, LY, 170, '#ffe58a', 2, 0.4));
   body.push(el('circle', { cx: LX, cy: LY - 150, r: 46, fill: 'none', stroke: INK, 'stroke-width': 30 }), el('circle', { cx: LX, cy: LY - 150, r: 46, fill: 'none', stroke: '#f2c14e', 'stroke-width': 14 }));
   const glass = `M${LX - 70} ${LY - 74}Q${LX - 84} ${LY} ${LX - 70} ${LY + 74}L${LX + 70} ${LY + 74}Q${LX + 84} ${LY} ${LX + 70} ${LY - 74}Z`;
   const cap = `M${LX - 62} ${LY - 74}L${LX - 40} ${LY - 112}L${LX + 40} ${LY - 112}L${LX + 62} ${LY - 74}Z`;

@@ -1,5 +1,5 @@
-// ABYSSAL PACK — the premium booster as a doodle: black-violet foil with flat oil-slick rings of magenta, teal and
-// gold, gold seal strips and a gold trim line, and the NACRE sigil in a gold ring with a drawn corona of pointed rays.
+// ABYSSAL PACK — the premium booster as a doodle: black-violet foil with flat oil-slick rings of magenta and teal
+// pooled inside a gold trim line, gold seal strips, and the NACRE sigil in a gold ring with a drawn corona of rays.
 // Same pouch and tear line (the printed dashes at y = 150) as the Tide Pack; nothing but foil sits above y = 220.
 import { el, g, poly, ribbon, blob, rng, ink, stroke, flat, inkCircle, star4, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
@@ -23,11 +23,12 @@ export function build(s) {
   // ---- the printed body: oil on black water, in flat hard-edged rings
   const body = [el('rect', { x: 0, y: SEAL_T, width: W, height: SEAL_B - SEAL_T, fill: BODY })];
   body.push(flat(blob(360, 560, 420, 330, rng(5), 10, 0.14), BODY2));
-  body.push(...slick(110, 792, 240, 190, 11, 0.3, 1, -1), ...slick(640, 318, 210, 170, 23, 1.2, -1, 1), ...slick(668, 800, 130, 120, 37, 2.1, -1, -1), ...slick(60, 380, 120, 130, 41, 0.9, 1, 1));
-  for (let i = 0; i < 30; i++) body.push(el('circle', { cx: r.range(50, 670), cy: r.range(230, 900), r: r.range(2, 4.5), fill: r.pick([GOLD, '#ff9fdc', '#ffffff']), opacity: r.range(0.45, 0.9) }));
-  // foil shine: hard-edged diagonal stripes, under the trim and the medallion
+  // foil shine: hard-edged diagonal stripes on the bare foil only, under the slicks, the trim and the medallion
   const shine = (x0, w, o) => flat(poly([[x0, SEAL_T], [x0 + w, SEAL_T], [x0 + w - 330, SEAL_B], [x0 - 330, SEAL_B]], true), '#ffffff', { opacity: o });
   body.push(shine(560, 96, 0.1), shine(686, 30, 0.1), shine(300, 40, 0.07));
+  // four slicks pooled behind the corona, one bulging into each corner of the trim and all stopping short of it
+  body.push(...slick(272, 758, 150, 84, 11, 0.3, 1, -1), ...slick(524, 414, 82, 128, 23, 1.2, -1, 1), ...slick(516, 732, 72, 68, 37, 2.1, -1, -1), ...slick(212, 408, 72, 76, 41, 0.9, 1, 1));
+  for (let i = 0; i < 30; i++) body.push(el('circle', { cx: r.range(50, 670), cy: r.range(230, 900), r: r.range(2, 4.5), fill: r.pick([GOLD, '#ff9fdc', '#ffffff']), opacity: r.range(0.45, 0.9) }));
   // gold trim: one fat gold line with ink either side, a star on each corner
   const fx0 = 70, fx1 = 650, fy0 = 254, fy1 = 884;
   const frame = `M${fx0 + 34} ${fy0}H${fx1 - 34}Q${fx1} ${fy0} ${fx1} ${fy0 + 34}V${fy1 - 34}Q${fx1} ${fy1} ${fx1 - 34} ${fy1}H${fx0 + 34}Q${fx0} ${fy1} ${fx0} ${fy1 - 34}V${fy0 + 34}Q${fx0} ${fy0} ${fx0 + 34} ${fy0}Z`;
@@ -36,11 +37,11 @@ export function build(s) {
   art.push(g({ 'clip-path': bodyClip }, body));
 
   // ---- the corona: a ring of pointed gold rays, long and short, each with its hard shadow half
-  const R = 196, N = 16, tips = [];
+  const R = 188, N = 16, tips = [];                           // the long rays stop 26 short of the trim line
   const P = (rr, a) => [CX + Math.cos(a) * rr, CY + Math.sin(a) * rr];
   const rays = [], dark = [];
   for (let i = 0; i < N; i++) {
-    const a = i * TAU / N - TAU / 4, hw = TAU / N / 2, R1 = R + (i % 2 ? 50 : 96) - (i % 4 === 0 ? 0 : 8);
+    const a = i * TAU / N - TAU / 4, hw = TAU / N / 2, R1 = R + (i % 2 ? 44 : 76) - (i % 4 === 0 ? 0 : 6);
     rays.push(P(R - 8, a - hw), P(R1, a));
     dark.push(flat(poly([P(R - 8, a), P(R1, a), P(R - 8, a + hw)], true), GOLD_D));
     tips.push(P(R1, a));
@@ -56,7 +57,7 @@ export function build(s) {
   ]));
   art.push(inkCircle(CX, CY, R - 25, '#3b1d74', { w: W_INNER }));
   art.push(el('circle', { cx: CX, cy: CY, r: R - 58, fill: '#55289c' }));
-  const sg = sigil(s, { cx: CX, cy: CY, size: 274, outer: 13, inner: 7, eye: '#2a1560', ring: '#6a2fb4' });
+  const sg = sigil(s, { cx: CX, cy: CY, size: 238, outer: 13, inner: 7, eye: '#2a1560', ring: '#6a2fb4' });   // star on the corona's centre; the lip clears the well rim
   art.push(sg.markup);
   art.push(star4(...sg.at(0.52, -0.6), 16, '#ffffff', 4));
   // sparkles off the ray tips and round the field
@@ -97,11 +98,11 @@ function pouch() {
   return d + `L${XL} ${SEAL_B}C${XL - bulge} ${SEAL_B - 130} ${XL - bulge} ${SEAL_T + 130} ${XL} ${SEAL_T}Z`;
 }
 
-/** An oil-slick: nested flat puddles (magenta, teal, gold) round a dark middle, all the same wobbly shape, each
- *  slid a little off the last so the bands run fat on one side and thin on the other. */
+/** An oil-slick: two flat bands (magenta, then teal) round a dark middle, all the same wobbly shape, each slid a
+ *  little off the last (toward dx, dy) so the bands run thin on that side and fat on the other. */
 function slick(cx, cy, rx, ry, seed, rot = 0, dx = 1, dy = -1) {
   const band = (f, o, fill) => flat(blob(cx + dx * o * rx, cy + dy * o * ry, rx * f, ry * f, rng(seed), 8, 0.26, rot), fill);
-  return [band(1, 0, MAG), band(0.8, 0.07, TEAL), band(0.64, 0.13, GOLD_D), band(0.52, 0.19, BODY2)];
+  return [band(1, 0, MAG), band(0.78, 0.07, TEAL), band(0.56, 0.14, BODY2)];
 }
 
 const circle = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
@@ -109,9 +110,11 @@ const arcPts = (x, y, r, a0, a1, n = 12) => Array.from({ length: n + 1 }, (_, i)
 
 // ------------------------------------------------------------------------------------------------ the sigil
 // The shell is a spiral that winds in onto a round eye: rad(t) = rho + (1 - rho) * G^(t / 2pi), t <= 0 (t = 0 is the
-// lip), so every whorl is G times narrower than the one outside it. Drawn in "unit" space (lip radius = 1) and fitted
-// so the silhouette's box is `size` across, centred on (cx, cy). Doodle rules: flat pastel chambers, ONE hard shadow
-// tone (a violet film, hard-edged), a couple of hard highlights, fat ink contour, thinner ink inside.
+// lip), so every whorl is G times narrower than the one outside it. Drawn in "unit" space (lip radius = 1) and scaled
+// so the silhouette's box is `size` across, with the STAR (the eye's centre), not the box, on (cx, cy): the shell
+// reaches 0.65 units left of the star, 0.95 right, 0.55 up, 0.78 down, and at most 0.99 from it (the lip's corner).
+// Doodle rules: flat pastel chambers, ONE hard shadow tone (a violet film, hard-edged), a couple of hard highlights,
+// fat ink contour, thinner ink inside.
 // Returns { markup, sil (the silhouette path), eye: [x, y, r], at(ux, uy) -> canvas point, k (px per unit) }.
 
 function sigil(s, o) {
@@ -119,7 +122,7 @@ function sigil(s, o) {
   const tints = o.tints || ['#fff3d2', '#ffc0e0', '#b3e0ff'], coilFill = o.coil || '#b4f0d8';
   const eyeFill = o.eye || '#27307f', eyeRing = o.ring || '#3a55c4';
   const shade = o.shade || '#6a48c4', shadeO = o.shadeO ?? 0.36;
-  const TAU = Math.PI * 2, G = 3.0, rho = 0.24, eyeR = 0.31, step = TAU / 6, bow = 0.2, lipBow = 0.14, mouth = -0.17;
+  const TAU = Math.PI * 2, G = 3.0, rho = 0.24, eyeR = 0.31, step = TAU / 6, bow = 0.2, lipBow = 0.14, mouth = -0.17, deep = 0.5, tipT = -0.09, tipU = 0.16;
   const rad = (t) => rho + (1 - rho) * Math.pow(G, t / TAU);
   const inR = (t) => Math.max(eyeR, rad(t - TAU));
   const U = (t, rr) => [rr * Math.cos(rot - t), rr * Math.sin(rot - t)];
@@ -129,13 +132,19 @@ function sigil(s, o) {
     const u = i / n, tt = t + b * Math.sin(Math.PI * u);
     return U(tt, rad(tt) + (inR(tt) - rad(tt)) * u);
   });
-  const lip = () => Array.from({ length: 11 }, (_, i) => { const u = i / 10; return U(lipBow * Math.sin(Math.PI * u), 1 + (rad(-TAU) - 1) * u); });
+  /** The lip: a plain bowed edge from the end of the outer wall to the inner whorl, its outer corner rounded off. */
+  const lipAt = (u) => U(lipBow * Math.sin(Math.PI * u), 1 + (rad(-TAU) - 1) * u);
+  const lip = () => {
+    const a = U(tipT, rad(tipT)), c = U(0, 1), b = lipAt(tipU);
+    const corner = Array.from({ length: 7 }, (_, i) => { const v = i / 6, w0 = (1 - v) * (1 - v), w1 = 2 * v * (1 - v), w2 = v * v; return [w0 * a[0] + w1 * c[0] + w2 * b[0], w0 * a[1] + w1 * c[1] + w2 * b[1]]; });
+    return [...corner, ...Array.from({ length: 10 }, (_, i) => lipAt(tipU + (1 - tipU) * (i + 1) / 10))];
+  };
 
-  // silhouette in unit space, then the fit
-  const silU = [...arc(rad, -TAU, 0, 72), ...lip().slice(1, -1)];
+  // silhouette in unit space, then the fit: the box sets the scale, the star sets the place
+  const silU = [...arc(rad, -TAU, tipT, 72), ...lip().slice(1, -1)];
   let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
   for (const p of silU) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
-  const k = size / Math.max(x1 - x0, y1 - y0), ox = cx - (x0 + x1) / 2 * k, oy = cy - (y0 + y1) / 2 * k;
+  const k = size / Math.max(x1 - x0, y1 - y0), ox = cx, oy = cy;
   const at = (ux, uy) => [ox + ux * k, oy + uy * k];
   const M = (pts) => pts.map((p) => at(p[0], p[1]));
   const sil = poly(M(silU), true);
@@ -144,17 +153,22 @@ function sigil(s, o) {
 
   // chambers, lip inward: flat pastel fills (six round the outer whorl; the inner coil is one piece)
   out.push(flat(sil, tints[0]));
-  const walls = [];
+  const fills = [], walls = [];
   for (let i = 0; i < 6; i++) {
     const ta = -i * step, tb = -(i + 1) * step;
     const a = i === 0 ? sept(0, mouth) : sept(ta), b = sept(tb);
     const pts = [...arc(rad, tb, ta, 14), ...a.slice(1), ...arc(inR, ta, tb, 14).slice(1), ...b.slice().reverse().slice(1)];
-    out.push(flat(poly(M(pts), true), tints[i % tints.length]));
+    fills.push(flat(poly(M(pts), true), tints[i % tints.length]));
     if (i > 0) walls.push(stroke(poly(M(a)), { w: inner }));
   }
+  out.push(g({ 'clip-path': clip }, fills));
   walls.push(stroke(poly(M(sept(-TAU))), { w: inner }));
-  // the mouth: a dark sliver of the inside, between the lip and the first chamber
-  walls.push(ink(poly(M([...lip(), ...sept(0, mouth).reverse().slice(1, -1)]), true), eyeFill, { w: inner }));
+  // the mouth: the inside of the shell seen between the lip and the first chamber, in the shell's one shadow tone
+  // (cream under the violet film); the deep water shows only as a thin crescent against the back wall
+  const back = sept(0, mouth), mouthD = poly(M([...lip(), ...back.slice().reverse().slice(1)]), true);
+  walls.push(flat(mouthD, tints[0]), flat(mouthD, shade, { opacity: shadeO }));
+  walls.push(flat(poly(M([...back, ...sept(0, mouth * deep).reverse().slice(1, -1)]), true), eyeFill));
+  walls.push(stroke(mouthD, { w: inner }));
 
   // one hard shadow tone: the lower-right rim of the shell, and the inner coil's shadow on the outer whorl
   const d = 0.085 * k;
@@ -172,7 +186,7 @@ function sigil(s, o) {
   out.push(el('circle', { cx: at(...U(-0.545 * TAU, rad(-0.545 * TAU) * 0.86))[0], cy: at(...U(-0.545 * TAU, rad(-0.545 * TAU) * 0.86))[1], r: 0.036 * k, fill: '#fff', opacity: 0.92 }));
 
   // ink inside: chamber walls and the coil line
-  out.push(...walls);
+  out.push(g({ 'clip-path': clip }, walls));
   out.push(stroke(poly(M(arc(rad, -2 * TAU, -TAU, 60))), { w: inner }));
 
   // the eye and its star

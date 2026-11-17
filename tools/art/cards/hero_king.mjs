@@ -1,6 +1,6 @@
 // THE DROWNED KING (the hard opponent) — long dead on his sunken throne: a chunky skull under a dented crown with one
 // living gem, cold blue pinpricks in the hollow sockets, a ragged collar, chains. Menacing, but still a doodle.
-import { el, g, spline, poly, sample, ink, stroke, flat, inkCircle, inkEllipse, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
+import { el, g, spline, poly, sample, waveBand, ink, stroke, flat, inkCircle, inkEllipse, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
 export const out = 'ui';
 export const flatOnly = true;
@@ -51,6 +51,8 @@ export function build(s) {
   s.specks({ n: 34, rmin: 2, rmax: 5, colors: ['#7fb8ff', '#b9a6ff', '#bff6ff'], opacity: 0.45, layer: 0 });
   // the back of his throne, far and flat
   s.add(0, flat('M150 1100L150 420L210 330L270 420L270 250L340 150L410 250L410 1100Z', '#0c1436'), flat('M874 1100L874 420L814 330L754 420L754 250L684 150L614 250L614 1100Z', '#0c1436'));
+  // a paler flat band of silt-light behind his shoulders, so the dark mantle has something to stand against
+  s.add(0, flat(waveBand(s.w, s.h, 760, 14, 2.5, 1.1), '#3046a0'));
   s.lumps({ y: 960, amp: 60, n: 6, fill: '#070b22', layer: 0 });
   s.paper();
 
@@ -69,8 +71,8 @@ export function build(s) {
   body.push(contour([cloak, collar, neck, skull, crown]));
 
   // the ragged collar and the mantle
-  body.push(ink(collar, '#2a3676', { w: W_INNER }));
-  body.push(g({ 'clip-path': s.clip(el('path', { d: collar })) }, [flat('M512 300L920 300L920 860L512 860Z', '#1d2659'), flat('M330 470L400 700L624 700L694 470L694 860L330 860Z', '#141a44')]));
+  body.push(ink(collar, '#5266b6', { w: W_INNER }));
+  body.push(g({ 'clip-path': s.clip(el('path', { d: collar })) }, [flat('M512 300L920 300L920 860L512 860Z', '#3b4c98'), flat('M330 470L400 700L624 700L694 470L694 860L330 860Z', '#1c2458')]));
   body.push(stroke(collar, { w: W_INNER }));
   body.push(stroke('M196 398L236 560M828 398L788 560', { w: W_DETAIL }));
   body.push(ink(cloak, '#1a2152', { w: W_INNER }));
@@ -79,8 +81,6 @@ export function build(s) {
     flat('M240 790Q512 930 784 790L784 740L240 740Z', '#11163c'),
   ]));
   body.push(stroke(cloak, { w: W_INNER }));
-  // tatters: holes and a patch of pale weed on the shoulder
-  body.push(ink('M196 930q30 -26 54 4q-8 34 -40 30q-22 -8 -14 -34Z', '#0a1030', { w: W_DETAIL }), ink('M800 960q24 -20 44 6q-10 26 -34 20q-16 -8 -10 -26Z', '#0a1030', { w: W_DETAIL }));
 
   // the neck bones
   body.push(ink(neck, BONE_S, { w: W_INNER }), stroke('M462 742L562 742M458 784L566 784', { w: W_DETAIL + 1 }));

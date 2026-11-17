@@ -1,4 +1,5 @@
-// DRIFTWOOD GOLEM (common 4/5) — a chunky golem of driftwood logs, rope and barnacles with a glowing blue core,
+// DRIFTWOOD GOLEM (common 4/5) — a chunky golem of driftwood planks lashed with rope, a pearl caught in the knothole
+// of his chest, barnacles on him,
 // standing in the shallows at dusk. Doodle style: fat ink line, flat colour, one hard shadow, drawn light.
 import { el, g, ribbon, poly, ink, stroke, flat, inkCircle, inkEllipse, eye, star4, halo, waveBand, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
@@ -8,7 +9,7 @@ const bar = (x, y, w, h, fill, o = {}) => el('rect', { x: x - w / 2, y: y - h / 
 
 const WOOD = '#ecd7ae', WOOD_D = '#bd9c8c', GRAIN = '#fbefd0';
 const ROPE = '#f2b65a', ROPE_D = '#cf8a3e';
-const HOLE = '#2c1f52', CORE = '#5fd0ff', CORE_L = '#d8fbff', CORE_D = '#2a86e0';
+const HOLE = '#2c1f52', PEARL = '#fff8ec', PEARL_D = '#e6d2f7';
 const WEED = '#4fb58f', SHELLC = '#fff4e2';
 
 export function build(s) {
@@ -47,41 +48,47 @@ export function build(s) {
   // ---- 2: the golem
   const body = [];
   const legL = 'M398 610L494 610L502 980L386 980Z', legR = 'M530 610L626 610L638 980L522 980Z';
-  const torso = 'M392 328L632 328Q680 338 676 400L666 592Q660 646 610 646L414 646Q364 646 358 592L348 400Q344 338 392 328Z';
+  // the torso is three planks side by side: splintered ends at the shoulders and along the bottom
+  const torso = 'M392 328L640 328L648 290L660 316L672 282L680 330L676 400L668 622L652 606L638 636L620 616L604 640L600 664L576 646L552 674L524 652L498 676L472 654L448 672L424 652L420 636L402 648L386 626L370 644L358 620L348 400Q344 338 392 328Z';
   // the head is a short log with one snapped end
   const head = 'M404 196L606 188Q642 188 642 224L642 308Q642 342 608 342L410 342L384 318L402 296L378 270L400 246L380 222Z';
   const twig = ribbon([[574, 194], [596, 150], [636, 128]], 26, 18);
   const leaf = 'M634 128q10 -44 58 -40q4 44 -58 40z';
   const armL = ribbon([[362, 370], [312, 470], [292, 590]], 100, 88);
+  const splitL = 'M304 376L302 316L326 346L344 298L368 372Z';     // the snapped top of that arm
   const armR = ribbon([[656, 384], [724, 366], [756, 290]], 100, 86);
   const fistL = rr(208, 556, 160, 150, 62), fistR = rr(682, 160, 152, 150, 62);
-  body.push(contour([legL, legR, armL, armR, torso, head, twig, leaf, fistL, fistR]));
+  body.push(contour([legL, legR, splitL, armL, armR, torso, head, twig, leaf, fistL, fistR]));
 
   const grain = (d) => stroke(d, { w: W_DETAIL });
-  const knot = (x, y, q, rot = 0) => g({}, [inkEllipse(x, y, q, q * 0.62, WOOD_D, { w: W_DETAIL, rot }), el('circle', { cx: x, cy: y, r: q * 0.24, fill: INK })]);
-  body.push(form(legL, WOOD, [flat('M376 600h50l-8 400h-50z', WOOD_D), grain('M462 660v64M446 744v40')]));
-  body.push(form(legR, WOOD, [flat('M512 600h48l-6 400h-48z', WOOD_D), grain('M596 650v70M582 742v40')]));
-  body.push(form(armL, WOOD, [flat(ribbon([[330, 356], [280, 460], [258, 590]], 50, 44), WOOD_D), grain('M340 450q-12 40 -16 80')]));
-  body.push(form(armR, WOOD, [flat(ribbon([[650, 414], [730, 396], [770, 310]], 44, 40), WOOD_D), grain('M690 366q24 -4 36 -22')]));
+  body.push(form(legL, WOOD, [flat('M376 600h50l-8 400h-50z', WOOD_D), grain('M466 690v56M448 722v44M474 764v30')]));
+  body.push(form(legR, WOOD, [flat('M512 600h48l-6 400h-48z', WOOD_D), grain('M600 684v60M584 730v40M608 762v30')]));
+  body.push(form(splitL, WOOD, [flat('M290 300h28v80h-28z', WOOD_D)]));
+  body.push(form(armL, WOOD, [flat(ribbon([[310, 350], [262, 458], [244, 590]], 22, 22), WOOD_D), grain('M330 400q-16 36 -22 76M306 470q-8 30 -10 56M346 452q-8 26 -10 44')]));
+  body.push(form(armR, WOOD, [flat(ribbon([[650, 414], [730, 396], [770, 310]], 44, 40), WOOD_D), grain('M690 366q24 -4 36 -22M700 342q14 -6 22 -22M724 388q20 -14 28 -40')]));
   body.push(form(torso, WOOD, [
     flat('M330 310h100Q404 480 440 660h-110z', WOOD_D),
     flat('M330 598h360v60h-360z', WOOD_D),
-    // the core's light on the wood, drawn
-    el('circle', { cx: 512, cy: 488, r: 114, fill: '#c9f1ff', opacity: 0.6 }),
-    grain('M404 560v40M560 612h44M640 420q8 60 0 120M388 420q-6 40 0 80'),
-    // growth rings round the core
-    stroke('M512 386a102 102 0 0 1 96 68M614 520a102 102 0 0 1 -68 64M470 581a102 102 0 0 1 -56 -62', { w: W_DETAIL }),
-    knot(622, 590, 17, -10),
+    // the seams between the three planks, and their grain
+    stroke('M420 382V640M604 382V644', { w: W_INNER }),
+    grain('M386 430q-6 36 0 72M402 520v44M376 556v40M640 410q8 50 0 100M626 540v50M654 548v44M470 604v36M512 616v30M552 600v38'),
     // rope round the top
     flat('M330 340h370v42h-370z', ROPE), flat('M330 368h370v14h-370z', ROPE_D),
     stroke('M330 340h370M330 382h370', { w: W_DETAIL }),
     ...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => stroke(`M${372 + i * 40} 382l16 -42`, { w: W_DETAIL })),
   ]));
-  // the core
-  body.push(form(circ(512, 488, 78), HOLE, [
-    el('circle', { cx: 512, cy: 488, r: 62, fill: CORE_D }), el('circle', { cx: 512, cy: 488, r: 48, fill: CORE }), el('circle', { cx: 512, cy: 488, r: 30, fill: CORE_L }),
+  // the knothole in his chest and the pearl caught in it
+  const knothole = 'M512 410Q566 404 588 452Q604 500 572 544Q540 574 492 566Q444 556 434 506Q426 452 462 424Q484 410 512 410Z';
+  body.push(form(knothole, WOOD_D, [], W_INNER));
+  body.push(form('M508 426Q556 420 574 458Q588 498 562 534Q536 556 494 550Q456 540 448 500Q442 458 472 436Q488 426 508 426Z', HOLE, [], W_DETAIL));
+  // rope lashed crosswise over the planks and across the hole: it is what holds the pearl in
+  const lash = [[[352, 396], [672, 588]], [[672, 396], [352, 588]]];
+  body.push(g({ 'clip-path': s.clip(el('path', { d: torso })) }, [
+    ...lash.map((q) => ink(ribbon(q, 30, 30), ROPE, { w: W_DETAIL })),
+    ...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => stroke(`M${378 + i * 37} ${396 + i * 22.2}l-6 30M${646 - i * 37} ${396 + i * 22.2}l6 30`, { w: W_DETAIL - 1 })),
   ]));
-  body.push(star4(512, 488, 34, '#ffffff', 0));
+  body.push(form(circ(516, 496, 46), PEARL_D, [flat(circ(526, 486, 46), PEARL), flat(circ(534, 476, 13), '#ffffff'), el('circle', { cx: 510, cy: 464, r: 5, fill: '#fff' })], W_INNER));
+  body.push(star4(566, 446, 22, '#ffffff'));
   // fists: stumps with rope at the wrist
   body.push(form(fistL, WOOD, [
     flat('M190 540h200v40h-200z', ROPE), flat('M190 566h200v14h-200z', ROPE_D), stroke('M190 580h200', { w: W_DETAIL }),
@@ -103,14 +110,21 @@ export function build(s) {
     flat('M474 204h112q9 0 9 8t-9 8h-112q-9 0 -9 -8t9 -8z', '#ffffff', { opacity: 0.85 }),
     grain('M622 236v40M612 300h-30M420 300h26'),
   ]));
-  body.push(eye(462, 270, 36, { white: HOLE, iris: CORE, look: [0.2, 0.1], pupil: 0.6, lid: 0.16, lidRot: 12, lidFill: WOOD_D }));
-  body.push(eye(566, 270, 36, { white: HOLE, iris: CORE, look: [0.2, 0.1], pupil: 0.6, lid: 0.16, lidRot: -12, lidFill: WOOD_D }));
+  // the set's white eyes, each sitting in a knot of the log
+  body.push(el('ellipse', { cx: 458, cy: 272, rx: 50, ry: 45, fill: WOOD_D, transform: 'rotate(-14 458 272)' }), el('ellipse', { cx: 570, cy: 272, rx: 50, ry: 45, fill: WOOD_D, transform: 'rotate(14 570 272)' }));
+  body.push(eye(462, 270, 36, { look: [0.2, 0.1] }), eye(566, 270, 36, { look: [0.2, 0.1] }));
   body.push(stroke('M488 318q28 14 56 0', { w: W_INNER }));
   // weed over one shoulder, barnacles
   body.push(ink(ribbon([[436, 326], [404, 346], [372, 404], [384, 474]], 40, 20), WEED, { w: W_INNER }));
-  const barnacle = (x, y, q) => g({}, [inkCircle(x, y, q, SHELLC, { w: W_DETAIL }), el('circle', { cx: x, cy: y, r: q * 0.38, fill: INK })]);
-  body.push(barnacle(418, 566, 17), barnacle(446, 588, 12), barnacle(410, 600, 10), barnacle(620, 440, 14), barnacle(640, 464, 9), barnacle(614, 214, 12));
-  s.add(2, g({ filter: s.wobble(5) }, body));
+  // barnacles: little ridged cones with a slit on top, in clumps
+  const barnacle = (x, y, q, rot = 0) => g({ transform: `rotate(${rot} ${x} ${y})` }, [
+    ink(`M${x - q} ${y + q * 0.7}Q${x - q * 0.8} ${y - q * 0.7} ${x - q * 0.34} ${y - q * 0.8}L${x + q * 0.34} ${y - q * 0.8}Q${x + q * 0.8} ${y - q * 0.7} ${x + q} ${y + q * 0.7}Z`, SHELLC, { w: W_DETAIL }),
+    flat(`M${x - q} ${y + q * 0.7}Q${x - q * 0.8} ${y - q * 0.7} ${x - q * 0.34} ${y - q * 0.8}L${x - q * 0.1} ${y + q * 0.7}Z`, '#e3cfc0'),
+    stroke(`M${x - q * 0.3} ${y - q * 0.2}l${-q * 0.14} ${q * 0.7}M${x + q * 0.3} ${y - q * 0.2}l${q * 0.14} ${q * 0.7}`, { w: W_DETAIL - 1 }),
+    el('ellipse', { cx: x, cy: y - q * 0.74, rx: q * 0.38, ry: q * 0.2, fill: INK }),
+  ]);
+  body.push(barnacle(390, 602, 24, -8), barnacle(434, 612, 18, 6), barnacle(646, 452, 22, 10), barnacle(618, 476, 16, -8), barnacle(606, 208, 20, 8));
+  s.add(2, g({ filter: s.wobble(5) }, g({ transform: 'translate(0 30)' }, body)));
 
   // ---- 3: the shallows in front of his feet, foam, sparks off the core
 

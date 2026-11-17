@@ -23,12 +23,12 @@ function suckers(pts, n, r0, r1, t0 = 0.15, t1 = 0.95, off = 0) {
 }
 
 export function build(s) {
-  // ---- 0: the booth: violet dark in flat bands, a swag of curtain
-  s.bands([[0, '#56288e'], [290, '#472078'], [560, '#391964'], [820, '#2b1250']], { amp: 18, waves: 3 });
+  // ---- 0: the booth: deep indigo in flat bands (two clear value steps under her purple), a swag of curtain
+  s.bands([[0, '#2a2676'], [290, '#221f64'], [560, '#1b1852'], [820, '#151240']], { amp: 18, waves: 3 });
   s.shafts({ x: 512, y: -160, angle: 90, spread: 50, n: 3, color: '#ff9fe8', opacity: 0.08, width: 130 });
-  s.add(0, flat('M-20 -20L1044 -20L1044 150Q900 60 780 130Q650 30 512 110Q374 30 244 130Q124 60 -20 150Z', '#2b1250'));
+  s.add(0, flat('M-20 -20L1044 -20L1044 150Q900 60 780 130Q650 30 512 110Q374 30 244 130Q124 60 -20 150Z', '#120f38'));
   s.specks({ n: 30, rmin: 2, rmax: 5, colors: ['#ff9fe8', '#b9a6ff', '#ffe9a8'], opacity: 0.5, layer: 0 });
-  s.lumps({ y: 950, amp: 60, n: 6, fill: '#1c0b3a', layer: 0 });
+  s.lumps({ y: 950, amp: 60, n: 6, fill: '#0e0b2e', layer: 0 });
   s.paper();
 
   // ---- 1: the ball's light, drawn as flat rings behind her

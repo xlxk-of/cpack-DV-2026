@@ -21,22 +21,26 @@ export function build(s) {
   s.weed({ x: 120, h: 560, fill: '#1a6a66', sway: 36, width: 62 });
   s.weed({ x: 205, h: 330, fill: '#14524f', sway: 26, width: 48 });
   s.weed({ x: 900, h: 600, fill: '#1a6a66', sway: 36, lean: -0.05, width: 62 });
-  s.weed({ x: 815, h: 350, fill: '#14524f', sway: 24, width: 48 });
-  s.weed({ x: 690, h: 210, fill: '#14524f', sway: 18, width: 40 });
+  s.weed({ x: 815, h: 240, fill: '#14524f', sway: 24, width: 48 });
   s.lumps({ y: 965, amp: 60, n: 6, fill: '#0f3a48', layer: 1, w: W_MID });
 
   // ---- 2: the fry, face on, with its lamp
-  s.add(2, halo(LX, LY, 205, '#ffc45a', 3, 0.6));
+  // lamplight: opaque steps of the backdrop teal lightened toward the lamp's warm yellow (never a translucent disc)
+  s.add(2, halo(LX, LY, 205, ['#2d7d6e', '#7dbb80', '#f6e58c']));
   const cx = 520, cy = 492;
   const fish = [];
 
   // fins and tail, behind the body
   const finL = `M${cx - 185} ${cy + 5}C${cx - 250} ${cy - 30} ${cx - 310} ${cy - 15} ${cx - 326} ${cy + 28}C${cx - 296} ${cy + 36} ${cx - 286} ${cy + 54} ${cx - 304} ${cy + 88}C${cx - 255} ${cy + 100} ${cx - 205} ${cy + 80} ${cx - 175} ${cy + 55}Z`;
   const finR = `M${cx + 185} ${cy + 5}C${cx + 245} ${cy - 30} ${cx + 296} ${cy - 15} ${cx + 310} ${cy + 28}C${cx + 284} ${cy + 36} ${cx + 276} ${cy + 54} ${cx + 292} ${cy + 88}C${cx + 248} ${cy + 100} ${cx + 205} ${cy + 80} ${cx + 175} ${cy + 55}Z`;
-  const tail = `M${cx + 120} ${cy - 120}C${cx + 170} ${cy - 190} ${cx + 250} ${cy - 226} ${cx + 300} ${cy - 206}C${cx + 268} ${cy - 176} ${cx + 268} ${cy - 150} ${cx + 306} ${cy - 118}C${cx + 262} ${cy - 92} ${cx + 200} ${cy - 76} ${cx + 150} ${cy - 70}Z`;
+  // the tail: tucked low behind the body on a short stem, a forked fan (so it cannot be taken for a third side fin)
+  const tx = cx + 204, ty = cy + 204, tk = 0.86, tc = Math.SQRT1_2;
+  const T = (u, v) => `${(tx + (u - v) * tc * tk).toFixed(1)} ${(ty + (u + v) * tc * tk).toFixed(1)}`;
+  const tail = `M${T(-14, -26)}C${T(18, -66)} ${T(64, -98)} ${T(110, -92)}C${T(88, -60)} ${T(80, -28)} ${T(74, 0)}C${T(80, 28)} ${T(88, 60)} ${T(110, 92)}C${T(64, 98)} ${T(18, 66)} ${T(-14, 26)}Z`;
+  const stem = ribbon([[cx + 104, cy + 104], [cx + 160, cy + 158], [tx + 4, ty + 4]], 62, 44);
   const crest = `M${cx + 10} ${cy - 170}L${cx + 36} ${cy - 262}L${cx + 76} ${cy - 205}L${cx + 112} ${cy - 250}L${cx + 140} ${cy - 150}Z`;
-  fish.push(sticker([{ d: tail, fill: AMBER }, { d: crest, fill: AMBER }, { d: finL, fill: AMBER }, { d: finR, fill: AMBER }]));
-  fish.push(stroke(`M${cx - 300} ${cy + 32}L${cx - 232} ${cy + 36}M${cx - 282} ${cy + 76}L${cx - 226} ${cy + 58}M${cx + 286} ${cy + 32}L${cx + 226} ${cy + 36}M${cx + 270} ${cy + 76}L${cx + 222} ${cy + 58}M${cx + 276} ${cy - 150}L${cx + 196} ${cy - 124}`, { w: W_DETAIL }));
+  fish.push(sticker([{ d: stem, fill: TEAL_D }, { d: tail, fill: AMBER }, { d: crest, fill: AMBER }, { d: finL, fill: AMBER }, { d: finR, fill: AMBER }]));
+  fish.push(stroke(`M${cx - 300} ${cy + 32}L${cx - 232} ${cy + 36}M${cx - 282} ${cy + 76}L${cx - 226} ${cy + 58}M${cx + 286} ${cy + 32}L${cx + 226} ${cy + 36}M${cx + 270} ${cy + 76}L${cx + 222} ${cy + 58}M${T(30, -30)}L${T(84, -56)}M${T(30, 30)}L${T(84, 56)}`, { w: W_DETAIL }));
 
   // the stalk of the lure, off the brow
   const stalk = [[cx - 46, cy - 178], [cx - 62, cy - 276], [cx - 124, cy - 326], [cx - 196, cy - 316], [LX + 6, LY - 30]];
@@ -83,10 +87,10 @@ export function build(s) {
   // ---- 3: near weed at the edges, sparks off the lamp, bubbles
   s.weed({ x: -6, y: 1090, h: 640, fill: '#0b3038', sway: 40, lean: 0.07, width: 120, layer: 3, w: W_INNER });
   s.weed({ x: 1030, y: 1090, h: 560, fill: '#0b3038', sway: 40, lean: -0.08, width: 120, layer: 3, w: W_INNER });
-  for (const [x, y, rr] of [[850, 548, 22], [884, 470, 12], [806, 720, 16], [612, 742, 14], [226, 640, 15], [262, 584, 9], [180, 740, 11], [700, 196, 10]]) {
+  for (const [x, y, rr] of [[850, 548, 22], [884, 470, 12], [884, 770, 16], [612, 742, 14], [226, 640, 15], [262, 584, 9], [180, 740, 11], [700, 196, 10]]) {
     s.add(3, inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
   }
-  s.add(3, star4(LX + 126, LY + 16, 24, '#ffe9a8'), star4(LX - 92, LY + 40, 20, '#fff'), star4(LX - 48, LY - 104, 16, '#ffe9a8'), star4(770, 690, 20, '#ffe9a8'));
+  s.add(3, star4(LX + 126, LY + 16, 24, '#ffe9a8'), star4(LX - 92, LY + 40, 20, '#fff'), star4(LX - 48, LY - 104, 16, '#ffe9a8'), star4(880, 636, 20, '#ffe9a8'));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffd98a', '#fff3cf', '#8fe6d6'], opacity: 0.9 });
 }
 

@@ -68,19 +68,23 @@ export function build(s) {
   const CX = 430, CY = 338, R = 150;        // the helmet
   const hose = ribbon([[346, 222], [292, 120], [352, 10], [296, -160]], 34, 34);
   const nub = circ(344, 226, 30);
-  const armB = ribbon([[346, 548], [292, 588], [262, 640]], 64, 56);
-  const gloveB = circ(256, 652, 37);
+  const armB = ribbon([[346, 548], [292, 588], [266, 634]], 64, 58);
+  const cuffB = ribbon([[279, 610], [267, 632]], 76, 76);
+  const gloveB = circ(254, 656, 37);
   const legL = rr(346, 630, 82, 116, 26), legR = rr(438, 630, 82, 116, 26);
   const bootL = 'M318 792q-8 -58 50 -62h44q24 4 22 34v28z', bootR = 'M432 792v-28q-2 -30 22 -34h44q58 4 50 62z';
   const torso = rr(332, 486, 202, 196, 72);
   const collar = 'M336 470L528 470Q566 500 548 536L316 536Q298 500 336 470Z';
   const helmet = circ(CX, CY, R);
-  const armF = ribbon([[490, 520], [552, 566], [604, 592]], 66, 56);
-  const gloveF = circ(608, 596, 37), thumb = circ(596, 560, 16);
-  body.push(contour([hose, nub, armB, gloveB, legL, legR, bootL, bootR, torso, collar, helmet, armF, gloveF, thumb]));
+  // the reaching arm: the same chunky tube as the other sleeve, out from behind the torso, glove on the lid's rim
+  const armF = ribbon([[500, 574], [552, 571], [588, 558]], 66, 60);
+  const cuffF = ribbon([[570, 565], [596, 554]], 78, 78);
+  const gloveF = circ(632, 538, 37), thumb = circ(618, 503, 16);
+  body.push(contour([hose, nub, armB, cuffB, gloveB, armF, cuffF, legL, legR, bootL, bootR, torso, collar, helmet, gloveF, thumb]));
   body.push(form(hose, SUIT, [flat(ribbon([[336, 222], [282, 120], [342, 10], [286, -160]], 14, 14), SUIT_D)]));
   body.push(form(nub, GOLD_D));
-  body.push(form(armB, SUIT_D), form(gloveB, BOOT_D));
+  body.push(form(armB, SUIT_D), form(gloveB, BOOT_D), form(cuffB, GOLD_D));
+  body.push(form(armF, SUIT, [flat(ribbon([[500, 598], [556, 594], [600, 576]], 26, 24), SUIT_D)]), form(cuffF, GOLD, [flat(ribbon([[568, 589], [604, 574]], 24, 24), GOLD_D)]));
   body.push(form(legL, SUIT, [flat(rr(336, 620, 34, 140, 10), SUIT_D)]), form(legR, SUIT, [flat(rr(428, 620, 30, 140, 10), SUIT_D)]));
   body.push(form(bootL, BOOT, [flat('M300 770h160v40h-160z', BOOT_D), el('circle', { cx: 352, cy: 750, r: 7, fill: '#fff', opacity: 0.8 })]));
   body.push(form(bootR, BOOT, [flat('M420 770h160v40h-160z', BOOT_D)]));
@@ -90,8 +94,7 @@ export function build(s) {
     stroke('M320 606h230M320 640h230', { w: W_DETAIL }),
     ink(rr(410, 598, 50, 50, 12), GOLD, { w: W_DETAIL }),
   ]));
-  body.push(form(armF, SUIT, [flat(ribbon([[480, 560], [552, 598], [596, 618]], 26, 22), SUIT_D)]));
-  body.push(form(thumb, BOOT), form(gloveF, BOOT, [flat(circ(600, 612, 37), BOOT_D), el('circle', { cx: 620, cy: 580, r: 7, fill: '#fff', opacity: 0.8 })]));
+  body.push(form(thumb, BOOT), form(gloveF, BOOT, [flat(circ(624, 554, 37), BOOT_D), el('circle', { cx: 644, cy: 522, r: 7, fill: '#fff', opacity: 0.8 })]));
   body.push(form(collar, GOLD, [flat('M300 512h270v40h-270z', GOLD_D), ...[352, 404, 456, 508].map((x) => el('circle', { cx: x, cy: 498, r: 7, fill: INK }))]));
   body.push(form(helmet, GOLD_D, [
     flat(circ(CX + 34, CY - 30, R), GOLD),
@@ -115,7 +118,7 @@ export function build(s) {
   // ---- 3: his breath going up, the pearl's sparkle, a near ledge
   [[572, 232, 17], [606, 166, 24], [566, 104, 13], [618, 60, 9]].forEach(([x, y, q]) => s.add(3, inkCircle(x, y, q, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - q * 0.34, cy: y - q * 0.36, r: q * 0.22, fill: '#fff' })));
   s.inkBubbles({ n: 5, x0: 60, x1: 960, y0: 300, y1: 760, rmin: 8, rmax: 20 });
-  s.add(3, star4(792, 548, 34), star4(636, 512, 20, '#ffe9a8'), star4(232, 330, 24), star4(818, 300, 18, '#ffd1ef'));
+  s.add(3, star4(792, 548, 34), star4(708, 474, 20, '#ffe9a8'), star4(232, 330, 24), star4(818, 300, 18, '#ffd1ef'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffd1ef', '#b9f3ff'], opacity: 0.9 });
   s.lumps({ y: 1000, amp: 60, n: 5, fill: '#0f1a45', layer: 3, w: W_MID });
 }

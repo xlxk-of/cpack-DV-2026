@@ -249,8 +249,8 @@ export function build(s) {
   props.push(shadow(1500, 1128, 92, 36), mound(r, 1494, 1104, 80, 52, '#5fd8c8', '#2fa8a0', '#d8fff6'));
   props.push(spiral(1356, 1140, 30, -30, '#ffd9e6', '#f08fb0'), starfish(1866, 650, 44, 0.9, '#ffb347', '#e07a2a'), tuft(1884, 820, 120, '#2f9a7a', 16), anemone(1860, 236, 40, '#7fe8d8', '#fff0a0'));
   // little things along the top and bottom edges (so a phone-width crop still has some life), well clear of the middle
-  props.push(scallop(770, 36, 26, 10, '#ffd9e6', '#f08fb0'), starfish(1130, 40, 30, 0.7, '#ff7f8f', '#d9485f'), rock(r, 944, 26, 34, 20));
-  props.push(starfish(800, 1162, 30, 0.2, '#ffb347', '#e07a2a'), scallop(1120, 1164, 26, 170, '#fff0c8', '#e0b060'), rock(r, 966, 1176, 36, 20));
+  props.push(scallop(770, 36, 26, 10, '#ffd9e6', '#f08fb0'), starfish(1130, 40, 30, 0.7, '#ff7f8f', '#d9485f'));
+  props.push(starfish(800, 1162, 30, 0.2, '#ffb347', '#e07a2a'), scallop(1120, 1164, 26, 170, '#fff0c8', '#e0b060'));
   s.add(2, g({ filter: s.wobble(4, 0.012, 2) }, props));
 
   // ---- 3: bubbles and glints, corners only

@@ -1,6 +1,9 @@
 // REEF SENTINEL (common, Guard) — a stout old crab, coral and barnacles growing on its shell, claws up, not moving.
 import { el, g, spline, ribbon, ink, stroke, flat, inkCircle, inkEllipse, sticker, eye, star4, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
+const SEAM_Y = 412; // where the shell's rim seam meets the shell's sides
+/** The seam's height at dx from the crab's middle (it is the quadratic drawn in the shell). */
+const seamY = (dx) => { const t = (dx + 236) / 472; return SEAM_Y - 68 * 2 * t * (1 - t); };
 const RED = '#f2643a', RED_D = '#c93d2e', RED_L = '#ff9a5c', CREAM = '#f6e7c4', CORAL = '#b79df2', CORAL_D = '#8f74d6';
 
 export function build(s) {
@@ -29,8 +32,9 @@ export function build(s) {
   // legs and arms behind the shell
   const limbs = [];
   for (const sd of [-1, 1]) {
-    for (const [a, b, c] of [[[178, 522], [292, 556], [300, 700]], [[160, 562], [244, 612], [246, 728]], [[128, 590], [182, 654], [180, 748]]]) {
-      limbs.push({ d: ribbon([[cx + sd * a[0], a[1]], [cx + sd * b[0], b[1]], [cx + sd * c[0], c[1]]], 50, 20), fill: RED_D });
+    // stout legs: as chunky as the claws ask for, and kept short
+    for (const [a, b, c] of [[[178, 522], [290, 562], [310, 690]], [[160, 562], [240, 616], [242, 718]], [[128, 590], [176, 652], [172, 738]]]) {
+      limbs.push({ d: ribbon([[cx + sd * a[0], a[1]], [cx + sd * b[0], b[1]], [cx + sd * c[0], c[1]]], 74, 32), fill: RED_D });
     }
     limbs.push({ d: ribbon([[cx + sd * 185, 468], [cx + sd * 262, 452], [cx + sd * 246, 380]], 56, 50), fill: RED });
   }
@@ -47,9 +51,9 @@ export function build(s) {
   crab.push(g({ 'clip-path': s.clip(el('path', { d: shell })) }, [
     // one hard shadow: the right side and the underside
     flat(`M${cx + 110} 300C${cx + 220} 420 ${cx + 150} 540 ${cx - 20} 566C${cx - 110} 580 ${cx - 200} 560 ${cx - 270} 520L${cx - 270} 660L${cx + 290} 660L${cx + 290} 300Z`, RED_D),
-    // the armoured rim of the carapace, and its knobs
-    stroke(`M${cx - 236} 440Q${cx} 372 ${cx + 236} 440`, { w: W_INNER }),
-    ...[[-150, 386, 11], [-196, 414, 8], [-30, 364, 9], [36, 366, 12], [182, 404, 9]].map(([dx, y, rr]) => inkCircle(cx + dx, y, rr, RED_L, { w: W_DETAIL })),
+    // the armoured rim of the carapace, high on the shell so it stays well clear of the brows, and its rivets on it
+    stroke(`M${cx - 236} ${SEAM_Y}Q${cx} ${SEAM_Y - 68} ${cx + 236} ${SEAM_Y}`, { w: W_INNER }),
+    ...[[-150, 11], [-192, 8], [-30, 9], [36, 12], [182, 9]].map(([dx, rr]) => inkCircle(cx + dx, seamY(dx), rr, RED_L, { w: W_DETAIL })),
     // hard highlight
     flat(`M${cx - 206} 470C${cx - 204} 440 ${cx - 190} 424 ${cx - 168} 414C${cx - 180} 432 ${cx - 184} 448 ${cx - 184} 470Z`, '#fff', { opacity: 0.9 }),
   ]));
@@ -79,10 +83,10 @@ export function build(s) {
     s.add(3, inkEllipse(x, y, rx, ry, '#16708a', { w: W_INNER }));
     for (const [dx, dy, rr] of [[-0.3, -0.55, 16], [0.2, -0.62, 11], [0.5, -0.4, 14], [-0.62, -0.3, 10]]) s.add(3, el('circle', { cx: x + dx * rx, cy: y + dy * ry, r: rr, fill: '#2a8fa6' }));
   }
-  for (const [x, y, rr] of [[150, 420, 20], [182, 350, 11], [880, 500, 16], [850, 220, 12], [900, 160, 22], [330, 150, 10], [640, 700, 12], [118, 600, 12]]) {
-    s.add(3, inkCircle(x, y, rr, '#e4fffb', { w: W_DETAIL, 'fill-opacity': 0.4 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
+  for (const [x, y, rr] of [[150, 420, 20], [182, 350, 11], [880, 500, 16], [874, 228, 12], [900, 160, 22], [330, 150, 10], [622, 706, 12], [118, 600, 12]]) {
+    s.add(3, inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
   }
-  s.add(3, star4(600, 232, 28), star4(196, 232, 20, '#fff6c0'), star4(820, 664, 22), star4(404, 700, 16, '#fff6c0'));
+  s.add(3, star4(600, 232, 28), star4(196, 232, 20, '#fff6c0'), star4(868, 590, 22), star4(404, 700, 16, '#fff6c0'));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffffff', '#d6fff4', '#ffe9c0'], opacity: 0.9 });
 }
 

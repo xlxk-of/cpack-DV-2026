@@ -17,10 +17,10 @@ function barnacle(x, y, r) {
 
 export function build(s) {
   // ---- 0: harbour murk in flat bands
-  s.bands([[0, '#356a5c'], [300, '#2c5a52'], [560, '#234a46'], [820, '#1a3a39']], { amp: 18, waves: 3 });
-  s.shafts({ x: 320, y: -140, angle: 82, spread: 40, n: 3, color: '#c8ffe8', opacity: 0.09, width: 120 });
+  s.bands([[0, '#1f8072'], [300, '#1a6f63'], [560, '#155e55'], [820, '#104d47']], { amp: 18, waves: 3 });
+  s.shafts({ x: 200, y: -140, angle: 84, spread: 40, n: 3, color: '#c8ffe8', opacity: 0.09, width: 120 });
   s.specks({ n: 34, rmin: 2, rmax: 5, colors: ['#9fe0c8', '#d8e8a0'], opacity: 0.45, layer: 0 });
-  s.lumps({ y: 930, amp: 80, n: 6, fill: '#122b2c', layer: 0 });
+  s.lumps({ y: 930, amp: 80, n: 6, fill: '#0b3a36', layer: 0 });
   s.paper();
 
   // ---- 1: his ghost-light, drawn as flat rings; weed
@@ -43,14 +43,14 @@ export function build(s) {
   body.push(contour([coat, head, earL, earR, crown, brim, chin, ...fronds]));
 
   // coat
-  body.push(ink(coat, '#3d6670', { w: W_INNER }));
+  body.push(ink(coat, '#283770', { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: coat })) }, [
-    flat('M560 700C700 760 760 900 740 1100L1000 1100L1000 700Z', '#2d4d5a'),
-    flat('M250 760Q512 900 774 760L774 700L250 700Z', '#2d4d5a'),
+    flat('M560 700C700 760 760 900 740 1100L1000 1100L1000 700Z', '#1d2957'),
+    flat('M250 760Q512 900 774 760L774 700L250 700Z', '#1d2957'),
   ]));
   body.push(stroke(coat, { w: W_INNER }));
-  body.push(ink('M150 900C230 820 330 800 420 850L360 1000C290 950 220 950 160 990Z', '#527f80', { w: W_INNER }));
-  body.push(ink('M874 900C794 820 694 800 604 850L664 1000C734 950 804 950 864 990Z', '#466f74', { w: W_INNER }));
+  body.push(ink('M150 900C230 820 330 800 420 850L360 1000C290 950 220 950 160 990Z', '#3d5298', { w: W_INNER }));
+  body.push(ink('M874 900C794 820 694 800 604 850L664 1000C734 950 804 950 864 990Z', '#334688', { w: W_INNER }));
   body.push(inkCircle(250, 1000, 26, '#f2c531', { w: W_DETAIL + 1 }));
 
   // head: pale ghost-grey, one shadow tone under the brim and down the far side
@@ -58,7 +58,7 @@ export function build(s) {
   body.push(ink(head, '#b4dece', { w: W_INNER }));
   body.push(g({ 'clip-path': s.clip(el('path', { d: head })) }, [
     flat('M260 230L760 230L760 352Q512 330 260 392Z', '#86b5a8'),
-    flat('M650 380C700 460 700 560 640 680L770 680L770 380Z', '#86b5a8'),
+    flat('M692 380C714 470 698 580 628 690L770 690L770 380Z', '#86b5a8'),
   ]));
   body.push(stroke(head, { w: W_INNER }));
 
@@ -80,10 +80,8 @@ export function build(s) {
 
   // the glowing eye and the squint
   body.push(halo(418, 446, 118, '#7ff5ee', 2, 0.7));
-  body.push(eye(418, 446, 62, { look: [0.25, 0.15], iris: '#28b8cc', white: '#f2fffb', pupil: 0.5 }));
-  body.push(el('circle', { cx: 423, cy: 449, r: 13, fill: INK }));
+  body.push(eye(418, 446, 62, { look: [0.25, 0.15] }));
   body.push(stroke('M556 462Q604 428 652 462', { w: W_INNER + 4 }));
-  body.push(stroke('M560 492q40 16 84 0', { w: W_DETAIL }), stroke('M662 440l22 -10M664 462l24 4', { w: W_DETAIL }));
   // brows: one up, one jammed down
   body.push(ink('M340 372C370 330 450 322 494 350C500 366 492 380 480 384C440 368 390 372 352 396C340 392 336 382 340 372Z', '#f1f6e6', { w: W_INNER }));
   body.push(ink('M540 410C570 386 650 388 700 420C708 434 700 448 688 448C650 430 590 428 552 440C538 434 534 420 540 410Z', '#d5e3d0', { w: W_INNER }));
@@ -107,8 +105,8 @@ export function build(s) {
   ]));
   body.push(stroke(brim, { w: W_INNER }));
   // barnacles: on the hat, the cheek, the shoulder
-  body.push(barnacle(620, 128, 28), barnacle(664, 170, 20), barnacle(604, 178, 15), barnacle(236, 288, 24), barnacle(274, 262, 16));
-  body.push(barnacle(336, 560, 22), barnacle(690, 520, 18), barnacle(760, 870, 28), barnacle(716, 900, 18));
+  body.push(barnacle(620, 128, 28), barnacle(664, 170, 20), barnacle(236, 288, 24));
+  body.push(barnacle(336, 560, 22), barnacle(690, 520, 18), barnacle(760, 870, 28));
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: pipe bubbles, a glint off the eye
