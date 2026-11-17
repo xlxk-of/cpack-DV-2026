@@ -159,6 +159,6 @@ export function build(s) {
 
   // ---- 3: bubbles and plankton
   const bub = (x, y, rr) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })]);
-  s.add(3, bub(960, 720, 12), bub(982, 690, 7), bub(1130, 730, 6), bub(1150, 712, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9)));
+  s.add(3, bub(960, 720, 12), bub(982, 690, 7), bub(1130, 730, 6), bub(1150, 712, 8), bub(560, 900, 12), bub(590, 850, 7), bub(1700, 960, 12), bub(240, 780, 10), bub(1340, 880, 9));
   s.specks({ n: 40, y0: SEA + 60, rmin: 2, rmax: 5, colors: ['#bfefff', '#ffe9a8', '#8fd0ff'], opacity: 0.6 });
 }

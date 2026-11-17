@@ -237,7 +237,7 @@ export function build(s) {
   // top right: the amphora, purple sponges, a starfish
   props.push(shadow(1716, 196, 190, 70, 12), at(1700, 150, 68, amphora(s), 0.9));
   props.push(shadow(1500, 130, 100, 34), sponge(1496, 128, 0.82, '#c79bff', '#9468e0'));
-  props.push(starfish(1846, 380, 52, 0.2, '#ff7f8f', '#d9485f'), scallop(1380, 54, 36, 14, '#fff0c8', '#e0b060'), rock(r, 1630, 300, 30, 20));
+  props.push(starfish(1846, 380, 52, 0.2, '#ff7f8f', '#d9485f'), scallop(1380, 54, 36, 14, '#fff0c8', '#e0b060'));
   props.push(spiral(1858, 520, 26, -150, '#d8f0ff', '#8fb8e0'));
   // bottom left: the chest and its spill
   props.push(shadow(196, 1090, 210, 60), tuft(60, 1010, 150, '#2f9a7a', -20), at(180, 1000, -8, chest(s), 1));
