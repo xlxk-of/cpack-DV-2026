@@ -1,0 +1,74 @@
+# Builds the iOS app (the web game in a native wrapper) as an UNSIGNED .ipa and publishes it as the release
+# "ios-latest", so it can be downloaded straight to a phone. iOS only installs signed apps: put the .ipa on the phone
+# with a sideloading tool (AltStore, Sideloadly, TrollStore), which signs it with your own Apple ID.
+name: iOS app (unsigned IPA)
+
+on:
+  push:
+    branches: [main, claude/upbeat-planck-wxgfz3]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'art/**'
+      - 'ui/**'
+      - 'fx/**'
+      - 'fonts/**'
+      - 'sfx/**'
+      - 'icons/**'
+      - 'index.html'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-ipa
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bundle the game into the app
+        run: |
+          mkdir -p ios/www
+          cp -R index.html manifest.webmanifest src art ui fx fonts sfx icons ios/www/
+
+      - name: Generate the Xcode project
+        run: |
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          cd ios && xcodegen generate
+
+      - name: Build for iPhone (no signing)
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/NACRE.xcodeproj -scheme NACRE -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tail -n 60
+
+      - name: Package the .ipa
+        run: |
+          test -f build/Build/Products/Release-iphoneos/NACRE.app/www/index.html
+          mkdir -p out/Payload
+          cp -R build/Build/Products/Release-iphoneos/NACRE.app out/Payload/
+          cd out && zip -qry NACRE.ipa Payload && ls -la NACRE.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NACRE-ipa
+          path: out/NACRE.ipa
+
+      - name: Publish as the release "ios-latest"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete ios-latest --yes --cleanup-tag || true
+          gh release create ios-latest out/NACRE.ipa \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "NACRE for iOS (unsigned build)" \
+            --notes "Unsigned .ipa built from $GITHUB_SHA. iOS will not install it by tapping: add it with AltStore, Sideloadly or TrollStore, which sign it with your own Apple ID. To play with no install at all, open the game's web page in Safari and use Share, Add to Home Screen."
