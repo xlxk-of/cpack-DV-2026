@@ -1,8 +1,8 @@
 # NACRE · Duels of the Drowned Stars
 
 A collectible card duelling game that runs as a plain web page: open foil packs, build a twenty-card deck, trade,
-and duel three lords of a drowned sea. Twenty original cards, all illustrated in HD, with foils that get louder with
-rarity.
+and duel three lords of a drowned sea. Twenty original cards, all drawn as chunky marker doodles (fat ink line, flat
+colour) and rendered in HD, with foils that get louder with rarity.
 
 | Rarity | Cards | What the card does in your hand |
 |---|---|---|
@@ -73,4 +73,7 @@ python3 tools/fx/make.py                        # the foil textures (needs numpy
 node tools/sim.mjs 300                          # AI-vs-AI games, to check the rules and the difficulty curve
 ```
 
-Fonts: Cinzel and Cormorant Garamond (SIL Open Font License).
+The drawing rules that keep thirty pictures in one hand (one ink colour and set of line weights, one eye, one skin
+tone, drawn light instead of blur, safe margins) are written at the top of the doodle kit in `tools/art/lib.mjs`.
+
+Fonts: Fredoka and Nunito (SIL Open Font License).
