@@ -23,7 +23,7 @@ export function build(s) {
 
   // ---- 1: kelp it is threading, the water it has cut
   s.add(1, kelp(r, { x: 62, h: 900, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
-  s.add(1, kelp(r, { x: 966, h: 960, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
+  s.add(1, kelp(r, { x: 966, h: 960, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5, skip: [2] }));
   s.add(1, kelp(r, { x: 610, h: 330, fill: '#215f42', w: W_MID, width: 24, leaf: 84, n: 3 }));
   s.add(1, kelp(r, { x: 300, h: 300, fill: '#215f42', w: W_MID, width: 24, leaf: 84, n: 3 }));
   const wake = [];
@@ -117,27 +117,29 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, [g({ transform: `translate(${FX - 523 * K} ${FY - 410 * K}) scale(${K})` }, fish)]));
 
   // ---- 3: speed lines, bubbles off the jaw, torn leaf, near kelp whipping past the edges
-  s.add(3, kelp(r, { x: -10, y: 1090, h: 900, fill: '#114032', w: W_INNER, width: 44, leaf: 150, n: 4, sway: 30 }));
+  s.add(3, kelp(r, { x: -10, y: 1090, h: 900, fill: '#114032', w: W_INNER, width: 44, leaf: 150, n: 4, sway: 30, skip: [1] }));
   s.add(3, kelp(r, { x: 1034, y: 1090, h: 700, fill: '#114032', w: W_INNER, width: 44, leaf: 150, n: 3, sway: 30 }));
-  s.add(3, streak(...mv(420, 316), 120, 12), streak(...mv(560, 232), 90, 10), streak(...mv(470, 700), 170, 12), streak(...mv(660, 640), 110, 10), streak(...mv(820, 560), 70, 9));
-  for (const [x0, y0, rr] of [[196, 500, 15], [158, 446, 9], [226, 398, 11], [330, 330, 8], [866, 300, 13], [470, 790, 12]]) {
+  s.add(3, streak(...mv(402, 300), 120, 12), streak(...mv(560, 232), 90, 10), streak(...mv(470, 700), 170, 12), streak(...mv(660, 640), 110, 10), streak(...mv(820, 560), 70, 9));
+  for (const [x0, y0, rr] of [[196, 500, 15], [158, 446, 9], [226, 398, 11], [330, 330, 8], [732, 714, 13], [470, 790, 12]]) {
     const [x, y] = mv(x0, y0);
     s.add(3, inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
   }
   s.add(3, scrap(330, 730, 24, -30, '#5fb86a'), scrap(842, 690, 20, 20, '#5fb86a'), scrap(430, 232, 18, -50, '#5fb86a'));
-  s.add(3, star4(170, 640, 24, '#fff3a0'), star4(540, 180, 18), star4(880, 440, 16, '#fff3a0'));
+  s.add(3, star4(196, 772, 24, '#fff3a0'), star4(486, 140, 18), star4(880, 440, 16, '#fff3a0'));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffffff', '#e8ffc8', '#fff3a0'], opacity: 0.9 });
 }
 
 /** Doodle kelp rooted at (x, y): a wavy stem with fat pointed blades either side, one ink line round the lot
- *  (w = 0 for the far backdrop: flat, no line). */
-function kelp(r, { x, y = 1060, h = 700, sway = 30, width = 28, leaf = 120, fill, w = W_MID, n = 5 }) {
+ *  (w = 0 for the far backdrop: flat, no line). `skip` lists blades (counted from the root) to leave off, so that
+ *  none reaches into the fish. */
+function kelp(r, { x, y = 1060, h = 700, sway = 30, width = 28, leaf = 120, fill, w = W_MID, n = 5, skip = [] }) {
   const ph = r.range(0, 6), pts = [];
   for (let i = 0; i <= 7; i++) { const t = i / 7; pts.push([x + Math.sin(t * 4.2 + ph) * sway * (0.3 + t), y - h * t]); }
   const sm = sample(pts, 6);
   let d = ribbon(pts, width, width * 0.5);
   for (let k = 0; k < n; k++) {
     const p = sm[Math.round((0.22 + 0.72 * k / Math.max(1, n - 1)) * (sm.length - 1))], sd = k % 2 ? 1 : -1, L = leaf * (1 - 0.3 * k / n) * r.range(0.85, 1.15);
+    if (skip.includes(k)) continue;
     d += ribbon([p, [p[0] + sd * L * 0.5, p[1] - L * 0.42], [p[0] + sd * L, p[1] - L * 0.62]], 1, 1, (u) => leaf * 0.36 * Math.sin(Math.PI * Math.pow(u, 0.6)) + 3);
   }
   if (!w) return flat(d, fill);
