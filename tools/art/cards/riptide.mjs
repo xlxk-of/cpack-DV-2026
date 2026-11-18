@@ -61,7 +61,6 @@ export function build(s) {
   body.push(g({ 'clip-path': s.clip(parts.map((d) => el('path', { d })).join('')) }, [
     flat(ribbon(line.map((_, i) => { const t = TE * i / (line.length - 1); return sp(t, -fat(t) * 0.3); }), fat0(0) * 0.46, fat0(TE) * 0.46, shapeT, 3), FOAM_D),
   ]));
-  { const [x, y] = sp(0.998, 2); body.push(stroke(`M${x - 9} ${y + 2}q8 -12 18 -4`, { w: W_DETAIL })); }
   // foam curls and the pull of the water, drawn
   blobs.forEach(([x, y, q, t], i) => {
     if (i % 2) return;
