@@ -72,3 +72,47 @@ jobs:
             --target "$GITHUB_SHA" --prerelease \
             --title "NACRE for iOS (unsigned build)" \
             --notes "Unsigned .ipa built from $GITHUB_SHA. iOS will not install it by tapping: add it with AltStore, Sideloadly or TrollStore, which sign it with your own Apple ID. To play with no install at all, open the game's web page in Safari and use Share, Add to Home Screen."
+
+  # Proof that the wrapper really runs: the same app, built for the simulator, launched, and photographed.
+  smoke:
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bundle the game and generate the project
+        run: |
+          mkdir -p ios/www
+          cp -R index.html manifest.webmanifest src art ui fx fonts sfx icons ios/www/
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          cd ios && xcodegen generate
+
+      - name: Build for the simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/NACRE.xcodeproj -scheme NACRE -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath simbuild \
+            CODE_SIGNING_ALLOWED=NO build | tail -n 30
+
+      - name: Launch it and take a screenshot
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k in sorted(d, reverse=True) if 'iOS' in k for x in d[k] if x['name'].startswith('iPhone')))")
+          echo "simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" simbuild/Build/Products/Debug-iphonesimulator/NACRE.app
+          xcrun simctl launch "$UDID" games.nacre.duels
+          sleep 30
+          mkdir -p out
+          xcrun simctl io "$UDID" screenshot out/NACRE-on-iPhone-simulator.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: simulator-screenshot
+          path: out/NACRE-on-iPhone-simulator.png
+
+      - name: Attach the screenshot to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ios-latest out/NACRE-on-iPhone-simulator.png --clobber
