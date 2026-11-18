@@ -28,6 +28,23 @@ the address it gives you. On a phone, *Add to Home Screen* makes it open like an
 
 Progress is kept in the browser's own storage; nothing is sent anywhere.
 
+### As an iPhone app (.ipa)
+
+`ios/` holds a small native wrapper (a full-screen web view that serves the bundled game from its own URL scheme).
+The workflow `.github/workflows/ios.yml` builds it on GitHub's macOS runners every time the game changes and
+publishes the result as the release **ios-latest**: `NACRE.ipa`, under *Releases* on the repository page.
+
+The build is **unsigned**, because signing needs an Apple account and this repository holds none. iOS will not
+install an unsigned app by tapping the file, so install it with a tool that signs it with your own Apple ID:
+
+- **AltStore** or **Sideloadly** (free; need a Mac or PC once to set up; apps signed with a free Apple ID last seven
+  days and are then refreshed by the same tool), or
+- **TrollStore**, on the iOS versions it supports (no computer, no expiry), or
+- your own Apple Developer account: open the generated project in Xcode, pick your team, and run it on the phone.
+
+No computer and no account? Use the web page instead: open it in Safari, tap **Share → Add to Home Screen**, and it
+opens full-screen like an app.
+
 ## The game
 
 - **Duel** — two heroes at 30 health. Each turn you gain a pearl of mana (up to 10) and draw a card. Play minions and
@@ -60,6 +77,7 @@ Progress is kept in the browser's own storage; nothing is sent anywhere.
 | `fx/` | the tiling foil textures (oil slick, glitter, flakes) |
 | `tools/art/` | the illustrations' source: each picture is a small script that draws layered SVG |
 | `sfx/` | pack sounds (from the WICK pack opener); duel sounds are synthesised in `src/sfx.js` |
+| `ios/`, `.github/workflows/ios.yml` | the iPhone wrapper app and the workflow that builds the unsigned `.ipa` |
 
 ## Rebuilding the art
 
