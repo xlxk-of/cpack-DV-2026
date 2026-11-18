@@ -408,7 +408,7 @@ textarea { border: 2.5px solid var(--ink); }
 .logo h1 { position: relative; display: inline-block; letter-spacing: .06em; margin-right: -.06em; background: none; color: var(--ink); -webkit-text-stroke: .16em var(--ink); filter: drop-shadow(0 .07em 0 var(--ink)); }
 .logo h1::after { content: attr(data-t); position: absolute; left: 0; top: 0; -webkit-text-stroke: 0; background: linear-gradient(180deg, #ffffff 0 50%, #c9ecff 50% 74%, #ffc9ec 74% 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .logo p { letter-spacing: .2em; color: #fff; text-shadow: 0 2px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink), 0 -2px 0 var(--ink); }
-.home-bg { background: linear-gradient(180deg, rgba(20, 28, 68, 0) 55%, rgba(20, 28, 68, .7) 100%), url(../ui/home.webp) center / cover no-repeat, #141c44; }
+.home-bg { background: url(../ui/home.webp) center / cover no-repeat, #141c44; }
 
 /* packs */
 .pack-pic { filter: drop-shadow(0 8px 0 rgba(26, 18, 48, .6)); }

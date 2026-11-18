@@ -364,7 +364,8 @@ const STD_DEFS = `
 //   * EYES: always the `eye` helper — white ball, one big dark pupil, one glint. No iris rings, no lens eyes. A
 //     predator may have a yellow ball and a slit pupil. The main character's eyes are BIG: each at least ~34 radius
 //     on the 1024 canvas (together about a tenth of the canvas width or more), whatever the size of the body.
-//   * SKIN: every human and mermaid uses SKIN with SKIN_SHADE for the one shadow tone.
+//   * SKIN: every living human and mermaid uses SKIN with SKIN_SHADE for the one shadow tone (the drowned and the
+//     dead are exempt: Old Brackwater is sea-mint, the Drowned King is bone).
 //   * HALOS are opaque: steps of the BACKDROP colour lightened toward the light's hue (pass `halo` a list of solid
 //     colours, outermost first). Never a translucent yellow disc: over blue or teal it turns olive.
 //   * LIGHT STAYS BEHIND: halos, shafts, rays and sound rings are always drawn behind the subject, never across it.
@@ -372,8 +373,10 @@ const STD_DEFS = `
 //   * VALUE: the band directly behind the subject is at least two clear value steps away from the subject's main
 //     colour (a teal ship needs a dark navy or a pale band behind it, not teal). No backdrop band is lighter than
 //     BRIGHTEST_BAND. Far water, sky and ground bands never carry an ink line.
-//   * SAFE AREA: every part of the subject stays inside the middle 80% of the canvas (102..922 on 1024). On the four
-//     full-art cards nothing but backdrop and floor goes below y = 800 (a text plate covers it).
+//   * SAFE AREA (measured from the real card frames; canvas pixels on 1024): a normal card's window shows the full
+//     width but only y 70..850, and its name plate overlaps the last of that, so every inked part of the subject
+//     sits inside x 102..922, y 90..820. A full-art card shows from y 25 down, with the text plate from y 800: its
+//     subject sits inside x 102..922, y 50..790, and nothing but backdrop and floor goes below 800.
 //   * FOREGROUND: round-tipped weed, bubbles, sparkles. No dark angular blades or shards in the corners.
 //   * Inside a medallion or ring (card back, packs) the sigil is centred on its star; the standalone emblem is
 //     balanced on its canvas by its outline instead.

@@ -35,14 +35,24 @@
 
 /* ---- the picture */
 .card .art { position: absolute; left: 6cqw; right: 6cqw; top: 6cqw; height: 73.5cqw; border-radius: 2.6cqw; overflow: hidden; background: #0d1838; box-shadow: 0 0 0 var(--iw) var(--ink); }
-.card .art-l { position: absolute; left: -7%; top: -7%; width: 114%; height: 114%; object-fit: cover; object-position: 50% 40%; display: block; }
+.card .art-l { position: absolute; object-fit: cover; object-position: 50% 30%; display: block; }
+/* a flat picture fills the window exactly, so as much of it shows as the window's shape allows */
+.card .art-l.flat { left: 0; top: 0; width: 100%; height: 100%; }
+/* layers are drawn a little oversize, just enough that sliding them never uncovers an edge */
+.card .art-l:not(.flat) { left: -4%; top: -4%; width: 108%; height: 108%; }
 .card .art-l.l0 { transform: translate(calc(var(--px) * 2.4cqw), calc(var(--py) * 2.4cqw)); }
 .card .art-l.l1 { transform: translate(calc(var(--px) * 1.1cqw), calc(var(--py) * 1.1cqw)); }
 .card .art-l.l2 { transform: translate(calc(var(--px) * -.7cqw), calc(var(--py) * -.7cqw)); }
 .card .art-l.l3 { transform: translate(calc(var(--px) * -3cqw), calc(var(--py) * -3cqw)); }
 .card.full .art { left: 3cqw; right: 3cqw; top: 3cqw; height: 94cqw; border-radius: 3.6cqw 3.6cqw 0 0; box-shadow: none; background: none;
   -webkit-mask-image: linear-gradient(#000 80%, transparent 99%); mask-image: linear-gradient(#000 80%, transparent 99%); }
-.card.full .art-l { object-position: 50% 50%; }
+/* full art shows the whole square: only 2% is kept spare above it (the spare 6% below is under the text plate), so
+   the layers slide less far up and down than they do sideways */
+.card.full .art-l:not(.flat) { top: -2%; }
+.card.full .art-l.l0 { transform: translate(calc(var(--px) * 2.4cqw), calc(var(--py) * 1.4cqw)); }
+.card.full .art-l.l1 { transform: translate(calc(var(--px) * 1.1cqw), calc(var(--py) * .7cqw)); }
+.card.full .art-l.l2 { transform: translate(calc(var(--px) * -.7cqw), calc(var(--py) * -.5cqw)); }
+.card.full .art-l.l3 { transform: translate(calc(var(--px) * -3cqw), calc(var(--py) * -1.7cqw)); }
 
 /* ---- the name banner: an ink shape with a flat ribbon inside it */
 .card .plate { position: absolute; left: 1.6cqw; right: 1.6cqw; top: 75cqw; height: 13.6cqw; background: var(--ink);
