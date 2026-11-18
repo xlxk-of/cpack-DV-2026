@@ -8,12 +8,13 @@ const LIME = '#a9e25c', LIME_D = '#78c24e', BELLY = '#fff6c4', GOLD = '#ffc93c',
 export function build(s) {
   const r = s.r;
 
-  // ---- 0: sunny shallow water in flat aqua bands (none lighter than the set's brightest); the only cream is the
-  // sun's disc at the top, inside two opaque steps of the water lightened toward it
-  s.bands([[0, '#7fdcd6'], [200, '#69d0cd'], [450, '#52c0c3'], [700, '#3fadb5']], { amp: 16, waves: 3 });
-  s.add(0, halo(540, -70, 330, ['#98e5d6', '#bdefd4']), el('circle', { cx: 540, cy: -70, r: 150, fill: '#fff6c4' }));
-  s.shafts({ x: 540, y: -160, angle: 90, spread: 56, n: 5, color: '#ffffff', opacity: 0.2, width: 110 });
-  s.lumps({ y: 720, amp: 110, n: 6, fill: '#369fa9', layer: 0 });
+  // ---- 0: sunny shallow water in flat teal bands, deep enough that the lime head and gold gills sit two value steps
+  // off them (sun rays included); the only pale thing is the sun's disc at the top, inside two opaque steps of the
+  // water lightened toward it
+  s.bands([[0, '#45b6b9'], [200, '#3fb2b6'], [450, '#37a7ae'], [700, '#309ca6']], { amp: 16, waves: 3 });
+  s.add(0, halo(540, -70, 330, ['#4fbebe', '#69cbc6']), el('circle', { cx: 540, cy: -70, r: 150, fill: '#fff6c4' }));
+  s.shafts({ x: 540, y: -160, angle: 90, spread: 56, n: 5, color: '#ffffff', opacity: 0.15, width: 110 });
+  s.lumps({ y: 720, amp: 110, n: 6, fill: '#2a919b', layer: 0 });
   s.specks({ n: 36, rmin: 2, rmax: 5, colors: ['#ffffff', '#fffbd0'], opacity: 0.6, layer: 0 });
   s.paper();
 

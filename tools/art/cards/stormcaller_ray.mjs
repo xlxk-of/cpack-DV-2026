@@ -17,9 +17,11 @@ export function build(s) {
       half ? flat('M30 30L16 62L34 62L-8 122L8 60L22 60Z', ZAP_D) : '',
       el('path', { d: BOLT, fill: 'none', stroke: INK, 'stroke-width': w / k, 'stroke-linejoin': 'round' })]); };
 
-  // ---- 0: storm water in flat bands; far forks of lightning coming down from the surface, flat, no line
-  s.bands([[0, '#2c5d8c'], [300, '#234b7a'], [560, '#1a3966'], [820, '#11284c']], { amp: 18, waves: 3 });
-  s.shafts({ x: 512, y: -160, angle: 90, spread: 50, n: 4, color: '#a9d8ff', opacity: 0.1, width: 100 });
+  // ---- 0: storm water in flat bands, dark enough behind the ray that its violet sits two value steps off them; the
+  // fan of light is the water's own blue one step up (never lighter than that, even where two shafts cross); far
+  // forks of lightning coming down from the surface, flat, no line
+  s.bands([[0, '#1a3f6c'], [300, '#173761'], [560, '#143057'], [820, '#11284c']], { amp: 18, waves: 3 });
+  s.shafts({ x: 512, y: -160, angle: 90, spread: 50, n: 4, color: '#254f7e', opacity: 0.6, width: 100 });
   const far = (x, y, rot, k, op) => el('path', { d: BOLT, fill: '#bfe6ff', opacity: op, transform: `translate(${x} ${y}) rotate(${rot}) scale(${k})` });
   s.add(0, far(170, -30, 8, 2.3, 0.3), far(884, -50, -6, 2.7, 0.3), far(350, -40, -12, 1.5, 0.22), far(700, -40, 14, 1.4, 0.2));
   s.specks({ n: 40, rmin: 2, rmax: 5, colors: ['#8fd0ff', '#b9a6ff'], opacity: 0.5, layer: 0 });

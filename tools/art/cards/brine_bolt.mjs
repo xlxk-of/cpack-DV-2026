@@ -10,9 +10,12 @@ const CA = Math.cos(ANG * Math.PI / 180), SA = Math.sin(ANG * Math.PI / 180);
 const W_OUT = 16 / SC; // the bolt's outer line: the set's 16 contour once the bolt has been scaled into place
 const toC = (x, y) => [OX + (x * CA - y * SA) * SC, OY + (x * SA + y * CA) * SC];
 
+const SEA_Y = 748, SEA_PH = 5.76; // the far sea's top edge: its crest is under the strike, its trough under the bolt's last left corner
+
 export function build(s) {
   const r = s.r;
-  const [tx, ty] = toC(50, 395); // where the point lands
+  const TIP = [78, 313]; // the bolt's point (its last zig is kept short so the strike sits clear of the name plate)
+  const [tx, ty] = toC(...TIP); // where the point lands
 
   // ---- 0: navy in flat bands, and ONE flat disc of the navy lightened toward the bolt's blue behind the strike (with
   // the aura hugging the bolt in layer 2 that makes the set's clean two-step halo; no bands of light, no third ring)
@@ -20,37 +23,42 @@ export function build(s) {
   s.add(0, halo(500, 440, 294, ['#223f8c']));
   for (let i = 0; i < 9; i++) r(); // the nine draws three light shafts used to take here: keeps every speck where it was
   s.specks({ n: 40, rmin: 2, rmax: 5, colors: ['#8fd0ff', '#b9a6ff'], opacity: 0.5, layer: 0 });
-  s.add(0, flat(waveBand(1024, 1024, 800, 22, 2.5, 1.2), '#0a1238'));
+  s.add(0, flat(waveBand(1024, 1024, SEA_Y, 22, 2.5, SEA_PH), '#0a1238'));
   s.paper();
 
   // ---- 1: far forks, streaks of rain along the bolt's line, the dark swell it is falling into
   s.add(1, fork([[838, 96], [800, 190], [856, 200], [812, 316]], '#6f9fea'), fork([[150, 470], [118, 560], [168, 566], [136, 664]], '#6f9fea'));
   const rain = [];
-  for (const [x, y, len] of [[690, 250, 90], [760, 380, 60], [250, 560, 80], [330, 700, 60], [900, 560, 70], [120, 300, 60], [600, 120, 50]]) {
+  for (const [x, y, len] of [[690, 250, 90], [760, 380, 60], [250, 560, 80], [307, 667, 40], [900, 560, 70], [120, 300, 60], [600, 120, 50]]) {
     rain.push(`M${x} ${y}l${-SA * len} ${CA * len}`);
   }
   s.add(1, el('path', { d: rain.join(''), fill: 'none', stroke: '#4f86e0', 'stroke-width': 9, 'stroke-linecap': 'round', opacity: 0.7 }));
-  s.add(1, ink(waveBand(1024, 1024, 846, 16, 3.5, 0.4), '#1b3a94', { w: W_MID }));
-  s.add(1, stroke('M120 880q40 -16 80 0M430 872q34 -14 68 0M880 884q36 -14 72 0', { w: W_MID - 2, stroke: '#4f86e0' }));
-  s.add(1, ink(waveBand(1024, 1024, 914, 14, 4.5, 2.4), '#15307c', { w: W_MID }));
+  s.add(1, ink(waveBand(1024, 1024, 790, 16, 3.5, 0.7), '#1b3a94', { w: W_MID }));
+  s.add(1, stroke('M120 824q40 -16 80 0M430 816q34 -14 68 0M880 834q36 -14 72 0', { w: W_MID - 2, stroke: '#4f86e0' }));
+  s.add(1, ink(waveBand(1024, 1024, 862, 14, 4.5, 2.4), '#15307c', { w: W_MID }));
 
   // ---- 2: the bolt
   // it comes in from beyond the top-left corner: A and B are far off the canvas, so the bolt has no upper end
   const A = [-68, -760], B = [56, -760];
-  const pts = [B, [-55, -340], [60, -365], [-5, -120], [110, -145], [46, 100], [156, 75], [50, 395], [-18, 190], [-123, 215], [-61, -25], [-166, 0], [-104, -240], [-209, -215], A];
+  const pts = [B, [-55, -340], [60, -365], [-5, -120], [110, -145], [46, 100], [156, 75], TIP, [-18, 190], [-123, 215], [-61, -25], [-166, 0], [-104, -240], [-209, -215], A];
   const boltD = poly(pts) + 'Z';
   const bolt = [];
   // drawn light: one flat opaque step of glow hugging the shape (the disc's blue lightened again toward the bolt).
-  // It is cut off level with the strike, behind the star's arms, so no sliver of it shows underneath them.
-  bolt.push(g({ 'clip-path': s.clip(el('rect', { x: 0, y: 0, width: 1024, height: ty + 8 })) }, [g({ transform: TF }, [
+  // It is cut off level with the strike, behind the star's arms, so no sliver of it shows underneath them (only
+  // right of the last left-hand corner, which hangs lower than the strike: there the glow runs down to the far sea's
+  // edge and stops behind it).
+  const air = [[-40, -40]];
+  for (let i = 0; i <= 48; i++) air.push([-40 + 1104 * i / 48, SEA_Y + 1 + Math.sin(i / 48 * Math.PI * 5 + SEA_PH) * 22]);
+  air.push([1064, -40]);
+  bolt.push(g({ 'clip-path': s.clip(el('path', { d: poly(air, true) })) }, [g({ 'clip-path': s.clip(el('path', { d: `M0 0H1024V${ty + 8}H${tx - 110}V1024H0Z` })) }, [g({ transform: TF }, [
     el('path', { d: boltD, fill: '#3e6eaf', stroke: '#3e6eaf', 'stroke-width': 80, 'stroke-linejoin': 'round' }),
-  ])]));
+  ])])]));
   // splash rings: far halves behind the bolt
   // crowns of spray, not hoops: the far half of each passes behind the bolt, the near half is burst open where the
   // bolt goes through and breaks into droplets there. [cx, cy, rx, ry, left piece ends at, right piece ends at (deg),
   // droplets across the gap [deg, size, tilt]]
   const rings = [[-82, -440, 140, 40, 142, 54, [[112, 9, -24], [84, 9, 20]]], [-5, 32, 235, 58, 130, 26, [[119, 10, -40], [104, 11, -20], [86, 11, 16]]]];
-  const hit = [tx - 6, ty - 4, 150, 40, 116, 64, []];
+  const hit = [tx + 4, ty + 2, 140, 38, 116, 64, []];
   bolt.push(g({ transform: TF }, rings.map((q) => ring(...q, 'back'))));
   bolt.push(ring(...hit, 'back'));
   // the shape itself: flat cyan, one hard shadow down its right-hand edges, a white-hot core
@@ -58,7 +66,7 @@ export function build(s) {
     ink(boltD, CYAN_D, { w: W_OUT }),
     g({ 'clip-path': s.clip(el('path', { d: boltD })) }, [
       el('path', { d: boltD, fill: CYAN, transform: 'translate(-36 -8)' }),
-      el('path', { d: 'M-8 -770L-126 -314L-20 -340L-90 -72L16 -98L-48 150L54 126L46 292', fill: 'none', stroke: HOT, 'stroke-width': 26, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+      el('path', { d: 'M-8 -770L-126 -314L-20 -340L-90 -72L16 -98L-48 150L54 126L60 238', fill: 'none', stroke: HOT, 'stroke-width': 26, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
     ]),
     stroke(boltD, { w: W_OUT }),
     ...rings.map((q) => ring(...q, 'front')),
@@ -71,13 +79,13 @@ export function build(s) {
   // ---- 3: thrown droplets, sparks, the near swell
   const drops = [
     [toC(-250, -262), 20, -70], [toC(-300, -200), 12, -80], [toC(160, -262), 18, 60], [toC(210, -214), 11, 75],
-    [toC(-280, 90), 16, -75], [toC(190, -70), 14, 70], [toC(270, -6), 9, 80],
-    [[tx - 176, ty - 44], 16, -60], [[tx + 150, ty - 70], 18, 50], [[tx - 96, ty - 96], 12, -25], [[tx + 62, ty - 112], 13, 20], [[tx + 214, ty - 22], 10, 70],
+    [toC(-340, 0), 16, -75], [toC(190, -70), 14, 70], [toC(270, -6), 9, 80],
+    [[tx - 295, ty + 6], 16, -60], [[tx + 150, ty - 70], 18, 50], [[tx - 96, ty - 96], 12, -25], [[tx + 62, ty - 112], 13, 20], [[tx + 214, ty - 22], 10, 70],
   ];
   s.add(3, drops.map(([p, k, a]) => drop(p[0], p[1], k, a)));
-  s.add(3, star4(742, 232, 32), star4(112, 404, 22, '#fff3a8'), star4(858, 506, 20), star4(408, 760, 18, '#fff3a8'), star4(560, 150, 16));
+  s.add(3, star4(742, 232, 32), star4(112, 404, 22, '#fff3a8'), star4(858, 506, 20), star4(186, 714, 18, '#fff3a8'), star4(560, 150, 16));
   s.specks({ n: 16, rmin: 3, rmax: 7, colors: ['#ffffff', '#bfefff', '#fff3a8'], opacity: 0.9 });
-  s.add(3, ink(waveBand(1024, 1024, 978, 18, 2.5, 4), '#0e1d5a', { w: W_INNER }));
+  s.add(3, ink(waveBand(1024, 1024, 942, 18, 2.5, 4), '#0e1d5a', { w: W_INNER }));
 }
 
 /** Half of a crown of spray seen nearly edge-on. 'back' is the far (upper) arc, whole. 'front' is the near one,

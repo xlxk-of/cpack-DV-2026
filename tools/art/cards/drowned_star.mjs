@@ -33,7 +33,8 @@ export function build(s) {
   mid.push(halo(CX, CY, 378, ['#2b2468', '#463c82', '#463c82']));
   [VIOLET, SKY, MINT, GOLD, PINK].forEach((c, i) => mid.push(el('circle', { cx: CX, cy: CY, r: 446 - i * 15, fill: 'none', stroke: c, 'stroke-width': 15.6 })));
   mid.push(el('circle', { cx: CX, cy: CY, r: 454, fill: 'none', stroke: INK, 'stroke-width': W_MID }), el('circle', { cx: CX, cy: CY, r: 378, fill: 'none', stroke: INK, 'stroke-width': W_MID }));
-  mid.push(ink(burst(CX, CY, 8, 346, 282, 214, 0), GOLD, { w: W_MID }));
+  // (the ray that points straight up is kept as short as its neighbours: a full-art frame shows the picture from y 50)
+  mid.push(ink(burst(CX, CY, 8, 346, 282, 214, 0, 278), GOLD, { w: W_MID }));
   mid.push(ink(burst(CX, CY, 8, 256, 256, 204, 11.25), '#ffe98a', { w: W_MID }));
   mid.push(el('circle', { cx: CX, cy: CY, r: 190, fill: '#fff6c0' }), el('circle', { cx: CX, cy: CY, r: 150, fill: '#fffbe0' }));
   s.add(1, g({}, mid));
@@ -115,11 +116,12 @@ function starPath(cx, cy, R, r, n = 5, rot = -90, round = 0.3) {
 }
 const f = (v) => Math.round(v * 10) / 10;
 
-/** A burst of n pointed rays alternating long and short, with valleys at rv. */
-function burst(cx, cy, n, RL, RS, rv, rot) {
+/** A burst of n pointed rays alternating long and short, with valleys at rv; `Rtop` (optional) is the length of
+ *  the first ray alone, the one that points straight up when rot is 0. */
+function burst(cx, cy, n, RL, RS, rv, rot, Rtop = RL) {
   const pts = [];
   for (let i = 0; i < n * 2; i++) {
-    const a = (rot + i * 180 / n - 90) * Math.PI / 180, b = (rot + (i + 0.5) * 180 / n - 90) * Math.PI / 180, R = i % 2 ? RS : RL;
+    const a = (rot + i * 180 / n - 90) * Math.PI / 180, b = (rot + (i + 0.5) * 180 / n - 90) * Math.PI / 180, R = i === 0 ? Rtop : i % 2 ? RS : RL;
     pts.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R], [cx + Math.cos(b) * rv, cy + Math.sin(b) * rv]);
   }
   return poly(pts, true);
