@@ -48,7 +48,7 @@ function home() {
 
 function duels() {
   const ready = deckReady();
-  $('#duels').replaceChildren(
+  $('#duels').replaceChildren(...[
     ready ? null : h('p.note.warn', {}, `Your deck has ${S.deck.length} of ${DECK_SIZE} cards. `, h('a', { href: '#', onclick: (e) => { e.preventDefault(); go('collection'); } }, 'Finish it in the Collection'), ' before duelling.'),
     h('div.foes', {}, OPPONENTS.map((o, i) => {
       const wins = S.wins[o.id] || 0;
@@ -60,7 +60,7 @@ function duels() {
           h('p', {}, o.blurb),
           h('p.note', { html: `Win: <i class="coin"></i> ${o.gold}` + (wins ? ` · beaten ${wins}×` : ` · first win: ${Object.entries(o.firstWin).map(([k, n]) => `${n} ${k === 'abyss' ? 'Abyssal' : 'Tide'} pack${n > 1 ? 's' : ''}`).join(', ')}`) }),
           btn('Duel', () => { if (!deckReady()) { toast('Your deck needs ' + DECK_SIZE + ' cards'); return; } go('battle', o); }, ready ? '' : 'off')));
-    })));
+    }))].filter(Boolean));
 }
 
 load();
