@@ -4,21 +4,26 @@ import { el, g, spline, ribbon, sample, poly, ink, stroke, flat, inkCircle, stic
 
 const GREEN = '#52bd68', GREEN_D = '#2f8f52', BELLY = '#dcef8e', YELLOW = '#ffd83a', YELLOW_D = '#f0a81e';
 const SPEED = -24 * Math.PI / 180; // the line it is travelling along
+// The fish is drawn at its first size and then enlarged K times about (523, 410), landing centred on (FX, FY). Its
+// ink lines are divided by K so they come out at the set's weights. `mv` carries a point along with it.
+const K = 1.18, FX = 516, FY = 414;
+const mv = (x, y) => [FX + (x - 523) * K, FY + (y - 410) * K];
+const WS = W_SUBJECT / K, WI = W_INNER / K, WD = W_DETAIL / K;
 
 export function build(s) {
   const r = s.r;
 
   // ---- 0: green gloom in flat bands, far kelp with no ink
-  s.bands([[0, '#2f7c56'], [300, '#256849'], [570, '#1b523c'], [820, '#133e30']], { amp: 18, waves: 3 });
+  s.bands([[0, '#2a7050'], [270, '#1b5443'], [640, '#144236'], [840, '#0e3129']], { amp: 18, waves: 3 });
   s.shafts({ x: 740, y: -140, angle: 104, spread: 40, n: 4, color: '#d9ffa8', opacity: 0.09, width: 110 });
-  for (const [x, h] of [[40, 760], [210, 520], [400, 820], [730, 700], [1000, 600]]) s.add(0, kelp(r, { x, h, fill: '#1a4f3b', w: 0, width: 22, leaf: 90 }));
+  for (const [x, h] of [[40, 760], [210, 520], [400, 820], [730, 700], [1000, 600]]) s.add(0, kelp(r, { x, h, fill: '#123b30', w: 0, width: 22, leaf: 90 }));
   s.specks({ n: 36, rmin: 2, rmax: 5, colors: ['#bff0a0', '#fff3a0'], opacity: 0.45, layer: 0 });
-  s.lumps({ y: 905, amp: 80, n: 7, fill: '#0e3026', layer: 0 });
+  s.lumps({ y: 905, amp: 80, n: 7, fill: '#0a251f', layer: 0 });
   s.paper();
 
   // ---- 1: kelp it is threading, the water it has cut
-  s.add(1, kelp(r, { x: 120, h: 900, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
-  s.add(1, kelp(r, { x: 890, h: 960, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
+  s.add(1, kelp(r, { x: 62, h: 900, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
+  s.add(1, kelp(r, { x: 966, h: 960, fill: '#27714c', w: W_MID, width: 30, leaf: 120, n: 5 }));
   s.add(1, kelp(r, { x: 610, h: 330, fill: '#215f42', w: W_MID, width: 24, leaf: 84, n: 3 }));
   s.add(1, kelp(r, { x: 300, h: 300, fill: '#215f42', w: W_MID, width: 24, leaf: 84, n: 3 }));
   const wake = [];
@@ -65,7 +70,7 @@ export function build(s) {
   const tailD = poly([[ep[0] - e.dx * 26 - e.nx * 14, ep[1] - e.dy * 26 - e.ny * 14], [ep[0] + e.dx * 96 - e.nx * 76, ep[1] + e.dy * 96 - e.ny * 76],
     [ep[0] + e.dx * 44, ep[1] + e.dy * 44], [ep[0] + e.dx * 78 + e.nx * 62, ep[1] + e.dy * 78 + e.ny * 62], [ep[0] - e.dx * 26 + e.nx * 14, ep[1] - e.dy * 26 + e.ny * 14]], true);
   const fish = [];
-  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.32, 0.78, -1, 80, 3), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }]));
+  fish.push(sticker([{ d: tailD, fill: YELLOW }, { d: sail(0.32, 0.78, -1, 80, 3), fill: YELLOW }, { d: sail(0.56, 0.76, 1, 44, 2), fill: YELLOW }, { d: bodyD, fill: GREEN }], { outer: WS, inner: WI }));
 
   // inside the body: pale belly, dark bars over the back, one hard shadow along the underside, a hard highlight
   const band = (k0, k1, t0 = 0, t1 = 1) => { const a = [], b = []; for (let i = I(t0); i <= I(t1); i++) { a.push(at(i, k0)); b.push(at(i, k1)); } return poly([...a, ...b.reverse()], true); };
@@ -82,15 +87,15 @@ export function build(s) {
     el('path', { d: poly(hi), fill: 'none', stroke: '#fff', 'stroke-width': 13, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.9 }),
     el('circle', { cx: at(I(0.26), -0.35)[0], cy: at(I(0.26), -0.35)[1], r: 8, fill: '#fff', opacity: 0.9 }),
   ]));
-  fish.push(stroke(bodyD, { w: W_INNER }));
+  fish.push(stroke(bodyD, { w: WI }));
 
   // gill, and the fin behind it flattened back by speed
   const ig = I(0.29), ga = at(ig, -0.3), gb = at(ig, 0.3), gc = at(ig, 0, 36);
-  fish.push(stroke(`M${ga[0]} ${ga[1]}Q${gc[0]} ${gc[1]} ${gb[0]} ${gb[1]}`, { w: W_INNER }));
+  fish.push(stroke(`M${ga[0]} ${ga[1]}Q${gc[0]} ${gc[1]} ${gb[0]} ${gb[1]}`, { w: WI }));
   const pf = at(I(0.35), 0.14), f3 = fr[I(0.35)];
   const pfin = [pf, [pf[0] + f3.dx * 62 + f3.nx * 26, pf[1] + f3.dy * 62 + f3.ny * 26], [pf[0] + f3.dx * 128 + f3.nx * 30, pf[1] + f3.dy * 128 + f3.ny * 30]];
-  fish.push(ink(ribbon(pfin, 1, 1, (u) => 56 * Math.sin(Math.PI * Math.pow(u, 0.5)) + 6), YELLOW, { w: W_INNER }));
-  fish.push(stroke(`M${pf[0] + f3.dx * 30 + f3.nx * 12} ${pf[1] + f3.dy * 30 + f3.ny * 12}L${pfin[2][0] - f3.dx * 30} ${pfin[2][1] - f3.dy * 30}`, { w: W_DETAIL, stroke: YELLOW_D }));
+  fish.push(ink(ribbon(pfin, 1, 1, (u) => 56 * Math.sin(Math.PI * Math.pow(u, 0.5)) + 6), YELLOW, { w: WI }));
+  fish.push(stroke(`M${pf[0] + f3.dx * 30 + f3.nx * 12} ${pf[1] + f3.dy * 30 + f3.ny * 12}L${pfin[2][0] - f3.dx * 30} ${pfin[2][1] - f3.dy * 30}`, { w: WD, stroke: YELLOW_D }));
 
   // the grin: a white band of teeth along the jaw, a zig-zag through it
   const i1 = I(0.012), i2 = I(0.25), mu = [], ml = [], zig = [];
@@ -100,23 +105,24 @@ export function build(s) {
   }
   const nz = 13;
   for (let j = 0; j <= nz; j++) { const q = Math.round(j / nz * (mu.length - 1)), a = j % 2 ? 0.86 : 0.14; zig.push([mu[q][0] + (ml[q][0] - mu[q][0]) * a, mu[q][1] + (ml[q][1] - mu[q][1]) * a]); }
-  fish.push(ink(poly([...mu, ...ml.slice().reverse()], true), '#fffdf0', { w: W_INNER }));
-  fish.push(stroke(poly(zig), { w: W_DETAIL }));
+  fish.push(ink(poly([...mu, ...ml.slice().reverse()], true), '#fffdf0', { w: WI }));
+  fish.push(stroke(poly(zig), { w: WD }));
 
   // the eye: the one hot yellow thing in the forest, under a hard brow
   const ie = I(0.125), ec = at(ie, -0.2), rot = Math.atan2(fr[ie].dy, fr[ie].dx) * 180 / Math.PI - 10;
-  fish.push(eye(ec[0], ec[1], 47, { white: YELLOW, pupil: 0.46, look: [-0.5, 0.35], lid: 0.3, lidRot: rot, lidFill: GREEN_D }));
-  fish.push(stroke(lidLine(ec[0], ec[1], 47, 0.3, rot, 14), { w: W_INNER + 4 }));
+  fish.push(eye(ec[0], ec[1], 47, { white: YELLOW, pupil: 0.46, look: [-0.5, 0.35], lid: 0.3, lidRot: rot, lidFill: GREEN_D, w: WI }));
+  fish.push(stroke(lidLine(ec[0], ec[1], 47, 0.3, rot, 14), { w: (W_INNER + 4) / K }));
   const no = at(I(0.02), -0.22);
   fish.push(el('circle', { cx: no[0], cy: no[1], r: 5, fill: INK }));
-  s.add(2, g({ filter: s.wobble(5) }, fish));
+  s.add(2, g({ filter: s.wobble(5) }, [g({ transform: `translate(${FX - 523 * K} ${FY - 410 * K}) scale(${K})` }, fish)]));
 
   // ---- 3: speed lines, bubbles off the jaw, torn leaf, near kelp whipping past the edges
   s.add(3, kelp(r, { x: -10, y: 1090, h: 900, fill: '#114032', w: W_INNER, width: 44, leaf: 150, n: 4, sway: 30 }));
   s.add(3, kelp(r, { x: 1034, y: 1090, h: 700, fill: '#114032', w: W_INNER, width: 44, leaf: 150, n: 3, sway: 30 }));
-  s.add(3, streak(420, 316, 120, 12), streak(560, 232, 90, 10), streak(470, 700, 170, 12), streak(660, 640, 110, 10), streak(820, 560, 70, 9));
-  for (const [x, y, rr] of [[196, 500, 15], [158, 446, 9], [226, 398, 11], [330, 330, 8], [866, 300, 13], [470, 790, 12]]) {
-    s.add(3, inkCircle(x, y, rr, '#e4ffd8', { w: W_DETAIL, 'fill-opacity': 0.4 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
+  s.add(3, streak(...mv(420, 316), 120, 12), streak(...mv(560, 232), 90, 10), streak(...mv(470, 700), 170, 12), streak(...mv(660, 640), 110, 10), streak(...mv(820, 560), 70, 9));
+  for (const [x0, y0, rr] of [[196, 500, 15], [158, 446, 9], [226, 398, 11], [330, 330, 8], [866, 300, 13], [470, 790, 12]]) {
+    const [x, y] = mv(x0, y0);
+    s.add(3, inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
   }
   s.add(3, scrap(330, 730, 24, -30, '#5fb86a'), scrap(842, 690, 20, 20, '#5fb86a'), scrap(430, 232, 18, -50, '#5fb86a'));
   s.add(3, star4(170, 640, 24, '#fff3a0'), star4(540, 180, 18), star4(880, 440, 16, '#fff3a0'));

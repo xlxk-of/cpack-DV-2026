@@ -27,7 +27,8 @@ export function build(s) {
   s.paper();
 
   // ---- 1: the charge round the wing tips, drawn as flat rings; fish clearing off; the reef
-  s.add(1, halo(832, 232, 118, ZAP_L, 3, 0.34), halo(192, 232, 118, ZAP_L, 3, 0.34));
+  const CHARGE = ['#3c72a6', '#538dbf', '#73abd8'];     // opaque steps of the water lightened to pale blue: no yellow over blue
+  s.add(1, halo(832, 232, 118, CHARGE), halo(192, 232, 118, CHARGE));
   const fish = (x, y, a, k, f) => g({ transform: `translate(${x} ${y}) rotate(${a}) scale(${k})`, opacity: 0.9 }, [
     ink('M-34 0L-64 -22Q-56 0 -64 22Z', f, { w: W_MID / k }), ink('M-40 0a40 25 0 1 0 80 0a40 25 0 1 0 -80 0Z', f, { w: W_MID / k }),
     el('circle', { cx: 18, cy: -5, r: 8, fill: '#fff' }), el('circle', { cx: 20, cy: -5, r: 4.5, fill: INK })]);
@@ -41,12 +42,14 @@ export function build(s) {
   const half = [[512, 292], [600, 304], [690, 322], [768, 292], [838, 222], [822, 334], [768, 438], [696, 530], [614, 604], [512, 642]];
   const pts = half.concat(half.slice(1, -1).reverse().map(([x, y]) => [1024 - x, y]));
   const bodyD = spline(pts, true, 10);
-  const tail = ribbon([[512, 320], [548, 236], [500, 190], [540, 150]], 30, 12);
+  // the tail trails out from behind the body low on one side, tapering, a spark on its tip
+  const tailPts = [[660, 500], [736, 566], [780, 636], [748, 708]];
+  const tail = ribbon(tailPts, 36, 10);
   const lobeR = ribbon([[596, 570], [616, 632], [584, 668]], 62, 30), lobeL = ribbon([[428, 570], [408, 632], [440, 668]], 62, 30);
   const body = [];
   body.push(contour([tail, lobeL, lobeR, bodyD]));
-  body.push(form(tail, BODY_D));
-  body.push(g({ transform: 'translate(540 150) rotate(-150) scale(0.5)' }, el('path', { d: BOLT, fill: ZAP, stroke: INK, 'stroke-width': W_DETAIL / 0.5 + 12, 'stroke-linejoin': 'round' })), bolt(540, 150, -150, 0.5, { w: W_DETAIL, half: false }));
+  body.push(form(tail, BODY, [flat(ribbon(tailPts.map(([x, y]) => [x - 10, y + 12]), 18, 6), BODY_D)]));
+  body.push(g({ transform: 'translate(746 706) rotate(26) scale(0.5)' }, el('path', { d: BOLT, fill: ZAP, stroke: INK, 'stroke-width': W_DETAIL / 0.5 + 12, 'stroke-linejoin': 'round' })), bolt(746, 706, 26, 0.5, { w: W_DETAIL, half: false }));
   body.push(form(lobeL, BODY, [flat(ribbon([[412, 570], [392, 632], [424, 668]], 30, 16), BODY_D)]), form(lobeR, BODY, [flat(ribbon([[580, 570], [600, 632], [568, 668]], 30, 16), BODY_D)]));
   const zapWing = [bolt(634, 442, -124, 1.66)];
   body.push(form(bodyD, BODY_D, [
@@ -70,7 +73,7 @@ export function build(s) {
 
   // ---- 3: sparks jumping off the wing tips, bubbles
   s.add(3, bolt(858, 176, -150, 0.72, { w: W_DETAIL }), bolt(876, 262, -74, 0.6, { w: W_DETAIL }), mirror([bolt(858, 176, -150, 0.72, { w: W_DETAIL }), bolt(876, 262, -74, 0.6, { w: W_DETAIL })]));
-  s.add(3, bolt(720, 640, -20, 0.55, { w: W_DETAIL }), mirror(bolt(770, 560, -30, 0.45, { w: W_DETAIL })));
+  s.add(3, bolt(826, 486, -20, 0.55, { w: W_DETAIL }), mirror(bolt(770, 560, -30, 0.45, { w: W_DETAIL })));
   s.add(3, star4(770, 190, 26, ZAP_L), star4(244, 176, 22, ZAP_L), star4(880, 380, 18), star4(150, 360, 20), star4(650, 180, 16, '#ffffff'), star4(300, 680, 18, ZAP_L));
   s.inkBubbles({ n: 7, y0: 700, rmin: 8, rmax: 22 });
   [[300, 250, 12], [322, 204, 8], [716, 236, 10]].forEach(([x, y, q]) => s.add(3, inkCircle(x, y, q, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - q * 0.34, cy: y - q * 0.36, r: q * 0.22, fill: '#fff' })));
