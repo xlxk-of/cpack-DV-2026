@@ -1,6 +1,7 @@
 // ABYSSAL PACK — the premium booster as a doodle: black-violet foil with flat oil-slick rings of magenta and teal
 // pooled inside a gold trim line, gold seal strips, and the NACRE sigil in a gold ring with a drawn corona of rays.
-// Same pouch and tear line (the printed dashes at y = 150) as the Tide Pack; nothing but foil sits above y = 220.
+// Same pouch, tear line (the printed dashes at y = 150) and medallion centre as the Tide Pack, so the two line up
+// side by side; nothing but foil sits above y = 190.
 import { el, g, poly, ribbon, blob, rng, ink, stroke, flat, inkCircle, star4, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
 export const out = 'ui';
@@ -9,7 +10,7 @@ export const noThumb = true;
 export const size = [720, 1040];
 export const transparent = true;
 
-const W = 720, H = 1040, XL = 36, XR = 684, T = 26, B = 1014, SEAL_T = 120, SEAL_B = 920, TEAR = 150, CX = 360, CY = 566, TAU = Math.PI * 2;
+const W = 720, H = 1040, XL = 36, XR = 684, T = 26, B = 1014, SEAL_T = 120, SEAL_B = 920, TEAR = 150, CX = 360, CY = 530, TAU = Math.PI * 2;
 const BODY = '#26143f', BODY2 = '#35195c', GOLD = '#ffd65a', GOLD_D = '#f09c36', GOLD_L = '#fff3b8', MAG = '#d23c9c', TEAL = '#1fb3a8';
 
 export function build(s) {
@@ -22,15 +23,15 @@ export function build(s) {
 
   // ---- the printed body: oil on black water, in flat hard-edged rings
   const body = [el('rect', { x: 0, y: SEAL_T, width: W, height: SEAL_B - SEAL_T, fill: BODY })];
-  body.push(flat(blob(360, 560, 420, 330, rng(5), 10, 0.14), BODY2));
+  body.push(flat(blob(360, CY - 6, 420, 330, rng(5), 10, 0.14), BODY2));
   // foil shine: hard-edged diagonal stripes on the bare foil only, under the slicks, the trim and the medallion
   const shine = (x0, w, o) => flat(poly([[x0, SEAL_T], [x0 + w, SEAL_T], [x0 + w - 330, SEAL_B], [x0 - 330, SEAL_B]], true), '#ffffff', { opacity: o });
   body.push(shine(560, 96, 0.1), shine(686, 30, 0.1), shine(300, 40, 0.07));
   // four slicks pooled behind the corona, one bulging into each corner of the trim and all stopping short of it
-  body.push(...slick(272, 758, 150, 84, 11, 0.3, 1, -1), ...slick(524, 414, 82, 128, 23, 1.2, -1, 1), ...slick(516, 732, 72, 68, 37, 2.1, -1, -1), ...slick(212, 408, 72, 76, 41, 0.9, 1, 1));
-  for (let i = 0; i < 30; i++) body.push(el('circle', { cx: r.range(50, 670), cy: r.range(230, 900), r: r.range(2, 4.5), fill: r.pick([GOLD, '#ff9fdc', '#ffffff']), opacity: r.range(0.45, 0.9) }));
+  body.push(...slick(272, 722, 150, 84, 11, 0.3, 1, -1), ...slick(524, 378, 82, 128, 23, 1.2, -1, 1), ...slick(516, 696, 72, 68, 37, 2.1, -1, -1), ...slick(212, 372, 72, 76, 41, 0.9, 1, 1));
+  for (let i = 0; i < 30; i++) body.push(el('circle', { cx: r.range(50, 670), cy: r.range(194, 864), r: r.range(2, 4.5), fill: r.pick([GOLD, '#ff9fdc', '#ffffff']), opacity: r.range(0.45, 0.9) }));
   // gold trim: one fat gold line with ink either side, a star on each corner
-  const fx0 = 70, fx1 = 650, fy0 = 254, fy1 = 884;
+  const fx0 = 70, fx1 = 650, fy0 = 218, fy1 = 848;
   const frame = `M${fx0 + 34} ${fy0}H${fx1 - 34}Q${fx1} ${fy0} ${fx1} ${fy0 + 34}V${fy1 - 34}Q${fx1} ${fy1} ${fx1 - 34} ${fy1}H${fx0 + 34}Q${fx0} ${fy1} ${fx0} ${fy1 - 34}V${fy0 + 34}Q${fx0} ${fy0} ${fx0 + 34} ${fy0}Z`;
   body.push(stroke(frame, { w: 20 }), stroke(frame, { w: 9, stroke: GOLD }));
   for (const [x, y] of [[fx0 + 8, fy0 + 8], [fx1 - 8, fy0 + 8], [fx0 + 8, fy1 - 8], [fx1 - 8, fy1 - 8]]) body.push(goldStar(x, y, 30, W_DETAIL));
@@ -61,7 +62,7 @@ export function build(s) {
   art.push(sg.markup);
   art.push(star4(...sg.at(0.52, -0.6), 16, '#ffffff', 4));
   // sparkles off the ray tips and round the field
-  art.push(star4(118, 330, 24, '#ffffff'), star4(610, 842, 22, GOLD_L), star4(590, 300, 16, GOLD_L, 4), star4(120, 700, 16, '#ffffff', 4), star4(206, 300, 13, '#ff9fdc', 4), star4(520, 868, 13, '#ff9fdc', 4));
+  art.push(star4(118, 294, 24, '#ffffff'), star4(610, 806, 22, GOLD_L), star4(590, 264, 16, GOLD_L, 4), star4(120, 664, 16, '#ffffff', 4), star4(206, 264, 13, '#ff9fdc', 4), star4(520, 832, 13, '#ff9fdc', 4));
 
   // ---- the seal strips: flat gold crimp stripes, an ink line where they meet the body
   const seals = [];
@@ -76,7 +77,7 @@ export function build(s) {
   // ---- the pouch's own light: one hard shadow down the right and along the bottom, hard highlights on the left
   const light = [
     el('path', { d: `M-200 -200H${W + 200}V${H + 200}H-200Z` + sil, 'fill-rule': 'evenodd', fill: '#0c0618', opacity: 0.34, transform: 'translate(-26 -14)' }),
-    stroke(`M58 ${SEAL_T + 60}V${SEAL_T + 96}`, { w: 10, stroke: '#ffffff', opacity: 0.7 }),
+    stroke(`M58 ${SEAL_T + 50}V${SEAL_T + 74}`, { w: 10, stroke: '#ffffff', opacity: 0.7 }),   // short: it sits between the tear line and the trim's corner star
     stroke(`M62 48V96`, { w: 10, stroke: '#ffffff', opacity: 0.8 }), stroke(`M62 ${SEAL_B + 26}V${SEAL_B + 70}`, { w: 10, stroke: '#ffffff', opacity: 0.8 }),
   ];
 

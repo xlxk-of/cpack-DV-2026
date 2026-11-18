@@ -24,7 +24,7 @@ export function build(s) {
   s.lumps({ y: 965, amp: 60, n: 6, fill: '#1a2a5c', layer: 1, w: W_MID });
 
   // ---- 2: the jelly
-  const cx = 512, cy = 400, R = 210;
+  const cx = 512, cy = 354, R = 210; // high enough that the longest tentacle ends clear of the name plate (y 800)
   const body = [];
   // tentacles: fat ribbons, behind the bell
   const tent = [];
@@ -58,7 +58,7 @@ export function build(s) {
 
   // ---- 3: what drifts in front
   s.inkBubbles({ n: 9, y0: 260, rmin: 9, rmax: 26 });
-  s.add(3, star4(300, 250, 36), star4(742, 300, 24, '#ffe9a8'), star4(700, 700, 20), star4(250, 640, 22, '#ffd1ef'));
+  s.add(3, star4(300, 204, 36), star4(742, 254, 24, '#ffe9a8'), star4(700, 654, 20), star4(250, 594, 22, '#ffd1ef'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffd1ef', '#b9f3ff'], opacity: 0.9 });
 }
 

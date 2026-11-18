@@ -34,7 +34,7 @@ export function build(s) {
   };
   const upper = [[0.1, 64], [0.34, 54], [0.57, 38]].map(([t, len]) => ({ d: tooth(q(U, UC, K, t), len, 56, [-0.12, 1]), fill: TOOTH }));
   const lower = [[0.08, 118], [0.3, 86], [0.5, 62], [0.69, 40]].map(([t, len], i) => ({ d: tooth(q(J, LC, K, t), len, i ? 56 : 62, [0.04, -1]), fill: TOOTH }));
-  const stalk = ribbon([[468, 222], [446, 128], [350, 92], [268, 140], [LX + 2, LY - 30]], 28, 20);
+  const stalk = ribbon([[468, 222], [448, 160], [352, 130], [268, 164], [LX + 2, LY - 30]], 28, 20); // the crest stays clear of the card window's top (y 96)
   const tail = `M765 440C798 420 824 376 836 334C848 386 842 426 824 455C842 486 850 528 836 580C820 544 798 492 765 472Z`;
   const dorsal = [`M508 222Q520 160 552 140Q578 180 600 226Z`, `M610 236Q632 186 664 172Q682 214 700 268Z`, `M706 280Q734 250 762 248Q768 290 772 340Z`];
   const pect = `M588 498C640 470 704 506 700 588C652 580 606 556 588 498Z`;
@@ -68,7 +68,7 @@ export function build(s) {
 
   // ---- 3: two tiny fish who have just noticed, bubbles, sparkles
   s.add(3, g({ filter: s.wobble(4, 0.014, 5) }, [fry(184, 702, 44, '#ffd76a', -8), fry(318, 770, 36, '#8fe3a8', 10)]));
-  s.add(3, star4(LX + DX, LY, 20, '#ffffff', 0), star4(300, 168, 26, '#ffffff'), star4(160, 330, 20, CYAN), star4(118, 196, 14, '#ffffff'));
+  s.add(3, star4(LX + DX, LY, 20, '#ffffff', 0), star4(300, 204, 26, '#ffffff'), star4(160, 330, 20, CYAN), star4(118, 196, 14, '#ffffff'));
   s.inkBubbles({ n: 5, x0: 800, x1: 920, y0: 140, y1: 860, rmin: 8, rmax: 24 });
   s.add(3, ...[[168, 470, 13], [142, 430, 8], [130, 780, 16], [236, 880, 10], [440, 800, 12]].map(([x, y, rr]) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })])));
   s.specks({ n: 14, rmin: 3, rmax: 6, colors: ['#ffffff', CYAN, '#ffb3c4'], opacity: 0.85 });

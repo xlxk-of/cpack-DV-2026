@@ -64,8 +64,8 @@ export function build(s) {
     // the dark of the hood, a magenta lining, and her face: lamp eyes and a small sure smile
     inkEll(512, 356, 116, 104, MAG), inkEll(512, 362, 98, 88, FACE),
     el('circle', { cx: 466, cy: 360, r: 50, fill: '#7fd8ff', opacity: 0.22 }), el('circle', { cx: 558, cy: 360, r: 50, fill: '#7fd8ff', opacity: 0.22 }),
-    eye(466, 358, 38, { look: [0, 0.35], white: '#e4ffff', lid: 0.26, lidRot: 12, lidFill: FACE, pupil: 0.46 }),
-    eye(558, 358, 38, { look: [0, 0.35], white: '#e4ffff', lid: 0.26, lidRot: -12, lidFill: FACE, pupil: 0.46 }),
+    eye(466, 358, 38, { look: [0, 0.35], white: '#ffffff', lid: 0.26, lidRot: 12, lidFill: FACE, pupil: 0.46 }),
+    eye(558, 358, 38, { look: [0, 0.35], white: '#ffffff', lid: 0.26, lidRot: -12, lidFill: FACE, pupil: 0.46 }),
     stroke(`M494 418q18 13 36 0`, { w: W_DETAIL + 1, stroke: '#ff9fd6' }),
     // the orb's drawn light on her robe, then sleeves, orb and hands
     halo(OX, OY, 150, ORB, 3, 0.42),
