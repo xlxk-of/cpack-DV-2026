@@ -387,6 +387,10 @@ const STD_DEFS = `
 //     eye has a pure white ball, including grumpy ones.
 //   * A glow that falls ON a subject lightens its fills in one or two hard steps and never its ink: no translucent
 //     disc laid over inked shapes.
+// Rule added after the fourth review:
+//   * EVERY light shape follows the halo rule, not only halos: beams, comet tails and light shafts over a coloured
+//     backdrop are opaque steps of that backdrop colour lightened toward the light (a comet tail = cream core inside
+//     one lighter-backdrop step). Never neutral grey, mauve or brown, and never a translucent pale wedge that greys.
 
 export const INK = '#1a1230';
 export const W_SUBJECT = 14, W_INNER = 8, W_DETAIL = 5, W_MID = 7;
