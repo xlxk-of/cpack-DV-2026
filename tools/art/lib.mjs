@@ -375,7 +375,7 @@ const STD_DEFS = `
 //     BRIGHTEST_BAND. Far water, sky and ground bands never carry an ink line.
 //   * SAFE AREA (measured from the real card frames; canvas pixels on 1024): a normal card's window shows the full
 //     width but only y 70..850, and its name plate overlaps the last of that, so every inked part of the subject
-//     sits inside x 102..922, y 90..820. A full-art card shows from y 25 down, with the text plate from y 800: its
+//     sits inside x 102..922, y 96..800 (a few pixels clear of the window top and of the plate, never tangent). A full-art card shows from y 25 down, with the text plate from y 800: its
 //     subject sits inside x 102..922, y 50..790, and nothing but backdrop and floor goes below 800.
 //   * FOREGROUND: round-tipped weed, bubbles, sparkles. No dark angular blades or shards in the corners.
 //   * Inside a medallion or ring (card back, packs) the sigil is centred on its star; the standalone emblem is
