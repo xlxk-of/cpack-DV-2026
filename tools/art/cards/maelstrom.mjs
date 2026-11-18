@@ -43,15 +43,15 @@ export function build(s) {
     halo(CX, CY, 138, '#b8f6ff', 3, 0.62),
     stroke(arm, { w: W_INNER }),
     // hard foam on the dark water, ink streaks on the light
-    ...[[0.04, 0.15], [0.24, 0.33], [0.43, 0.5], [0.6, 0.66]].map(([a, b]) => flat(streak(a, b, -GAP, 16), '#ffffff', { opacity: 0.92 })),
+    ...[[0.04, 0.15], [0.24, 0.33], [0.43, 0.5]].map(([a, b]) => flat(streak(a, b, -GAP, 16), '#ffffff', { opacity: 0.92 })),
     ...[[0.12, 0.2], [0.36, 0.43], [0.56, 0.62]].map(([a, b]) => stroke(poly(arc(a, b, 6, 10)), { w: W_DETAIL })),
     // spin: ink speed lines on the outer water following the spiral, and foam ticks riding the rim
     ...[[300, 0.2, 0.72], [282, 0.5, 0.9], [296, 1.42, 2.0], [276, 1.7, 2.12], [292, 2.72, 3.3], [272, 3.0, 3.42]].map(([rad, a0, a1]) => stroke(poly(ring(rad, a0, a1)), { w: W_DETAIL })),
     ...[[-1.22, 0.16], [-0.3, 0.1], [0.24, 0.17], [0.86, 0.1], [1.4, 0.16], [2.04, 0.1], [2.62, 0.17], [3.22, 0.1], [3.74, 0.14]].map(([a, len]) => ink(ribbon(ring(R + 2, a, a + len), 20, 20, (u) => 0.45 + 0.55 * Math.sin(Math.PI * u), 1), '#ffffff', { w: W_DETAIL })),
     // the eye: a hard dark hole the water sinks into, darker than the sea outside, with one small sparkle in it
-    el('ellipse', { cx: CX, cy: CY, rx: 60, ry: 60 * SQ, fill: HOLE, stroke: INK, 'stroke-width': W_DETAIL }),
+    el('ellipse', { cx: CX, cy: CY, rx: 62, ry: 62 * SQ, fill: HOLE, stroke: INK, 'stroke-width': W_DETAIL }),
     el('ellipse', { cx: CX + 7, cy: CY + 6, rx: 32, ry: 32 * SQ, fill: HOLE_D }),
-    star4(CX - 18, CY - 15, 17, '#ffffff', W_DETAIL),
+    star4(CX + 7, CY + 6, 17, '#ffffff', W_DETAIL),
   ];
   // each bolt's last point sits below the inner corner of its last jog, so it ends in a clean bright wedge
   const b1 = [[900, -160], [704, 136], [800, 168], [700, 296], [754, 318], [708, 420]], b2 = [[176, -150], [372, 168], [296, 194], [338, 302]];
@@ -69,7 +69,13 @@ export function build(s) {
   ]));
   s.add(3, star4(150, 300, 24, '#ffffff'), star4(880, 300, 20, BOLT), star4(860, 800, 20, '#ffffff'), star4(170, 820, 22, '#c9f6ff'), star4(540, 900, 16, '#ffffff'));
   s.add(3, g({ opacity: 0.7 }, [[140, 170], [330, 300], [610, 200], [900, 180], [930, 460], [90, 480], [760, 760], [270, 720]].map(([x, y]) => el('path', { d: `M${x} ${y}l-12 34`, stroke: '#dff3ff', 'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none' }))));
-  s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#c9f6ff'], opacity: 0.9 });
+  // the same dust `s.specks({ n: 14, rmin: 3, rmax: 7 })` scatters, minus any speck that would land in the dark eye
+  const dust = [];
+  for (let i = 0; i < 14; i++) {
+    const rr = 3 + 4 * Math.pow(s.r(), 2), x = s.r.range(0, s.w), y = s.r.range(0, s.h), fill = s.r.pick(['#ffffff', '#c9f6ff']), opacity = 0.9 * s.r.range(0.5, 1);
+    if (Math.hypot(x - CX, (y - CY) / SQ) > 76) dust.push(el('circle', { cx: x, cy: y, r: rr, fill, opacity }));
+  }
+  s.add(3, g({}, dust));
 }
 
 /** A closed ring round the whirlpool's centre with `n` soft bumps of height `amp` (a foamy rim). */

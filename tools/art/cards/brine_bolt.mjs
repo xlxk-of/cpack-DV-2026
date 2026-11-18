@@ -7,16 +7,18 @@ const CYAN = '#62defc', CYAN_D = '#2f9be8', AQUA = '#86f2dc', AQUA_D = '#3cc2bd'
 const ANG = -35, SC = 0.95, OX = 520, OY = 505;
 const TF = `translate(${OX} ${OY}) rotate(${ANG}) scale(${SC})`;
 const CA = Math.cos(ANG * Math.PI / 180), SA = Math.sin(ANG * Math.PI / 180);
+const W_OUT = 16 / SC; // the bolt's outer line: the set's 16 contour once the bolt has been scaled into place
 const toC = (x, y) => [OX + (x * CA - y * SA) * SC, OY + (x * SA + y * CA) * SC];
 
 export function build(s) {
   const r = s.r;
   const [tx, ty] = toC(50, 395); // where the point lands
 
-  // ---- 0: navy in flat bands, a stepped flare of lighter blue behind the strike
+  // ---- 0: navy in flat bands, and ONE flat disc of the navy lightened toward the bolt's blue behind the strike (with
+  // the aura hugging the bolt in layer 2 that makes the set's clean two-step halo; no bands of light, no third ring)
   s.bands([[0, '#1c317e'], [310, '#17286a'], [590, '#121f57'], [830, '#0d1745']], { amp: 18, waves: 3 });
-  s.add(0, halo(500, 440, 440, '#3f78e0', 3, 0.34));
-  s.shafts({ x: 120, y: -160, angle: 52, spread: 26, n: 3, color: '#8fd8ff', opacity: 0.09, width: 110 });
+  s.add(0, halo(500, 440, 294, ['#223f8c']));
+  for (let i = 0; i < 9; i++) r(); // the nine draws three light shafts used to take here: keeps every speck where it was
   s.specks({ n: 40, rmin: 2, rmax: 5, colors: ['#8fd0ff', '#b9a6ff'], opacity: 0.5, layer: 0 });
   s.add(0, flat(waveBand(1024, 1024, 800, 22, 2.5, 1.2), '#0a1238'));
   s.paper();
@@ -38,11 +40,11 @@ export function build(s) {
   const pts = [B, [-55, -340], [60, -365], [-5, -120], [110, -145], [46, 100], [156, 75], [50, 395], [-18, 190], [-123, 215], [-61, -25], [-166, 0], [-104, -240], [-209, -215], A];
   const boltD = poly(pts) + 'Z';
   const bolt = [];
-  // drawn light: flat steps of glow hugging the shape
-  bolt.push(g({ transform: TF }, [
-    el('path', { d: boltD, fill: '#7fdcff', stroke: '#7fdcff', 'stroke-width': 120, 'stroke-linejoin': 'round', opacity: 0.14 }),
-    el('path', { d: boltD, fill: '#7fdcff', stroke: '#7fdcff', 'stroke-width': 60, 'stroke-linejoin': 'round', opacity: 0.2 }),
-  ]));
+  // drawn light: one flat opaque step of glow hugging the shape (the disc's blue lightened again toward the bolt).
+  // It is cut off level with the strike, behind the star's arms, so no sliver of it shows underneath them.
+  bolt.push(g({ 'clip-path': s.clip(el('rect', { x: 0, y: 0, width: 1024, height: ty + 8 })) }, [g({ transform: TF }, [
+    el('path', { d: boltD, fill: '#3e6eaf', stroke: '#3e6eaf', 'stroke-width': 80, 'stroke-linejoin': 'round' }),
+  ])]));
   // splash rings: far halves behind the bolt
   // crowns of spray, not hoops: the far half of each passes behind the bolt, the near half is burst open where the
   // bolt goes through and breaks into droplets there. [cx, cy, rx, ry, left piece ends at, right piece ends at (deg),
@@ -53,12 +55,12 @@ export function build(s) {
   bolt.push(ring(...hit, 'back'));
   // the shape itself: flat cyan, one hard shadow down its right-hand edges, a white-hot core
   bolt.push(g({ transform: TF }, [
-    ink(boltD, CYAN_D, { w: W_SUBJECT }),
+    ink(boltD, CYAN_D, { w: W_OUT }),
     g({ 'clip-path': s.clip(el('path', { d: boltD })) }, [
       el('path', { d: boltD, fill: CYAN, transform: 'translate(-36 -8)' }),
       el('path', { d: 'M-8 -770L-126 -314L-20 -340L-90 -72L16 -98L-48 150L54 126L46 292', fill: 'none', stroke: HOT, 'stroke-width': 26, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
     ]),
-    stroke(boltD, { w: W_SUBJECT }),
+    stroke(boltD, { w: W_OUT }),
     ...rings.map((q) => ring(...q, 'front')),
   ]));
   bolt.push(ring(...hit, 'front'));

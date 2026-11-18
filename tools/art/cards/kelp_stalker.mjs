@@ -110,7 +110,7 @@ export function build(s) {
 
   // the eye: the one hot yellow thing in the forest, under a hard brow
   const ie = I(0.125), ec = at(ie, -0.2), rot = Math.atan2(fr[ie].dy, fr[ie].dx) * 180 / Math.PI - 10;
-  fish.push(eye(ec[0], ec[1], 47, { white: YELLOW, pupil: 0.46, look: [-0.5, 0.35], lid: 0.3, lidRot: rot, lidFill: GREEN_D, w: WI }));
+  fish.push(slitEye(s, ec[0], ec[1], 47, { look: [-0.5, 0.35], lid: 0.3, lidRot: rot, lidFill: GREEN_D, w: WI }));
   fish.push(stroke(lidLine(ec[0], ec[1], 47, 0.3, rot, 14), { w: (W_INNER + 4) / K }));
   const no = at(I(0.02), -0.22);
   fish.push(el('circle', { cx: no[0], cy: no[1], r: 5, fill: INK }));
@@ -155,6 +155,21 @@ function streak(x, y, len, w) {
 /** A scrap of torn kelp. */
 function scrap(x, y, k, rot, fill) {
   return ink(`M${-k} 0Q0 ${-k * 0.7} ${k} 0Q0 ${k * 0.7} ${-k} 0Z`, fill, { w: W_DETAIL, transform: `translate(${x} ${y}) rotate(${rot})` });
+}
+
+/** The set's predator eye (the kraken's recipe): yellow ball, a vertical slit pupil looking along `look`, one glint
+ *  beside the slit, and the same hard lid as the `eye` helper. */
+function slitEye(s, x, y, r, { look = [0, 0], lid = 0, lidRot = 0, lidFill = INK, w = W_INNER } = {}) {
+  const px = x + look[0] * r * 0.34, py = y + look[1] * r * 0.34;
+  return g({}, [
+    inkCircle(x, y, r, YELLOW, { w }),
+    g({ 'clip-path': s.clip(el('circle', { cx: x, cy: y, r })) }, [
+      flat(`M${px} ${py - r * 0.78}Q${px + r * 0.36} ${py} ${px} ${py + r * 0.78}Q${px - r * 0.36} ${py} ${px} ${py - r * 0.78}Z`, INK),
+      el('circle', { cx: px - r * 0.42, cy: py + r * 0.22, r: r * 0.15, fill: '#fff' }), // low enough to clear the brow
+      el('rect', { x: x - r * 1.6, y: y - r * 2.2, width: r * 3.2, height: r * (1.2 + lid * 2), fill: lidFill, transform: `rotate(${lidRot} ${x} ${y})` }),
+    ]),
+    el('circle', { cx: x, cy: y, r, fill: 'none', stroke: INK, 'stroke-width': w }),
+  ]);
 }
 
 /** The lower edge of an `eye` lid as a line (to ink it as a brow); `over` pokes it past the eyeball. */
