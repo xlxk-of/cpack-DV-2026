@@ -375,7 +375,15 @@ const STD_DEFS = `
 //   * SAFE AREA: every part of the subject stays inside the middle 80% of the canvas (102..922 on 1024). On the four
 //     full-art cards nothing but backdrop and floor goes below y = 800 (a text plate covers it).
 //   * FOREGROUND: round-tipped weed, bubbles, sparkles. No dark angular blades or shards in the corners.
-//   * The sigil is always centred on its star, not on its bounding box.
+//   * Inside a medallion or ring (card back, packs) the sigil is centred on its star; the standalone emblem is
+//     balanced on its canvas by its outline instead.
+// Rules added after the second review:
+//   * CONTOUR: the finished outer line round a main subject measures 15-17px on the 1024 canvas however it is made
+//     (`ink` with w 16; `sticker` with outer 12, which adds half its inner line). Not 13, not 19.
+//   * PREDATOR EYES are one recipe: yellow ball, vertical slit pupil, one glint (kraken, kelp_stalker). Every other
+//     eye has a pure white ball, including grumpy ones.
+//   * A glow that falls ON a subject lightens its fills in one or two hard steps and never its ink: no translucent
+//     disc laid over inked shapes.
 
 export const INK = '#1a1230';
 export const W_SUBJECT = 14, W_INNER = 8, W_DETAIL = 5, W_MID = 7;
