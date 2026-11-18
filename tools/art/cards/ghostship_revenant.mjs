@@ -1,25 +1,25 @@
 // GHOSTSHIP REVENANT (epic) — a chunky little ghost galleon still sailing along under the sea: tattered sails, lit
-// portholes, a ghost's face on the bow and a hem of spirit curls where the keel used to be. Doodle style: see the
+// portholes, a ghost's face on the bow and a scalloped ghost hem where the keel used to be. Doodle style: see the
 // DOODLE KIT in lib.mjs.
 import { el, g, ribbon, ink, stroke, flat, inkCircle, eye, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
-const HULL = '#4fb89a', HULL_SH = '#35907f', SAIL = '#dcffe6', SAIL_SH = '#a6e8c6', DARK = '#256b68', GLOW = '#f4ff9c', WISP = '#bff7d2';
+const HULL = '#4fb89a', HULL_SH = '#35907f', SAIL = '#dcffe6', SAIL_SH = '#a6e8c6', DARK = '#256b68', GLOW = '#f4ff9c', WISP = '#bff7d2', PORT = '#c3d67c';
 
 export function build(s) {
-  // ---- 0: dark teal water in flat bands, a far wreck with no ink
-  s.bands([[0, '#17566a'], [320, '#12475c'], [590, '#0e374c'], [830, '#0a2839']], { amp: 18, waves: 3 });
+  // ---- 0: dark navy water in flat bands (two clear value steps under the teal hull), a far wreck with no ink
+  s.bands([[0, '#123a5e'], [320, '#0e2e50'], [590, '#0a2342'], [830, '#071933']], { amp: 18, waves: 3 });
   s.shafts({ x: 620, y: -140, angle: 100, spread: 40, n: 4, color: '#9dffc8', opacity: 0.1, width: 110 });
   // a far wreck with no ink: a heeled-over hull and two broken masts
-  s.add(0, flat(`M-60 1064L-60 780C60 760 250 800 400 900L400 1064Z`, '#0b2f40'), flat(`M120 800L170 500L196 504L160 810Z`, '#0b2f40'), flat(`M118 610L252 640L248 664L114 634Z`, '#0b2f40'), flat(`M270 850L296 660L318 664L300 856Z`, '#0b2f40'));
-  s.add(0, flat(`M1084 1064L1084 720C1010 730 900 800 820 920L800 1064Z`, '#0b2f40'), flat(`M900 830L872 580L896 578L930 820Z`, '#0b2f40'), flat(`M836 668L950 650L954 672L840 692Z`, '#0b2f40'));
+  s.add(0, flat(`M-60 1064L-60 780C60 760 250 800 400 900L400 1064Z`, '#071a36'), flat(`M120 800L170 500L196 504L160 810Z`, '#071a36'), flat(`M118 610L252 640L248 664L114 634Z`, '#071a36'), flat(`M270 850L296 660L318 664L300 856Z`, '#071a36'));
+  s.add(0, flat(`M1084 1064L1084 720C1010 730 900 800 820 920L800 1064Z`, '#071a36'), flat(`M900 830L872 580L896 578L930 820Z`, '#071a36'), flat(`M836 668L950 650L954 672L840 692Z`, '#071a36'));
   s.specks({ n: 40, rmin: 2, rmax: 5, colors: ['#8fe8c8', '#c9ffd6', '#7fc8e8'], opacity: 0.45, layer: 0 });
-  s.lumps({ y: 910, amp: 80, n: 7, fill: '#071e2c', layer: 0 });
+  s.lumps({ y: 910, amp: 80, n: 7, fill: '#051226', layer: 0 });
   s.paper();
 
   // ---- 1: two little spirits, weed and the sea floor: thinner line, quiet colour
   s.weed({ x: 120, h: 380, fill: '#1c6f6a', sway: 30, width: 52 });
   s.weed({ x: 200, h: 250, fill: '#175a5c', sway: 22, width: 42 });
-  s.weed({ x: 944, h: 340, fill: '#1c6f6a', sway: 28, width: 54, lean: -0.05 });
+  s.weed({ x: 944, h: 262, fill: '#1c6f6a', sway: 28, width: 54, lean: -0.05 });
   s.weed({ x: 838, h: 250, fill: '#175a5c', sway: 22, width: 42 });
   s.add(1, spirit(150, 250, 46, '#6fcfae', -8), spirit(884, 520, 36, '#5fbfa6', 10), spirit(858, 150, 28, '#5fbfa6', -6));
   s.add(1, anchor(650, 900, 1.25, 18));
@@ -43,9 +43,6 @@ export function build(s) {
     ],
   }));
   const ship = figure(s, [
-    // the spirit curls it trails, behind everything
-    { d: wisp(770, 606, 0.3, 84, 32, -1, 44), fill: WISP },
-    { d: wisp(706, 656, 0.8, 64, 26, -1, 36), fill: WISP },
     { d: ribbon([[246, 474], [198, 440]], 22, 14), fill: DARK },
     { d: mast(482, 486, 140, 24), fill: DARK },
     { d: mast(342, 480, 226, 22), fill: DARK },
@@ -61,17 +58,17 @@ export function build(s) {
         flat(`M180 566Q500 618 860 552L860 800L180 800Z`, HULL_SH),
         flat(`M200 440L684 462L690 396L840 380L840 432L718 444L714 516L200 500Z`, WISP),
         stroke(`M210 500L714 516L718 444L820 434`, { w: W_DETAIL }),
-        ...[[530, 574], [612, 576], [694, 572]].map(([x, y]) => el('circle', { cx: x, cy: y, r: 40, fill: GLOW, opacity: 0.35 })),
+        ...[[530, 574], [612, 576], [694, 572]].map(([x, y]) => el('circle', { cx: x, cy: y, r: 27, fill: '#6fc8a0' })),
         stroke(`M470 634Q610 650 770 610`, { w: W_DETAIL }),
       ],
     },
   ]);
   const fittings = [
-    // lit portholes and the stern window
-    ...[[530, 574], [612, 576], [694, 572]].map(([x, y]) => g({}, [inkCircle(x, y, 24, GLOW, { w: W_INNER }), el('circle', { cx: x - 8, cy: y - 8, r: 6, fill: '#fff' })])),
+    // small dim portholes (so only the bow has eyes) and the lit stern window
+    ...[[530, 574], [612, 576], [694, 572]].map(([x, y]) => inkCircle(x, y, 15, PORT, { w: W_DETAIL + 1 })),
     ink(`M730 446Q752 424 774 444L776 484L732 488Z`, GLOW, { w: W_INNER }), stroke(`M753 438L754 486`, { w: W_DETAIL }),
-    // the face on the bow: two big lamp eyes and a wobbly ghost mouth
-    eye(322, 562, 38, { look: [-0.5, 0.25], white: GLOW }), eye(416, 566, 38, { look: [-0.5, 0.25], white: GLOW }),
+    // the face on the bow: two big white eyes and a wobbly ghost mouth
+    eye(322, 562, 38, { look: [-0.5, 0.25] }), eye(416, 566, 38, { look: [-0.5, 0.25] }),
     stroke(`M326 622q14 16 28 0q14 -16 28 0q14 16 28 0`, { w: W_INNER }),
     // sail creases
     stroke(`M400 330Q420 380 404 420M446 200Q460 230 450 256M290 300Q306 350 292 396`, { w: W_DETAIL }),
@@ -79,11 +76,11 @@ export function build(s) {
     stroke(`M796 404L806 352`, { w: W_INNER }),
   ];
   const lamp = [inkCircle(808, 336, 21, GLOW, { w: W_INNER }), el('circle', { cx: 801, cy: 329, r: 6, fill: '#fff' })];
-  s.add(2, g({ filter: s.wobble(5), transform: 'rotate(4 512 480)' }, [halo(808, 336, 110, GLOW, 3, 0.4), ship, ...fittings, ...lamp]));
+  s.add(2, g({ filter: s.wobble(5), transform: 'rotate(4 512 480)' }, [halo(808, 336, 110, ['#1d5568', '#2f7d7c', '#52ad93']), ship, ...fittings, ...lamp]));
 
-  // ---- 3: wisps, bubbles and sparkles drifting in front
+  // ---- 3: wisps floating free (never perched on a weed tip), bubbles and sparkles drifting in front
   s.add(3, g({ filter: s.wobble(4, 0.014, 7) }, [
-    flame(150, 600, 1.1, -14, WISP), flame(900, 690, 0.9, 12, WISP), flame(420, 880, 0.7, -8, GLOW),
+    flame(122, 486, 1.1, -14, WISP), flame(862, 676, 0.85, 12, WISP), flame(420, 880, 0.7, -8, GLOW),
   ]));
   s.inkBubbles({ n: 4, x0: 110, x1: 220, y0: 640, y1: 880, rmin: 8, rmax: 22, fill: '#c9ffe6' });
   s.inkBubbles({ n: 4, x0: 600, x1: 920, y0: 700, y1: 900, rmin: 8, rmax: 22, fill: '#c9ffe6' });
@@ -105,19 +102,6 @@ function scallop(x0, x1, y, n, depth) {
   const step = (x1 - x0) / n;
   for (let i = 0; i < n; i++) { const a = x0 + step * i, b = a + step; d += `Q${(a + b) / 2} ${y + depth} ${b} ${y}`; }
   return d;
-}
-
-/** A spirit curl as a flat shape: a tail running `len` px from (x, y) along `ang`, rolling up into a spiral of
- *  radius R (turn = 1 clockwise, -1 the other way). */
-function wisp(x, y, ang, len, R, turn = 1, w0 = 34) {
-  const ca = Math.cos(ang), sa = Math.sin(ang);
-  const pts = [[x, y], [x + ca * len * 0.5 + sa * turn * len * 0.14, y + sa * len * 0.5 - ca * turn * len * 0.14]];
-  const ex = x + ca * len, ey = y + sa * len, cx = ex - sa * turn * R, cy = ey + ca * turn * R;
-  for (let i = 0; i <= 9; i++) {
-    const t = i / 9, a = ang - turn * Math.PI / 2 + turn * t * Math.PI * 1.6, rr = R * (1 - t * 0.66);
-    pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
-  }
-  return ribbon(pts, w0, 9, null, 8);
 }
 
 /** A small drifting spirit for the middle distance. */

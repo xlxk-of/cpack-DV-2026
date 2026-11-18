@@ -63,10 +63,10 @@ export function build(s) {
     ]),
     // the dark of the hood, a magenta lining, and her face: lamp eyes and a small sure smile
     inkEll(512, 356, 116, 104, MAG), inkEll(512, 362, 98, 88, FACE),
-    el('circle', { cx: 472, cy: 364, r: 44, fill: '#7fd8ff', opacity: 0.22 }), el('circle', { cx: 552, cy: 364, r: 44, fill: '#7fd8ff', opacity: 0.22 }),
-    eye(472, 362, 30, { look: [0, 0.35], white: '#c9fdff', lid: 0.26, lidRot: 12, lidFill: FACE, pupil: 0.5 }),
-    eye(552, 362, 30, { look: [0, 0.35], white: '#c9fdff', lid: 0.26, lidRot: -12, lidFill: FACE, pupil: 0.5 }),
-    stroke(`M494 414q18 13 36 0`, { w: W_DETAIL + 1, stroke: '#ff9fd6' }),
+    el('circle', { cx: 466, cy: 360, r: 50, fill: '#7fd8ff', opacity: 0.22 }), el('circle', { cx: 558, cy: 360, r: 50, fill: '#7fd8ff', opacity: 0.22 }),
+    eye(466, 358, 38, { look: [0, 0.35], white: '#e4ffff', lid: 0.26, lidRot: 12, lidFill: FACE, pupil: 0.46 }),
+    eye(558, 358, 38, { look: [0, 0.35], white: '#e4ffff', lid: 0.26, lidRot: -12, lidFill: FACE, pupil: 0.46 }),
+    stroke(`M494 418q18 13 36 0`, { w: W_DETAIL + 1, stroke: '#ff9fd6' }),
     // the orb's drawn light on her robe, then sleeves, orb and hands
     halo(OX, OY, 150, ORB, 3, 0.42),
     figure(s, [
@@ -76,14 +76,13 @@ export function build(s) {
         stroke(orbSwirl, { w: W_INNER + 2, stroke: '#ffffff' }), el('circle', { cx: OX - 34, cy: OY - 38, r: 8, fill: '#fff' })] },
       { d: circ(OX - 70, OY + 26, 25), fill: SKIN }, { d: circ(OX + 70, OY + 26, 25), fill: SKIN },
     ], W_INNER + 2),
-    stroke(`M${OX - 84} ${OY + 20}q10 -6 20 0M${OX + 64} ${OY + 20}q10 -6 20 0`, { w: W_DETAIL }),
+    stroke(`M${OX - 50} ${OY + 20}l-13 2M${OX - 49} ${OY + 33}l-13 1M${OX + 50} ${OY + 20}l13 2M${OX + 49} ${OY + 33}l13 1`, { w: W_DETAIL }),
   ];
   s.add(2, g({ filter: s.wobble(5) }, fig));
 
-  // ---- 3: drops flung off the orb, sparkles, bubbles, and dark weed at the near corners
+  // ---- 3: drops flung off the orb, sparkles and bubbles
   s.add(3, g({ filter: s.wobble(4, 0.014, 7) }, [drop(404, 548, 13, -40), drop(622, 540, 12, 40), drop(452, 506, 9, -20), drop(574, 504, 9, 24)]));
   s.add(3, star4(250, 520, 32, '#ffffff'), star4(790, 500, 24, '#ffd1ef'), star4(690, 130, 22, '#ffffff'), star4(180, 250, 20, ORB), star4(830, 700, 18, '#ffffff'), star4(OX - 2, OY - 92, 18, '#ffffff'));
-  s.add(3, ink(ribbon([[-20, 1060], [50, 900], [10, 780], [70, 690]], 70, 22), '#1b1650', { w: W_INNER }), ink(ribbon([[1044, 1060], [980, 910], [1020, 800], [960, 720]], 70, 22), '#1b1650', { w: W_INNER }));
   s.inkBubbles({ n: 5, x0: 130, x1: 300, y0: 600, y1: 900, rmin: 8, rmax: 22 });
   s.inkBubbles({ n: 5, x0: 740, x1: 900, y0: 180, y1: 880, rmin: 8, rmax: 22 });
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffd1ef', '#b9f3ff'], opacity: 0.9 });

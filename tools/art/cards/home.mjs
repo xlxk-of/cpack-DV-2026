@@ -64,9 +64,11 @@ export function build(s) {
   s.paper({ opacity: 0.08 });
 
   // ---- 1: the beam (flat, hard-edged), stars, falling stars
+  // the lamp's light: opaque flat rings of the night sky lightened toward the lamp, behind the beam and the tower
+  s.add(1, halo(LX, LY, 170, ['#322e78', '#47418a', '#625a9e']));
   // both wedges go left and low: under the logo, down onto the water (the sea is drawn over their far end)
-  s.add(1, flat(poly([[LX, LY - 26], [LX, LY + 26], [LX - 500, 700], [LX - 817, 700]], true), PALE, { opacity: 0.16 }));
-  s.add(1, flat(poly([[LX, LY - 12], [LX, LY + 12], [LX - 571, 700], [LX - 700, 700]], true), PALE, { opacity: 0.16 }));
+  s.add(1, flat(poly([[LX, LY - 26], [LX, LY + 26], [LX - 447, 700], [LX - 726, 700]], true), PALE, { opacity: 0.16 }));
+  s.add(1, flat(poly([[LX, LY - 12], [LX, LY + 12], [LX - 506, 700], [LX - 630, 700]], true), PALE, { opacity: 0.16 }));
   const stars = [
     [640, 96, 26, PALE], [790, 150, 12, '#ffffff'], [900, 70, 16, '#ffffff'], [1010, 128, 11, PALE], [1120, 60, 24, PALE], [1290, 120, 14, '#ffffff'],
     [600, 250, 12, '#ffffff'], [1330, 230, 12, PALE], [880, 590, 11, PALE], [1040, 560, 12, '#ffffff'], [760, 560, 10, '#ffffff'],
@@ -81,8 +83,6 @@ export function build(s) {
   const lh = [];
   const rock = spline([[1000, 740], [1034, 628], [1104, 578], [1170, 566], [1290, 566], [1350, 584], [1420, 636], [1462, 740], [1236, 790]], true);
   const rock2 = spline([[1410, 740], [1432, 652], [1486, 618], [1540, 640], [1572, 740]], true);
-  // the lamp's light: opaque flat rings of the night sky lightened toward the lamp, behind everything
-  lh.push(halo(LX, LY, 170, ['#322e78', '#47418a', '#625a9e']));
   const rk = [];
   rk.push(g({ transform: 'translate(-29 0)' }, [ink(rock2, '#34306e', { w: W_INNER + 2 }), flat('M1486 622Q1540 640 1566 740L1510 740Q1520 672 1486 622Z', '#262258'), stroke(rock2, { w: W_INNER + 2 })]));
   rk.push(ink(rock, '#4a4690', { w: W_SUBJECT - 2 }));
@@ -121,7 +121,7 @@ export function build(s) {
   // where the lamp and the beam land on the water: flat pale dashes
   const SKYB = '#c8f6ff';
   for (const [x, y, l, c] of [[1140 + DX, SEA + 18, 60, PALE], [1250 + DX, SEA + 16, 44, PALE], [1190 + DX, SEA + 44, 36, PALE], [80, SEA + 14, 70, PALE], [230, SEA + 20, 50, PALE], [150, SEA + 46, 40, PALE],
-    [890, SEA + 16, 50, PALE], [1010, SEA + 20, 60, PALE], [950, SEA + 46, 40, PALE], [1106, SEA + 16, 36, PALE], [700, SEA + 16, 40, SKYB], [1300, SEA + 18, 50, SKYB], [520, SEA + 18, 44, SKYB]]) {
+    [960, SEA + 16, 50, PALE], [1080, SEA + 20, 60, PALE], [1020, SEA + 46, 40, PALE], [1176, SEA + 16, 36, PALE], [700, SEA + 16, 40, SKYB], [1300, SEA + 18, 50, SKYB], [520, SEA + 18, 44, SKYB]]) {
     sea.push(el('path', { d: `M${x} ${y}h${l}`, stroke: c, 'stroke-width': 8, 'stroke-linecap': 'round', opacity: 0.85 }));
   }
   // the drowned city: far ruins (flat, close to the water's colour), then nearer and darker

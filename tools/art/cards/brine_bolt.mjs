@@ -47,7 +47,7 @@ export function build(s) {
   // crowns of spray, not hoops: the far half of each passes behind the bolt, the near half is burst open where the
   // bolt goes through and breaks into droplets there. [cx, cy, rx, ry, left piece ends at, right piece ends at (deg),
   // droplets across the gap [deg, size, tilt]]
-  const rings = [[-82, -470, 150, 42, 138, 48, [[108, 10, -24], [84, 10, 20]]], [-5, 32, 235, 58, 130, 26, [[119, 10, -40], [104, 11, -20], [86, 11, 16]]]];
+  const rings = [[-82, -440, 140, 40, 142, 54, [[112, 9, -24], [84, 9, 20]]], [-5, 32, 235, 58, 130, 26, [[119, 10, -40], [104, 11, -20], [86, 11, 16]]]];
   const hit = [tx - 6, ty - 4, 150, 40, 116, 64, []];
   bolt.push(g({ transform: TF }, rings.map((q) => ring(...q, 'back'))));
   bolt.push(ring(...hit, 'back'));

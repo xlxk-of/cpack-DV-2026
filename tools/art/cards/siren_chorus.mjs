@@ -59,9 +59,9 @@ export function build(s) {
   const rockR = 'M884 1010L864 730Q856 668 798 656Q734 644 678 660Q628 678 624 736L612 1010Z';
   body.push(contour([rockL, rockR, rockC]));
   // each rock: a lit top plane, the mid tone on its face, the dark tone only down one side
-  body.push(form(rockL, ROCK, [flat('M110 640h82q-22 150 -4 400h-78z', ROCK_D), flat('M110 600H440V712Q290 676 110 716Z', ROCK_L), stroke('M330 760l22 30l-10 34', { w: W_DETAIL })]));
-  body.push(form(rockR, ROCK, [flat('M590 640h74q-22 150 -4 400h-70z', ROCK_D), flat('M584 600H914V716Q734 676 584 712Z', ROCK_L), stroke('M800 756l-20 32l12 30', { w: W_DETAIL })]));
-  body.push(form(rockC, ROCK, [flat('M330 560h84q-22 180 -4 480h-80z', ROCK_D), flat('M330 500H690V614Q512 580 330 614Z', ROCK_L), stroke('M604 690l14 34l-12 28', { w: W_DETAIL })]));
+  body.push(form(rockL, ROCK, [flat('M110 640h82q-22 150 -4 400h-78z', ROCK_D), flat('M110 600H440V744Q290 708 110 748Z', ROCK_L), stroke('M330 760l22 30l-10 34', { w: W_DETAIL })]));
+  body.push(form(rockR, ROCK, [flat('M590 640h74q-22 150 -4 400h-70z', ROCK_D), flat('M584 600H914V748Q734 708 584 744Z', ROCK_L), stroke('M800 756l-20 32l12 30', { w: W_DETAIL })]));
+  body.push(form(rockC, ROCK, [flat('M330 560h84q-22 180 -4 480h-80z', ROCK_D), flat('M330 500H690V660Q512 624 330 660Z', ROCK_L)]));
 
   // one siren, drawn round her head at (0,0), the head 180 across; `flip` mirrors her; `open` = the lead: eyes open,
   // both arms thrown up. The others sing with eyes shut and hands clasped.
@@ -127,5 +127,5 @@ export function build(s) {
   s.add(3, flat(waveBand(1024, 1024, 930, 10, 4, 2), '#3b2f92'));
   s.add(3, bar(150, 890, 160, 12, '#8f7bd6'), bar(880, 886, 180, 12, '#8f7bd6'));
   s.add(3, star4(206, 236, 30), star4(826, 250, 24, '#ffd1ef'), star4(360, 128, 18, '#fff3c4'), star4(690, 118, 22), diamond(142, 330, 13, '#ffd1ef'), diamond(884, 316, 12, '#fff3c4'));
-  s.specks({ n: 14, y1: 700, rmin: 3, rmax: 6, colors: ['#ffffff', '#ffd1ef', '#fff3c4'], opacity: 0.9 });
+  s.specks({ n: 14, y1: 700, rmin: 3, rmax: 6, colors: ['#ffffff', '#ffd1ef', '#fff3c4'], opacity: 0.9, layer: 1 });   // behind the singers, never on a face
 }
