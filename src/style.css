@@ -169,7 +169,7 @@ img { -webkit-user-drag: none; }
 .reveal.flash::before { animation: flash .9s ease-out; }
 @keyframes flash { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
 .reveal-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(10px, 2vw, 22px); perspective: 1400px; }
-.reveal .flip { --cw: clamp(96px, min(17vw, 38dvh), 212px); cursor: pointer; }
+.reveal .flip { --cw: clamp(96px, min(15.5vw, 38dvh), 188px); cursor: pointer; }
 @media (max-aspect-ratio: 1/1) { .reveal .flip { --cw: clamp(96px, min(27.5vw, 23dvh), 200px); } }
 .flip.deal { animation: deal .6s cubic-bezier(.2, .9, .3, 1.15) backwards; animation-delay: calc(var(--i) * 90ms); }
 @keyframes deal { from { transform: translateY(60dvh) rotate(14deg) scale(.6); opacity: 0; } }
