@@ -21,11 +21,13 @@ export function build(s) {
   s.add(1, branch(96, 960, 1.25, '#a068b8'), branch(936, 960, 1.4, '#a068b8'));
   s.add(1, dome(226, 900, 74, '#5f6cc4'), dome(812, 900, 86, '#5f6cc4'));
   s.add(1, tubes(742, 900, '#8a8ad4'), tubes(160, 930, '#8a8ad4'));
-  // the rise of sea floor it stands on
-  s.add(1, ink(`M-60 1100L-60 900C100 870 240 892 340 836C420 800 604 800 690 836C790 892 920 868 1084 896L1084 1100Z`, '#22367c', { w: W_MID }));
-  s.add(1, flat(`M360 850Q512 818 664 850Q512 836 360 850Z`, '#3a55a8'));
+  // the rise of sea floor it stands on: its top sits above the soles, so a strip of seabed shows under the feet
+  s.add(1, ink(`M-60 1100L-60 900C100 870 240 892 318 846C346 826 360 764 420 760C466 752 558 752 604 760C664 764 678 826 706 846C790 896 920 868 1084 896L1084 1100Z`, '#22367c', { w: W_MID }));
+  s.add(1, flat(`M371 797Q512 767 653 797Q512 784 371 797Z`, '#3a55a8'));
 
-  // ---- 2: the colossus
+  // ---- 2: the colossus, drawn at full size and then set down at K about the antler tips, so its feet end clear
+  // of the name plate (y 800); the line weights are divided by K to stay the set's 14 / 8 / 5 on the canvas
+  const K = 0.925, AY = 110, WS = W_SUBJECT / K, WI = W_INNER / K, WD = W_DETAIL / K;
   const torso = `M344 324Q512 298 680 324Q704 500 678 636Q668 698 602 702Q512 712 422 702Q356 698 346 636Q320 500 344 324Z`;
   const TILT = 'translate(0 12) rotate(-5 512 390)'; // the head, cocked a little to one side
   const sprout = (x, y, dx, h, w) => ribbon([[x, y], [x + dx * 0.4, y - h * 0.55], [x + dx, y - h]], w, w * 0.8);
@@ -52,34 +54,34 @@ export function build(s) {
     { d: sprout(250, 330, -14, 70, 28), fill: ORANGE }, { d: sprout(296, 316, 6, 92, 30), fill: '#ff9fb4' }, { d: sprout(340, 326, 16, 60, 26), fill: ORANGE },
     { d: sprout(690, 326, -14, 62, 26), fill: ORANGE_SH }, { d: sprout(734, 316, 4, 86, 30), fill: '#ff9fb4' }, { d: sprout(778, 332, 16, 60, 26), fill: ORANGE_SH },
     // stone arms and fists
-    { d: rr(204, 470, 142, 252, 58), fill: STONE, in: [shadeBlock(204, 470, 142, 252, STONE_SH), flat(`M190 560H360V606H190Z`, CORAL), stroke(`M190 560H360M190 606H360`, { w: W_DETAIL }), ...dots([[236, 520, 6], [262, 644, 7], [232, 660, 4]], '#c4b6ee')] },
-    { d: rr(678, 470, 142, 252, 58), fill: STONE, in: [shadeBlock(678, 470, 142, 252, STONE_SH), flat(`M660 560H840V606H660Z`, CORAL), flat(`M766 560H840V606H760Z`, CORAL_SH), stroke(`M660 560H840M660 606H840`, { w: W_DETAIL }), ...dots([[712, 522, 6], [736, 646, 7], [708, 664, 4]], '#c4b6ee')] },
+    { d: rr(204, 470, 142, 252, 58), fill: STONE, in: [shadeBlock(204, 470, 142, 252, STONE_SH), flat(`M190 560H360V606H190Z`, CORAL), stroke(`M190 560H360M190 606H360`, { w: WD }), ...dots([[236, 520, 6], [262, 644, 7], [232, 660, 4]], '#c4b6ee')] },
+    { d: rr(678, 470, 142, 252, 58), fill: STONE, in: [shadeBlock(678, 470, 142, 252, STONE_SH), flat(`M660 560H840V606H660Z`, CORAL), flat(`M766 560H840V606H760Z`, CORAL_SH), stroke(`M660 560H840M660 606H840`, { w: WD }), ...dots([[712, 522, 6], [736, 646, 7], [708, 664, 4]], '#c4b6ee')] },
     // boulder shoulders
     { d: boulder(294, 396, 104, 96), fill: CORAL, in: [flat(`M330 280C380 360 370 450 300 520L420 520L420 280Z`, CORAL_SH), flat(`M214 390C214 340 244 312 286 306C250 330 238 356 236 392Z`, '#ffffff', { opacity: 0.9 }), ...dots([[262, 440, 8], [300, 462, 6], [240, 420, 5]], '#ffb9a6')] },
     { d: boulder(730, 396, 104, 96), fill: CORAL, in: [flat(`M766 280C816 360 806 450 736 520L860 520L860 280Z`, CORAL_SH), flat(`M650 390C650 340 680 312 722 306C686 330 674 356 672 392Z`, '#ffffff', { opacity: 0.9 }), ...dots([[690, 446, 8], [724, 466, 6]], '#ffb9a6')] },
     // the big head set between them, overlapping the chest, under a stone brow
     { d: rr(412, 214, 200, 184, 52), fill: CORAL, tf: TILT, in: [flat(`M566 190C596 260 596 340 566 420L640 420L640 190Z`, CORAL_SH)] },
     { d: rr(398, 212, 228, 62, 26), fill: STONE, tf: TILT, in: [flat(`M560 190H660V300H548Z`, STONE_SH)] },
-  ]);
+  ], WS, WI);
   const plate = `M436 464Q512 438 588 464L588 552Q582 622 512 654Q442 622 436 552Z`;
   const details = [
     // the set's big white eyes, a flat little mouth
-    g({ transform: TILT }, [eye(469, 322, 36, { look: [0, 0.4] }), eye(555, 322, 36, { look: [0, 0.4] }), stroke(`M496 378h32`, { w: W_INNER })]),
+    g({ transform: TILT }, [eye(468, 322, 37, { look: [0, 0.4], w: WI }), eye(556, 322, 37, { look: [0, 0.4], w: WI }), stroke(`M496 378h32`, { w: WI })]),
     // a pale chest plate with a crack, knuckles, toes, coral pores
-    ink(plate, CREAM, { w: W_INNER }),
+    ink(plate, CREAM, { w: WI }),
     g({ 'clip-path': s.clip(el('path', { d: plate })) }, [flat(`M536 410C560 510 556 590 530 670L620 670L620 410Z`, '#f5b89a')]),
-    stroke(plate, { w: W_INNER }),
-    stroke(`M486 456L500 500L480 526L502 562M500 500L524 514`, { w: W_DETAIL }),
-    stroke(`M236 690v24M276 694v26M312 690v24M712 690v24M750 694v26M788 690v24`, { w: W_DETAIL }),
-    stroke(`M426 806v22M466 808v22M556 808v22M596 806v22`, { w: W_DETAIL }),
-    ...[[636, 440, 7, 5], [622, 506, 9, 6], [392, 560, 7, 5], [612, 664, 7, 5], [320, 360, 8, 5], [770, 372, 8, 5], [338, 430, 6, 4], [376, 462, 8, 5], [560, 676, 8, 5], [652, 548, 6, 4], [450, 684, 6, 4]].map(([x, y, a, b]) => inkEllipse(x, y, a, b, '#b8405f', { w: 4 })),
-    chestStub(398, 654, -14, -44, ORANGE), chestStub(630, 610, 14, -44, ORANGE_SH),
+    stroke(plate, { w: WI }),
+    stroke(`M486 456L500 500L480 526L502 562M500 500L524 514`, { w: WD }),
+    stroke(`M236 690v24M276 694v26M312 690v24M712 690v24M750 694v26M788 690v24`, { w: WD }),
+    stroke(`M426 806v22M466 808v22M556 808v22M596 806v22`, { w: WD }),
+    ...[[636, 440, 7, 5], [622, 506, 9, 6], [392, 560, 7, 5], [612, 664, 7, 5], [320, 360, 8, 5], [770, 372, 8, 5], [338, 430, 6, 4], [376, 462, 8, 5], [560, 676, 8, 5], [652, 548, 6, 4], [450, 684, 6, 4]].map(([x, y, a, b]) => inkEllipse(x, y, a, b, '#b8405f', { w: 4 / K })),
+    chestStub(398, 654, -14, -44, ORANGE, WI), chestStub(630, 610, 14, -44, ORANGE_SH, WI),
     // and one on each arm
-    chestStub(292, 552, -11, -38, ORANGE), chestStub(766, 676, 11, -40, ORANGE_SH),
+    chestStub(292, 552, -11, -38, ORANGE, WI), chestStub(766, 676, 11, -40, ORANGE_SH, WI),
     // round coral tips on the antlers
-    g({ transform: TILT }, [[-136, 132], [-78, 122], [-178, 160], [136, 132], [78, 122], [178, 160]].map(([dx, y]) => inkCircle(512 + dx, y, 15, dx < 0 ? '#ffd27a' : ORANGE, { w: W_INNER }))),
+    g({ transform: TILT }, [[-136, 132], [-78, 122], [-178, 160], [136, 132], [78, 122], [178, 160]].map(([dx, y]) => inkCircle(512 + dx, y, 15, dx < 0 ? '#ffd27a' : ORANGE, { w: WI }))),
   ];
-  s.add(2, g({ filter: s.wobble(5) }, [golem, ...details]));
+  s.add(2, g({ filter: s.wobble(5) }, g({ transform: `translate(512 ${AY}) scale(${K}) translate(-512 ${-AY})` }, [golem, ...details])));
 
   // ---- 3: a few small fish round its shoulders, bubbles, sparkles
   const shoal = [[158, 266, 40, 1], [860, 250, 40, -1], [140, 396, 32, 1]];
@@ -93,18 +95,18 @@ export function build(s) {
 
 /** Parts with ONE fat contour round the whole silhouette, like lib's sticker, but each part may carry hard shadow
  *  and highlight patches (`in`) clipped to its own shape before its inner line goes on. */
-function figure(s, parts, outer = W_SUBJECT) {
+function figure(s, parts, outer = W_SUBJECT, inner = W_INNER) {
   const tf = (p, m) => (p.tf ? g({ transform: p.tf }, m) : m); // a part may be tilted as a whole (`tf`)
   const back = parts.map((p) => tf(p, ink(p.d, INK, { w: outer * 2 })));
-  const front = parts.map((p) => tf(p, [flat(p.d, p.fill), p.in ? g({ 'clip-path': s.clip(el('path', { d: p.d })) }, p.in) : '', stroke(p.d, { w: p.w ?? W_INNER })].join('')));
+  const front = parts.map((p) => tf(p, [flat(p.d, p.fill), p.in ? g({ 'clip-path': s.clip(el('path', { d: p.d })) }, p.in) : '', stroke(p.d, { w: p.w ?? inner })].join('')));
   return g({}, [...back, ...front]);
 }
 
 /** A little two-pronged coral stub drawn on the chest or an arm: inner line weights. */
-function chestStub(x, y, dx, dy, c) {
+function chestStub(x, y, dx, dy, c, w = W_INNER) {
   const a = ribbon([[x, y], [x + dx * 0.4, y + dy * 0.6], [x + dx, y + dy]], 20, 17), b = ribbon([[x + dx * 0.3, y + dy * 0.45], [x - dx * 1.3, y + dy * 0.8]], 16, 14);
   const tips = [[x + dx, y + dy, 11], [x - dx * 1.3, y + dy * 0.8, 9.5]];
-  return g({}, [ink(a, INK, { w: W_INNER * 2 }), ink(b, INK, { w: W_INNER * 2 }), ...tips.map(([tx, ty, tr]) => inkCircle(tx, ty, tr, INK, { w: W_INNER * 2 })),
+  return g({}, [ink(a, INK, { w: w * 2 }), ink(b, INK, { w: w * 2 }), ...tips.map(([tx, ty, tr]) => inkCircle(tx, ty, tr, INK, { w: w * 2 })),
     flat(a, c), flat(b, c), ...tips.map(([tx, ty, tr]) => el('circle', { cx: tx, cy: ty, r: tr, fill: c }))]);
 }
 
