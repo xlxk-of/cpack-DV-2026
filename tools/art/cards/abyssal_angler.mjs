@@ -67,7 +67,7 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5), transform: `translate(${DX} 0)` }, [fish, ...face]));
 
   // ---- 3: two tiny fish who have just noticed, bubbles, sparkles
-  s.add(3, g({ filter: s.wobble(4, 0.014, 5) }, [fry(150, 670, 44, '#ffd76a', -8), fry(318, 770, 36, '#8fe3a8', 10)]));
+  s.add(3, g({ filter: s.wobble(4, 0.014, 5) }, [fry(184, 702, 44, '#ffd76a', -8), fry(318, 770, 36, '#8fe3a8', 10)]));
   s.add(3, star4(LX + DX, LY, 20, '#ffffff', 0), star4(300, 168, 26, '#ffffff'), star4(160, 330, 20, CYAN), star4(118, 196, 14, '#ffffff'));
   s.inkBubbles({ n: 5, x0: 800, x1: 920, y0: 140, y1: 860, rmin: 8, rmax: 24 });
   s.add(3, ...[[168, 470, 13], [142, 430, 8], [130, 780, 16], [236, 880, 10], [440, 800, 12]].map(([x, y, rr]) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })])));

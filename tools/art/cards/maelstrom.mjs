@@ -65,7 +65,7 @@ export function build(s) {
     boat(...sp(0.06, -GAP - 14), 1.56, -20), boat(...sp(0.3, -GAP), 1.37, 26), boat(...sp(0.48, -GAP + 14), 1.04, -36),
     plank(...sp(0.23, 0), 1.3, 20), plank(...sp(0.37, 0), 1.2, -50), plank(...sp(0.68, 0), 1, 80), plank(...sp(0.22, -GAP), 1.2, 60), plank(...sp(0.4, -GAP), 1.1, -20),
   ]));
-  s.add(3, star4(150, 300, 24, '#ffffff'), star4(880, 300, 20, BOLT), star4(860, 800, 20, '#ffffff'), star4(170, 820, 22, '#c9f6ff'), star4(470, 180, 16, '#ffffff'));
+  s.add(3, star4(150, 300, 24, '#ffffff'), star4(880, 300, 20, BOLT), star4(860, 800, 20, '#ffffff'), star4(170, 820, 22, '#c9f6ff'), star4(540, 900, 16, '#ffffff'));
   s.add(3, g({ opacity: 0.7 }, [[140, 170], [330, 300], [610, 200], [900, 180], [930, 460], [90, 480], [760, 760], [270, 720]].map(([x, y]) => el('path', { d: `M${x} ${y}l-12 34`, stroke: '#dff3ff', 'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none' }))));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#c9f6ff'], opacity: 0.9 });
 }
