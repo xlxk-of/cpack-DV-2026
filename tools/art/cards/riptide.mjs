@@ -6,7 +6,7 @@ const circ = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0
 const rr = (x, y, w, h, q) => `M${x + q} ${y}h${w - 2 * q}q${q} 0 ${q} ${q}v${h - 2 * q}q0 ${q} ${-q} ${q}h${-(w - 2 * q)}q${-q} 0 ${-q} ${-q}v${-(h - 2 * q)}q0 ${-q} ${q} ${-q}Z`;
 
 const CX = 520, CY = 424, TURN = 540, END = 160, R0 = 48, R1 = 292, GAP = R1 / (TURN / 360);
-const SEA = '#22a59d', SEA_D = '#168582', SEA_DD = '#0f6a70', SEA_L = '#43c4b6';
+const SEA = '#1b8c89', SEA_D = '#126f72', SEA_DD = '#0c5560', SEA_L = '#2fa79e';      // one value step down: with the rest of the set
 const FOAM = '#ffffff', FOAM_D = '#bdebe6', STREAK = '#8fe6da';
 
 // the spiral: t = 0 at the eye, 1 at the outer end (and on beyond 1); dr pushes the point outward
@@ -14,7 +14,10 @@ const ang = (t) => (END - (1 - t) * TURN) * Math.PI / 180;
 const sp = (t, dr = 0) => { const a = ang(t), q = R0 + R1 * t + dr; return [CX + Math.cos(a) * q, CY + Math.sin(a) * q]; };
 const arc = (t0, t1, dr = 0, n = 0) => { const N = n || Math.max(4, Math.ceil(Math.abs(t1 - t0) * 44)), out = []; for (let i = 0; i <= N; i++) out.push(sp(t0 + (t1 - t0) * i / N, dr)); return out; };
 const deg = (t) => ang(t) * 180 / Math.PI + 90;      // the way the flow runs outward at t, in degrees
-const fat = (t) => 26 + 58 * t;                        // the foam's width
+const TE = 0.98;                                       // where the foam arm runs out
+const taper = (t) => (t < 0.72 ? 1 : 1 - 0.87 * Math.min(1, (t - 0.72) / (TE - 0.72)) ** 1.25);   // it thins to a wisp
+const fat0 = (t) => 26 + 58 * t;
+const fat = (t) => fat0(t) * taper(t);                 // the foam's width
 
 export function build(s) {
   const r = s.r;
@@ -36,36 +39,40 @@ export function build(s) {
   s.add(1, streak(0.36, 0.5, GAP / 2 + 8, 20), streak(0.62, 0.75, GAP / 2 - 6, 22), streak(0.86, 0.98, GAP / 2 + 16, 24), streak(1.1, 1.22, GAP / 2 - 30, 24),
     streak(1.32, 1.44, 40, 26), streak(1.5, 1.6, GAP / 2 + 20, 24), streak(1.02, 1.1, GAP / 2 + 70, 18), streak(1.72, 1.8, 10, 26), streak(0.03, 0.14, GAP / 2 - 10, 14));
   const farFish = (x, y, a, k) => g({ transform: `translate(${x} ${y}) rotate(${a}) scale(${k})`, opacity: 0.9 }, [
-    ink('M-34 0L-64 -22Q-56 0 -64 22Z', '#2f8f93', { w: W_MID / k }), ink('M-40 0a40 25 0 1 0 80 0a40 25 0 1 0 -80 0Z', '#2f8f93', { w: W_MID / k }), el('circle', { cx: 18, cy: -5, r: 6, fill: INK })]);
+    ink('M-34 0L-64 -22Q-56 0 -64 22Z', '#27818a', { w: W_MID / k }), ink('M-40 0a40 25 0 1 0 80 0a40 25 0 1 0 -80 0Z', '#27818a', { w: W_MID / k }), el('circle', { cx: 18, cy: -5, r: 6, fill: INK })]);
   s.add(1, farFish(120, 200, 150, 0.9), farFish(930, 700, -30, 0.8), farFish(900, 150, 200, 0.7));
 
   // ---- 2: the foam spiral, with what it has caught
   const body = [];
-  const line = arc(0, 1);
-  const spiral = ribbon(line, fat(0), fat(1), null, 3);
+  const line = arc(0, TE), shapeT = (u) => taper(u * TE);
+  const spiral = ribbon(line, fat0(0), fat0(TE), shapeT, 3);
   const blobs = [];
-  for (let t = 0.12; t <= 1.001;) {
-    const q = 22 + 28 * t + r.range(-3, 3), [x, y] = sp(t, fat(t) / 2 - 10);
+  for (let t = 0.12; t <= TE - 0.04;) {
+    const k = taper(t), q = (22 + 28 * t + r.range(-3, 3)) * (0.25 + 0.75 * k), [x, y] = sp(t, fat(t) / 2 - 10 * k);
     blobs.push([x, y, q, t]);
     t += (q * 1.62) / ((R0 + R1 * t) * (TURN * Math.PI / 180));
   }
-  const [ex, ey] = sp(1), [ix, iy] = sp(0);
-  const parts = [spiral, circ(ex, ey, fat(1) / 2 + 4), circ(ix, iy, fat(0) / 2), ...blobs.map(([x, y, q]) => circ(x, y, q))];
-  body.push(contour(parts));
-  body.push(g({}, parts.map((d) => flat(d, FOAM))));
+  const [ex, ey] = sp(TE), [ix, iy] = sp(0);
+  const parts = [spiral, circ(ex, ey, fat(TE) / 2), circ(ix, iy, fat(0) / 2), ...blobs.map(([x, y, q]) => circ(x, y, q))];
+  // the arm breaks up: loose puffs of foam trailing off its thin end
+  const puffs = [[0.998, 2, 20], [1.008, 16, 15], [1.006, -12, 13], [1.03, 10, 16], [1.038, -4, 11], [1.056, 4, 11]].map(([t, dr, q]) => circ(...sp(t, dr), q));
+  body.push(contour(parts), contour(puffs, 9));
+  body.push(g({}, parts.concat(puffs).map((d) => flat(d, FOAM))));
   body.push(g({ 'clip-path': s.clip(parts.map((d) => el('path', { d })).join('')) }, [
-    flat(ribbon(line.map((_, i) => sp(i / (line.length - 1), -fat(i / (line.length - 1)) * 0.3)), fat(0) * 0.46, fat(1) * 0.46, null, 3), FOAM_D),
-    flat(circ(ex - 30, ey + 10, 26), FOAM_D),
+    flat(ribbon(line.map((_, i) => { const t = TE * i / (line.length - 1); return sp(t, -fat(t) * 0.3); }), fat0(0) * 0.46, fat0(TE) * 0.46, shapeT, 3), FOAM_D),
   ]));
+  { const [x, y] = sp(0.998, 2); body.push(stroke(`M${x - 9} ${y + 2}q8 -12 18 -4`, { w: W_DETAIL })); }
   // foam curls and the pull of the water, drawn
   blobs.forEach(([x, y, q, t], i) => {
     if (i % 2) return;
     const a = ang(t) + Math.PI * 0.2, c = q * 0.5;
     body.push(stroke(`M${x + Math.cos(a) * c} ${y + Math.sin(a) * c}A${c} ${c} 0 1 0 ${x + Math.cos(a + 4.2) * c} ${y + Math.sin(a + 4.2) * c}`, { w: W_DETAIL + 1 }));
   });
-  [[0.2, 0.3], [0.38, 0.5], [0.58, 0.68], [0.76, 0.86], [0.92, 0.98]].forEach(([a, b]) => body.push(stroke(poly(arc(a, b, -fat((a + b) / 2) * 0.06)), { w: W_DETAIL + 1 })));
-  // the eye of it
-  body.push(inkCircle(CX, CY, 30, '#0b4f60', { w: W_INNER }), el('circle', { cx: CX + 4, cy: CY + 4, r: 13, fill: '#073544' }));
+  [[0.2, 0.3], [0.38, 0.5], [0.58, 0.68], [0.76, 0.84]].forEach(([a, b]) => body.push(stroke(poly(arc(a, b, -fat((a + b) / 2) * 0.06)), { w: W_DETAIL + 1 })));
+  // speed lines in the trough, following the spin
+  [[0.05, 0.088, GAP / 2 + 24], [0.15, 0.2, GAP / 2 - 30], [0.165, 0.205, GAP / 2 + 26], [0.31, 0.37, GAP / 2 + 2], [0.335, 0.375, GAP / 2 - 30]].forEach(([a, b, dr]) => body.push(stroke(poly(arc(a, b, dr, 10)), { w: W_INNER })));
+  // the eye of it: a hard dark hole the foam pours into
+  body.push(inkCircle(CX, CY, 46, '#0c2f5a', { w: W_INNER }), el('circle', { cx: CX + 6, cy: CY + 6, r: 24, fill: '#071c3c' }));
 
   // a caught fish, nose outward against the pull
   const fish = (t, dr, k, fill, shade, turn = 0) => {
@@ -94,9 +101,9 @@ export function build(s) {
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: spray: foam bubbles, sparkles, flecks
-  s.inkBubbles({ n: 11, rmin: 8, rmax: 22, fill: '#ffffff' });
+  s.inkBubbles({ n: 11, rmin: 8, rmax: 22 });
   // droplets flung off the tail of the foam
-  [[1.05, 30, 15], [1.09, -6, 10], [1.1, 44, 8], [1.14, 14, 6]].forEach(([t, dr, q]) => { const [x, y] = sp(t, dr); s.add(3, inkCircle(x, y, q, '#ffffff', { w: W_DETAIL })); });
-  s.add(3, star4(236, 236, 30), star4(840, 560, 24, '#fff6c0'), star4(330, 830, 20), star4(800, 250, 18, '#bff5ec'));
+  [[1.074, 14, 8], [1.086, -8, 6], [1.022, -26, 6]].forEach(([t, dr, q]) => { const [x, y] = sp(t, dr); s.add(3, inkCircle(x, y, q, '#ffffff', { w: W_DETAIL })); });
+  s.add(3, star4(280, 196, 30), star4(840, 560, 24, '#fff6c0'), star4(330, 830, 20), star4(800, 250, 18, '#bff5ec'));
   s.specks({ n: 18, rmin: 3, rmax: 7, colors: ['#ffffff', '#d9fbf5'], opacity: 0.9 });
 }

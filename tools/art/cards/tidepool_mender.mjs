@@ -7,24 +7,24 @@ const LIME = '#a9e25c', LIME_D = '#78c24e', BELLY = '#fff6c4', GOLD = '#ffc93c',
 export function build(s) {
   const r = s.r;
 
-  // ---- 0: sunny shallow water in flat bands, the sun drawn as stepped rings at the top
-  s.bands([[0, '#fff6b4'], [200, '#c9f2c0'], [450, '#8fdfd0'], [700, '#62c8c6']], { amp: 16, waves: 3 });
-  s.add(0, halo(540, -70, 470, '#ffffff', 3, 0.6));
+  // ---- 0: sunny shallow water in flat aqua bands (none lighter than the set's brightest); the only cream is the
+  // sun's disc at the top, inside two opaque steps of the water lightened toward it
+  s.bands([[0, '#7fdcd6'], [200, '#69d0cd'], [450, '#52c0c3'], [700, '#3fadb5']], { amp: 16, waves: 3 });
+  s.add(0, halo(540, -70, 330, ['#98e5d6', '#bdefd4']), el('circle', { cx: 540, cy: -70, r: 150, fill: '#fff6c4' }));
   s.shafts({ x: 540, y: -160, angle: 90, spread: 56, n: 5, color: '#ffffff', opacity: 0.2, width: 110 });
-  s.lumps({ y: 720, amp: 110, n: 6, fill: '#52b7b4', layer: 0 });
+  s.lumps({ y: 720, amp: 110, n: 6, fill: '#369fa9', layer: 0 });
   s.specks({ n: 36, rmin: 2, rmax: 5, colors: ['#ffffff', '#fffbd0'], opacity: 0.6, layer: 0 });
   s.paper();
 
   // ---- 1: the pool: mossy boulders either side, weed, a sandy floor
   s.weed({ x: 250, y: 860, h: 300, fill: '#4fb88a', sway: 24, width: 46 });
-  s.weed({ x: 800, y: 860, h: 340, fill: '#4fb88a', sway: 26, width: 48, lean: -0.05 });
   s.add(1, ink(spline([[-80, 900], [-70, 560], [20, 470], [130, 500], [196, 620], [210, 900]], true), '#6fb8a0', { w: W_MID }));
   s.add(1, ink(spline([[820, 900], [836, 640], [910, 520], [1010, 500], [1100, 580], [1110, 900]], true), '#6fb8a0', { w: W_MID }));
   s.add(1, el('path', { d: 'M-10 560q60 -60 120 -30M900 580q50 -50 110 -40', fill: 'none', stroke: '#a9dcc0', 'stroke-width': 10, 'stroke-linecap': 'round' }));
   s.add(1, starfish(118, 640, 34, 12), starfish(930, 700, 28, -20));
   s.lumps({ y: 800, amp: 30, n: 5, fill: '#f3dc8e', layer: 1, w: W_MID });
   for (const [x, y, rx] of [[210, 880, 40], [700, 900, 54], [420, 950, 36], [880, 960, 30]]) s.add(1, stroke(`M${x - rx} ${y}q${rx} -14 ${rx * 2} 0`, { w: W_MID - 2, stroke: '#d9b860' }));
-  for (const [x, y, rr] of [[320, 870, 12], [610, 850, 9], [790, 930, 13], [150, 950, 10]]) s.add(1, inkCircle(x, y, rr, '#fff6c4', { w: W_MID - 2 }));
+  for (const [x, y, rr] of [[320, 870, 12], [610, 850, 9], [790, 930, 13], [150, 950, 10]]) s.add(1, bubble(x, y, rr));
 
   // ---- 2: the mender
   const cx = 512;
@@ -53,7 +53,10 @@ export function build(s) {
   const armUp = [[cx - 96, 612], [cx - 172, 618], [cx - 220, 570]], armDn = [[cx + 96, 610], [cx + 150, 650], [cx + 138, 700]];
   const bodyD = `M${cx - 104} 490C${cx - 150} 630 ${cx - 144} 756 ${cx - 56} 768L${cx + 56} 768C${cx + 144} 756 ${cx + 150} 630 ${cx + 104} 490Z`;
   ax.push(sticker([
-    { d: ribbon(armUp, 46, 40), fill: LIME }, { d: oval(cx - 224, 562, 30, 30), fill: LIME, inner: 0 },
+    // the raised hand is a mitten: a round palm and one clear thumb held out toward the head
+    { d: ribbon(armUp, 46, 40), fill: LIME },
+    { d: ribbon([[cx - 232, 560], [cx - 206, 544], [cx - 184, 530]], 26, 24) + oval(cx - 184, 530, 12, 12), fill: LIME, inner: 0 },
+    { d: oval(cx - 232, 560, 30, 31), fill: LIME, inner: 0 },
     { d: ribbon(armDn, 46, 40), fill: LIME }, { d: oval(cx + 138, 704, 28, 28), fill: LIME, inner: 0 },
     { d: bodyD, fill: LIME },
   ]));
@@ -61,7 +64,8 @@ export function build(s) {
     inkEllipse(cx, 676, 80, 92, BELLY, { w: W_INNER }),
     flat(`M${cx + 40} 520C${cx + 110} 620 ${cx + 100} 720 ${cx + 30} 790L${cx + 200} 790L${cx + 200} 520Z`, INK, { opacity: 0.16 }),
   ]));
-  ax.push(stroke(`M${cx - 236} 556l4 12M${cx - 220} 550l2 13`, { w: W_DETAIL }));
+
+  ax.push(stroke(`M${cx - 218} 533A30 31 0 0 1 ${cx - 202} 556`, { w: W_DETAIL }));
 
   // the head: a wide soft bun
   const head = spline([[cx - 194, 392], [cx - 170, 300], [cx - 84, 244], [cx, 236], [cx + 84, 244], [cx + 170, 300], [cx + 194, 392], [cx + 156, 478], [cx + 62, 520], [cx - 62, 520], [cx - 156, 478]], true);
@@ -92,11 +96,16 @@ export function build(s) {
   s.weed({ x: 1000, y: 1080, h: 400, fill: '#3fa878', sway: 22, lean: -0.03, width: 88, layer: 3, w: W_INNER });
   s.add(3, plus(160, 372, 20, GOLD, W_DETAIL, 12), plus(206, 122, 16, '#ffffff', W_DETAIL, -8), plus(352, 112, 14, '#fff3a0', W_DETAIL, 20),
     plus(868, 300, 18, '#ffffff', W_DETAIL, 10), plus(884, 470, 14, GOLD, W_DETAIL, -14), plus(196, 700, 14, '#ffffff', W_DETAIL, 8));
-  for (const [x, y, rr] of [[600, 118, 16], [646, 70, 9], [124, 480, 12], [872, 610, 16], [668, 706, 10], [430, 92, 10]]) {
-    s.add(3, inkCircle(x, y, rr, '#f0fffb', { w: W_DETAIL, 'fill-opacity': 0.45 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' }));
+  for (const [x, y, rr] of [[600, 118, 16], [646, 70, 9], [124, 480, 12], [916, 566, 16], [742, 536, 10], [430, 92, 10]]) {
+    s.add(3, bubble(x, y, rr));
   }
   s.add(3, star4(512, 150, 22), star4(852, 166, 16, '#fff6c0'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#fffbc0', '#ffe46a'], opacity: 0.9 });
+}
+
+/** The set's bubble: ink ring, tinted fill, one hard glint. */
+function bubble(x, y, rr) {
+  return g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })]);
 }
 
 /** A healing spark: a fat plus with the ink line round it. */
