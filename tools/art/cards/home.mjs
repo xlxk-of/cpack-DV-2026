@@ -16,12 +16,15 @@ const LX = 1613, LY = 334;  // the lamp (84% across, clear of the menu column)
 const DX = LX - 1204;       // the rock was drawn round a lamp at x 1204; it is slid across by this much
 const TY = 362 - LY;        // the tower is drawn with its lamp at y 362, then lifted by this much
 const GOLD = '#f6c544', PALE = '#fff3a8';
+const BEAM = ['#3c3a8c', '#5450a6', '#6c68ba', '#8480ce'];   // the lamp's beam: outer step, inner step, then the two lifts where it crosses the lamp's halo
 
-/** A falling star: an inked head with a flat two-tone tail streaming back along (dx, dy). */
+/** A falling star: an inked head with a flat two-step tail streaming back along (dx, dy). The tail is opaque (the
+ *  light rule): one step of the night sky lightened, and a cream core inside it. The Tide pack's tails are this build. */
+const TAIL_STEP = '#4a4690', TAIL_CORE = '#e8d898';
 function falling(x, y, s, dx, dy) {
   const len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, px = -uy, py = ux;
-  const tail = (w, l, c, o) => flat(poly([[x + px * w, y + py * w], [x + ux * l, y + uy * l], [x - px * w, y - py * w]], true), c, { opacity: o });
-  return g({}, [tail(s * 0.5, len, GOLD, 0.45), tail(s * 0.24, len * 0.7, PALE, 0.85), star4(x, y, s, PALE, W_DETAIL, 12)]);
+  const tail = (w, l, c) => flat(poly([[x + px * w, y + py * w], [x + ux * l, y + uy * l], [x - px * w, y - py * w]], true), c);
+  return g({}, [tail(s * 0.5, len, TAIL_STEP), tail(s * 0.24, len * 0.7, TAIL_CORE), star4(x, y, s, PALE, W_DETAIL, 12)]);
 }
 
 /** A drowned star: still alight on the sea bed, its light drawn as flat rings. */
@@ -67,8 +70,12 @@ export function build(s) {
   // the lamp's light: opaque flat rings of the night sky lightened toward the lamp, behind the beam and the tower
   s.add(1, halo(LX, LY, 170, ['#322e78', '#47418a', '#625a9e']));
   // both wedges go left and low: under the logo, down onto the water (the sea is drawn over their far end)
-  s.add(1, flat(poly([[LX, LY - 26], [LX, LY + 26], [LX - 447, 700], [LX - 726, 700]], true), PALE, { opacity: 0.16 }));
-  s.add(1, flat(poly([[LX, LY - 12], [LX, LY + 12], [LX - 506, 700], [LX - 630, 700]], true), PALE, { opacity: 0.16 }));
+  // (opaque, like every light shape: two flat steps of the sky's indigo lightened toward the lamp, saturation kept.
+  // Inside the halo's two inner rings both steps go up one, so the beam is never darker than the glow it crosses)
+  const beamOut = poly([[LX, LY - 26], [LX, LY + 26], [LX - 447, 700], [LX - 726, 700]], true);
+  const beamIn = poly([[LX, LY - 12], [LX, LY + 12], [LX - 506, 700], [LX - 630, 700]], true);
+  s.add(1, flat(beamOut, BEAM[0]), flat(beamIn, BEAM[1]));
+  [2, 1].forEach((k, i) => s.add(1, g({ 'clip-path': s.clip(el('circle', { cx: LX, cy: LY, r: 170 * k / 3 })) }, [flat(beamOut, BEAM[i + 1]), flat(beamIn, BEAM[i + 2])])));
   const stars = [
     [640, 96, 26, PALE], [790, 150, 12, '#ffffff'], [900, 70, 16, '#ffffff'], [1010, 128, 11, PALE], [1120, 60, 24, PALE], [1290, 120, 14, '#ffffff'],
     [600, 250, 12, '#ffffff'], [1330, 230, 12, PALE], [880, 590, 11, PALE], [1040, 560, 12, '#ffffff'], [760, 560, 10, '#ffffff'],

@@ -33,7 +33,7 @@ export function build(s) {
   const shine = (x0, w, o) => flat(poly([[x0, SEAL_T], [x0 + w, SEAL_T], [x0 + w - 330, SEAL_B], [x0 - 330, SEAL_B]], true), '#ffffff', { opacity: o });
   body.push(shine(560, 96, 0.13), shine(686, 30, 0.13), shine(300, 40, 0.09));
 
-  // falling stars with hard wedge tails
+  // falling stars with hard wedge tails (opaque, and laid over the foil shine so the shine cannot tint them)
   body.push(faller(112, 330, 28, '#ffd65a'), faller(644, 410, 22, '#ffffff'), faller(470, 286, 17, '#ffe9a8'));
   body.push(star4(82, 560, 20, '#ffffff', 4), star4(636, 668, 18, '#ffe9a8', 4), star4(236, 262, 15, '#ffffff', 4), star4(652, 548, 14, '#ffffff', 4));
   art.push(g({ 'clip-path': bodyClip }, body));
@@ -94,10 +94,13 @@ function seaRow(y, pitch, sag, shift) {
   return d + `V${H}H${-pitch + shift}Z`;
 }
 
-/** A falling star: a four-point star dragging a flat, hard-edged wedge of light up and to the right. */
+/** A falling star: a four-point star dragging a flat, hard-edged tail of light up and to the right. The tail is the
+ *  home screen's build and opaque (the light rule): one step of the foil's navy lightened, and a cream core inside it. */
+const TAIL_STEP = '#424ea2', TAIL_CORE = '#fcf0d2';
 function faller(x, y, sz, fill) {
-  const L = sz * 3.2;
-  return g({}, [flat(poly([[x - sz * 0.5, y - sz * 0.3], [x + L * 0.62, y - L], [x + sz * 0.3, y + sz * 0.5]], true), fill, { opacity: 0.3 }), star4(x, y, sz, fill, sz > 20 ? W_DETAIL : 4)]);
+  const L = sz * 3.2, dx = L * 0.62, dy = -L, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, px = -uy, py = ux;
+  const tail = (w, l, c) => flat(poly([[x + px * w, y + py * w], [x + ux * l, y + uy * l], [x - px * w, y - py * w]], true), c);
+  return g({}, [tail(sz * 0.5, len, TAIL_STEP), tail(sz * 0.24, len * 0.7, TAIL_CORE), star4(x, y, sz, fill, sz > 20 ? W_DETAIL : 4)]);
 }
 
 const circle = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
