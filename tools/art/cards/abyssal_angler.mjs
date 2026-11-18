@@ -22,7 +22,7 @@ export function build(s) {
   s.lumps({ y: 960, amp: 60, n: 6, fill: '#1f1d55', layer: 1, w: W_MID });
 
   // ---- 2: the angler (drawn facing left, then nudged into the frame)
-  const LX = 250, LY = 248; // the lure
+  const LX = 250, LY = 248, DX = -34; // the lure; DX slides the whole fish left, clear of the frame crop
   const U = [304, 384], K = [552, 548], J = [226, 522]; // upper lip tip, mouth corner, jaw tip
   const UC = [410, 506], LC = [392, 580]; // lip curve controls
   const q = (a, c, b, t) => [(1 - t) * (1 - t) * a[0] + 2 * t * (1 - t) * c[0] + t * t * b[0], (1 - t) * (1 - t) * a[1] + 2 * t * (1 - t) * c[1] + t * t * b[1]];
@@ -35,7 +35,7 @@ export function build(s) {
   const upper = [[0.1, 64], [0.34, 54], [0.57, 38]].map(([t, len]) => ({ d: tooth(q(U, UC, K, t), len, 56, [-0.12, 1]), fill: TOOTH }));
   const lower = [[0.08, 118], [0.3, 86], [0.5, 62], [0.69, 40]].map(([t, len], i) => ({ d: tooth(q(J, LC, K, t), len, i ? 56 : 62, [0.04, -1]), fill: TOOTH }));
   const stalk = ribbon([[468, 222], [446, 128], [350, 92], [268, 140], [LX + 2, LY - 30]], 28, 20);
-  const tail = `M765 440C800 420 836 372 852 326C866 384 858 424 838 455C858 486 868 530 852 590C830 548 800 492 765 472Z`;
+  const tail = `M765 440C798 420 824 376 836 334C848 386 842 426 824 455C842 486 850 528 836 580C820 544 798 492 765 472Z`;
   const dorsal = [`M508 222Q520 160 552 140Q578 180 600 226Z`, `M610 236Q632 186 664 172Q682 214 700 268Z`, `M706 280Q734 250 762 248Q768 290 772 340Z`];
   const pect = `M588 498C640 470 704 506 700 588C652 580 606 556 588 498Z`;
 
@@ -43,12 +43,11 @@ export function build(s) {
     // one hard shadow tone: the back and the belly, away from the lure
     flat(`M520 150C700 280 720 470 470 600C420 640 330 640 250 600L250 760L900 760L900 150Z`, RED_SH),
     el('circle', { cx: 640, cy: 330, r: 22, fill: RED }), el('circle', { cx: 700, cy: 400, r: 15, fill: RED }), el('circle', { cx: 690, cy: 300, r: 11, fill: RED }),
-    // the lure's light, drawn hard along the brow and snout
-    flat(`M306 404C306 310 372 238 470 216C400 262 350 320 340 396Z`, CYAN, { opacity: 0.9 }),
-    flat(`M232 540Q240 590 290 640Q254 592 252 544Z`, CYAN, { opacity: 0.9 }),
+    // the lure's light: one thin hard wedge on the forehead, on the side facing the lure
+    flat(`M300 362C300 280 380 214 456 204Q386 264 308 356Z`, CYAN, { opacity: 0.9 }),
   ];
   const fish = figure(s, [
-    { d: tail, fill: FIN, in: [flat(`M800 455L900 330L900 600Z`, '#b23350'), stroke(`M800 455L842 380M800 458L846 530`, { w: W_DETAIL })] },
+    { d: tail, fill: FIN, in: [flat(`M800 455L900 330L900 600Z`, '#b23350'), stroke(`M796 455L828 388M796 458L830 524`, { w: W_DETAIL })] },
     ...dorsal.map((d) => ({ d, fill: FIN })),
     { d: stalk, fill: RED_SH },
     { d: maw, fill: MAW },
@@ -61,17 +60,17 @@ export function build(s) {
     // gill crease, cheek and a mean little eye under a heavy brow
     stroke(`M584 380Q626 450 590 520`, { w: W_INNER }),
     stroke(`M548 536Q576 548 580 578`, { w: W_INNER }),
-    eye(424, 334, 37, { look: [-0.7, 0.45], lid: 0.42, lidRot: -22, lidFill: RED_SH, white: '#fff2d2', pupil: 0.44 }),
-    stroke(`M372 318L470 276`, { w: W_SUBJECT }),
+    eye(432, 340, 48, { look: [-0.7, 0.45], lid: 0.42, lidRot: -22, lidFill: RED_SH, white: '#fff2d2', pupil: 0.44 }),
+    stroke(`M364 320L492 266`, { w: W_SUBJECT }),
   ];
-  s.add(2, halo(LX - 12, LY, 215, CYAN, 3, 0.42));
-  s.add(2, g({ filter: s.wobble(5), transform: 'translate(-12 0)' }, [fish, ...face]));
+  s.add(2, halo(LX + DX, LY, 208, CYAN, 3, 0.42));
+  s.add(2, g({ filter: s.wobble(5), transform: `translate(${DX} 0)` }, [fish, ...face]));
 
   // ---- 3: two tiny fish who have just noticed, bubbles, sparkles
-  s.add(3, g({ filter: s.wobble(4, 0.014, 5) }, [fry(166, 652, 44, '#ffd76a', -8), fry(318, 770, 36, '#8fe3a8', 10)]));
-  s.add(3, star4(LX - 12, LY, 20, '#ffffff', 0), star4(322, 168, 26, '#ffffff'), star4(160, 330, 20, CYAN), star4(118, 196, 14, '#ffffff'));
+  s.add(3, g({ filter: s.wobble(4, 0.014, 5) }, [fry(150, 670, 44, '#ffd76a', -8), fry(318, 770, 36, '#8fe3a8', 10)]));
+  s.add(3, star4(LX + DX, LY, 20, '#ffffff', 0), star4(300, 168, 26, '#ffffff'), star4(160, 330, 20, CYAN), star4(118, 196, 14, '#ffffff'));
   s.inkBubbles({ n: 5, x0: 800, x1: 920, y0: 140, y1: 860, rmin: 8, rmax: 24 });
-  s.add(3, ...[[196, 470, 13], [170, 430, 8], [130, 780, 16], [236, 880, 10], [440, 800, 12]].map(([x, y, rr]) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })])));
+  s.add(3, ...[[168, 470, 13], [142, 430, 8], [130, 780, 16], [236, 880, 10], [440, 800, 12]].map(([x, y, rr]) => g({}, [inkCircle(x, y, rr, '#bfefff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })])));
   s.specks({ n: 14, rmin: 3, rmax: 6, colors: ['#ffffff', CYAN, '#ffb3c4'], opacity: 0.85 });
 }
 

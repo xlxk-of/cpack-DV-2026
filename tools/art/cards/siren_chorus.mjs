@@ -1,15 +1,16 @@
 // SIREN'S CHORUS (rare spell) — three sirens singing on rocks under a big flat moon; the song is drawn as broken
 // rings round the moon with sparkles riding them. Doodle style: fat ink line, flat colour, one hard shadow.
-import { el, g, ribbon, ink, stroke, flat, inkCircle, inkEllipse, eye, star4, halo, waveBand, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
+import { el, g, ribbon, ink, stroke, flat, inkCircle, inkEllipse, eye, star4, halo, waveBand, INK, SKIN, SKIN_SHADE, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
 const circ = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
 const rr = (x, y, w, h, q) => `M${x + q} ${y}h${w - 2 * q}q${q} 0 ${q} ${q}v${h - 2 * q}q0 ${q} ${-q} ${q}h${-(w - 2 * q)}q${-q} 0 ${-q} ${-q}v${-(h - 2 * q)}q0 ${-q} ${q} ${-q}Z`;
 const bar = (x, y, w, h, fill, o = {}) => el('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: h / 2, fill, ...o });
 const diamond = (x, y, q, fill, w = W_DETAIL) => ink(`M${x} ${y - q}L${x + q * 0.72} ${y}L${x} ${y + q}L${x - q * 0.72} ${y}Z`, fill, { w });
 
-const SKIN = '#fff0dc', SKIN_D = '#f2c9d6';
-const TAIL = '#8d86ff', TAIL_D = '#6a5fe0', FIN = '#bfb4ff';
-const ROCK = '#6452b8', ROCK_D = '#46379a', ROCK_L = '#9484e0';
+const ell = (x, y, rx, ry) => `M${x - rx} ${y}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+const SKIN_D = SKIN_SHADE;
+const TAIL = '#4fd3c6', TAIL_D = '#2ea3a6', FIN = '#aef3e4';       // aqua, so tails and fins stand off the indigo rocks
+const ROCK = '#6452b8', ROCK_D = '#46379a', ROCK_L = '#a596ee';
 const MOUTH = '#b93a78';
 
 export function build(s) {
@@ -19,7 +20,7 @@ export function build(s) {
   s.bands([[0, '#2a1e66'], [200, '#372880'], [400, '#4a3299'], [560, '#6540a8']], { amp: 14, waves: 3 });
   s.specks({ n: 36, y1: 560, rmin: 2, rmax: 4, colors: ['#fff3c4', '#ffd1ef', '#c9b8ff'], opacity: 0.8, layer: 0 });
   s.add(0, star4(130, 150, 13, '#fff3c4', 0), star4(900, 110, 11, '#fff3c4', 0), star4(820, 470, 9, '#ffd1ef', 0), star4(210, 430, 9, '#ffd1ef', 0));
-  s.add(0, halo(MX, MY, 350, '#ffc9ee', 3, 0.3), el('circle', { cx: MX, cy: MY, r: 216, fill: '#fff4e2' }));
+  s.add(0, halo(MX, MY, 350, '#ffc9ee', 3, 0.3), el('circle', { cx: MX, cy: MY, r: 236, fill: '#fff4e2' }));
   s.add(0, el('circle', { cx: MX - 96, cy: MY - 84, r: 40, fill: '#f6dcd6' }), el('circle', { cx: MX + 110, cy: MY - 20, r: 26, fill: '#f6dcd6' }),
     el('circle', { cx: MX + 36, cy: MY - 140, r: 18, fill: '#f6dcd6' }), el('circle', { cx: MX - 150, cy: MY + 40, r: 16, fill: '#f6dcd6' }));
   s.add(0, bar(150, 300, 280, 30, '#4a3299'), bar(90, 332, 200, 24, '#4a3299'), bar(900, 250, 260, 30, '#4a3299'), bar(940, 520, 300, 28, '#7a4cb4'), bar(110, 560, 260, 26, '#7a4cb4'));
@@ -30,13 +31,12 @@ export function build(s) {
   s.paper();
 
   // ---- 1: the song — broken rings round the moon, with sparkles in the gaps; far rocks
-  const ring = (R, n, rot, fill, cw) => {
+  const ring = (R, n, rot, fill, cw, lined) => {
     const C = 2 * Math.PI * R, on = C / n * 0.7, off = C / n * 0.3, o = { cx: MX, cy: MY, r: R, fill: 'none', 'stroke-linecap': 'round', 'stroke-dasharray': `${on.toFixed(1)} ${off.toFixed(1)}`, transform: `rotate(${rot} ${MX} ${MY})` };
-    const out = [el('circle', { ...o, stroke: INK, 'stroke-width': cw + W_MID * 2 - 2 }), el('circle', { ...o, stroke: fill, 'stroke-width': cw })];
-    return out;
+    return lined ? [el('circle', { ...o, stroke: INK, 'stroke-width': cw + W_MID * 2 - 2 }), el('circle', { ...o, stroke: fill, 'stroke-width': cw })] : [el('circle', { ...o, stroke: fill, 'stroke-width': cw })];
   };
   const gapAt = (R, n, rot, i) => { const a = (rot + (i + 0.85) * 360 / n) * Math.PI / 180; return [MX + Math.cos(a) * R, MY + Math.sin(a) * R]; };
-  const rings = [[276, 6, 8, '#ff9fdc', 16], [352, 7, 31, '#d6a6ff', 14], [428, 8, 5, '#a79cff', 12]];
+  const rings = [[282, 6, 8, '#ff9fdc', 16, true], [352, 7, 31, '#8a5cc4', 14, false], [428, 8, 5, '#6a4cb4', 12, false]];
   rings.forEach((q) => s.add(1, ...ring(...q)));
   const notes = [];
   rings.forEach(([R, n, rot], k) => { for (let i = 0; i < n; i++) {
@@ -54,59 +54,66 @@ export function build(s) {
   const form = (d, fill, inside = [], w = W_INNER) => g({}, [flat(d, fill), inside.length ? g({ 'clip-path': s.clip(el('path', { d })) }, inside) : '', stroke(d, { w })]);
   const contour = (ds, w = W_SUBJECT) => g({}, ds.map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': w * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })));
   const body = [];
-  const rockC = 'M360 1010L380 700Q390 624 450 608Q512 590 574 608Q634 624 644 700L664 1010Z';
-  const rockL = 'M150 1010L184 730Q196 672 250 660Q312 644 360 668Q400 692 402 746L414 1010Z';
-  const rockR = 'M874 1010L840 730Q828 672 774 660Q712 644 664 668Q624 692 622 746L610 1010Z';
+  const rockC = 'M352 1010L372 650Q382 572 446 556Q512 540 578 556Q642 572 652 650L672 1010Z';
+  const rockL = 'M140 1010L160 730Q168 668 226 656Q290 644 346 660Q396 678 400 736L412 1010Z';
+  const rockR = 'M884 1010L864 730Q856 668 798 656Q734 644 678 660Q628 678 624 736L612 1010Z';
   body.push(contour([rockL, rockR, rockC]));
-  body.push(form(rockL, ROCK, [flat('M120 640h130q-34 120 -6 400h-124z', ROCK_D), flat('M120 800h320v230h-320z', ROCK_D), flat('M262 672q40 -14 80 2q-40 0 -80 14z', ROCK_L), stroke('M330 740l22 30l-10 34', { w: W_DETAIL })]));
-  body.push(form(rockR, ROCK, [flat('M590 640h100q-30 120 -6 400h-94z', ROCK_D), flat('M590 800h320v230h-320z', ROCK_D), flat('M700 668q40 -12 76 4q-40 0 -76 12z', ROCK_L), stroke('M800 736l-20 32l12 30', { w: W_DETAIL })]));
-  body.push(form(rockC, ROCK, [flat('M340 580h110q-34 140 -6 460h-104z', ROCK_D), flat('M340 800h350v230h-350z', ROCK_D), flat('M556 620q40 8 58 44q-30 -22 -58 -26z', ROCK_L), stroke('M596 716l14 34l-12 28', { w: W_DETAIL })]));
+  // each rock: a lit top plane, the mid tone on its face, the dark tone only down one side
+  body.push(form(rockL, ROCK, [flat('M110 640h82q-22 150 -4 400h-78z', ROCK_D), flat('M110 600H440V712Q290 676 110 716Z', ROCK_L), stroke('M330 760l22 30l-10 34', { w: W_DETAIL })]));
+  body.push(form(rockR, ROCK, [flat('M590 640h74q-22 150 -4 400h-70z', ROCK_D), flat('M584 600H914V716Q734 676 584 712Z', ROCK_L), stroke('M800 756l-20 32l12 30', { w: W_DETAIL })]));
+  body.push(form(rockC, ROCK, [flat('M330 560h84q-22 180 -4 480h-80z', ROCK_D), flat('M330 500H690V614Q512 580 330 614Z', ROCK_L), stroke('M604 690l14 34l-12 28', { w: W_DETAIL })]));
 
-  // one siren, drawn round her head at (0,0) with a head 78 across; `flip` mirrors her, `open` = eyes open, arms wide
+  // one siren, drawn round her head at (0,0), the head 180 across; `flip` mirrors her; `open` = the lead: eyes open,
+  // both arms thrown up. The others sing with eyes shut and hands clasped.
   const siren = (x, y, k, flip, hair, hairD, open) => {
-    const W = (w) => w / k, p = [];
-    const hairB = 'M-92 -10C-100 -92 -50 -114 0 -114C50 -114 100 -92 92 -10C96 60 122 110 104 196C76 176 62 150 58 120L-58 120C-62 150 -76 176 -104 196C-122 110 -96 60 -92 -10Z';
-    const torso = 'M-40 56L40 56Q56 120 52 196L-52 196Q-56 120 -40 56Z';
-    const tailPts = open ? [[0, 168], [-6, 240], [10, 296], [62, 316]] : [[0, 168], [2, 244], [40, 306], [110, 306]];
+    const W = (w) => w / k, p = [], R = 90, mir = (pts) => pts.map(([a, b]) => [-a, b]);
+    // the hair is one solid mass behind her (no gaps for the night to show through)
+    const hairB = 'M-106 -10C-114 -104 -58 -130 0 -130C58 -130 114 -104 106 -10C108 60 126 112 114 198Q58 216 0 204Q-58 216 -114 198C-126 112 -108 60 -106 -10Z';
+    const torso = 'M-40 66L40 66Q56 130 52 206L-52 206Q-56 130 -40 66Z';
+    const tailPts = open ? [[0, 178], [-6, 232], [6, 280], [0, 312]] : [[0, 178], [0, 230], [12, 274], [40, 296]];
     const [fx, fy] = tailPts[3];
-    const tail = ribbon(tailPts, 108, 38);
-    const fluke = `M${fx - 10} ${fy}q22 -62 76 -66q-2 34 -24 58q30 10 36 46q-52 6 -88 -38z`;
-    const head = circ(0, 0, 78);
+    const tail = ribbon(tailPts, 108, open ? 44 : 38);
+    const fluke = open
+      ? `M0 ${fy - 8}q-58 4 -74 60q42 -18 74 -12q32 -6 74 12q-16 -56 -74 -60z`
+      : `M${fx - 10} ${fy}q22 -62 76 -66q-2 34 -24 58q30 10 36 46q-52 6 -88 -38z`;
+    const head = circ(0, 0, R);
     const cap = (u) => (u < 0.2 ? Math.sqrt(1 - (1 - u / 0.2) ** 2) : 1);
+    const armUp = [[38, 98], [98, 128], [124, 60], [136, -4]];
     const arms = open
-      ? [ribbon([[-34, 82], [-88, 112], [-122, 70]], 38, 30, cap), ribbon([[34, 82], [88, 112], [122, 70]], 38, 30, cap)]
-      : [ribbon([[-40, 82], [-62, 126], [-14, 136]], 38, 30, cap), ribbon([[40, 82], [62, 126], [14, 136]], 38, 30, cap)];
-    const hands = open ? [circ(-124, 62, 23), circ(124, 62, 23)] : [circ(0, 136, 25)];
+      ? [ribbon(mir(armUp), 38, 32, cap), ribbon(armUp, 38, 32, cap)]
+      : [ribbon([[-40, 92], [-64, 138], [-14, 148]], 38, 30, cap), ribbon([[40, 92], [64, 138], [14, 148]], 38, 30, cap)];
+    // open mitten hands (a palm and one thumb) for the lead; one clasped pair for the others
+    const hands = open ? [circ(-114, -30, 12), circ(114, -30, 12), ell(-140, -38, 26, 31), ell(140, -38, 26, 31)] : [circ(0, 148, 26)];
     p.push(contour([hairB, tail, fluke, torso, ...arms, ...hands, head], W(W_SUBJECT)));
-    p.push(form(hairB, hair, [flat('M-130 90h260v120h-260z', hairD), stroke('M-80 130q-6 30 -14 44M80 130q6 30 14 44', { w: W(W_DETAIL) })], W(W_INNER)));
-    p.push(form(fluke, FIN, [stroke(`M${fx + 6} ${fy - 6}q30 -20 48 -44M${fx + 10} ${fy + 6}q30 4 50 22`, { w: W(W_DETAIL) })], W(W_INNER)));
+    p.push(form(hairB, hair, [flat('M-150 104h300v130h-300z', hairD), stroke('M-92 140q-6 30 -14 44M92 140q6 30 14 44', { w: W(W_DETAIL) })], W(W_INNER)));
+    p.push(form(fluke, FIN, [stroke(open ? `M-8 ${fy + 2}q-22 6 -40 26M8 ${fy + 2}q22 6 40 26` : `M${fx + 6} ${fy - 6}q30 -20 48 -44M${fx + 10} ${fy + 6}q30 4 50 22`, { w: W(W_DETAIL) })], W(W_INNER)));
     p.push(form(tail, TAIL, [
       flat(ribbon(tailPts.map(([a, b]) => [a - 30, b + 10]), 44, 20), TAIL_D),
-      stroke('M-4 232q12 14 24 0M16 262q12 14 24 0M-2 204q10 12 20 0', { w: W(W_DETAIL) }),
+      stroke('M-2 222q12 14 24 0M-18 248q11 13 22 0M10 252q11 13 22 0', { w: W(W_DETAIL) }),
     ], W(W_INNER)));
-    p.push(form(torso, SKIN, [flat('M-60 50h34q-10 70 0 150h-34z', SKIN_D), flat('M-60 104h120v40h-120z', hair), stroke('M-60 104h120M-60 144h120', { w: W(W_DETAIL) }),
-      flat('M-60 172h120v40h-120z', TAIL), stroke('M-60 172q20 12 30 0q20 12 30 0q20 12 30 0q20 12 30 0', { w: W(W_DETAIL) })], W(W_INNER)));
+    p.push(form(torso, SKIN, [flat('M-60 60h34q-10 70 0 150h-34z', SKIN_D), flat('M-60 114h120v40h-120z', hair), stroke('M-60 114h120M-60 154h120', { w: W(W_DETAIL) }),
+      flat('M-60 182h120v40h-120z', TAIL), stroke('M-60 182q20 12 30 0q20 12 30 0q20 12 30 0q20 12 30 0', { w: W(W_DETAIL) })], W(W_INNER)));
     arms.forEach((d) => p.push(form(d, SKIN, [], W(W_INNER))));
     hands.forEach((d) => p.push(form(d, SKIN, [], W(W_INNER))));
-    p.push(form(head, SKIN_D, [flat(circ(8, -6, 78), SKIN)], W(W_INNER)));
+    p.push(form(head, SKIN_D, [flat(circ(9, -7, R), SKIN)], W(W_INNER)));
     // the fringe covers the top of the head's line, so hair and fringe are one mass
-    const fringe = 'Q64 -48 14 -46Q-8 -18 -40 -26Q-66 -30 -77 -8';
-    p.push(flat(`M-77 -8A77 77 0 0 1 77 -8L85 -8A85 85 0 0 0 -85 -8Z`, hair), flat(`M77 -8${fringe}A77 77 0 0 1 77 -8Z`, hair), stroke(`M77 -8${fringe}`, { w: W(W_DETAIL + 1) }));
-    p.push(flat('M-46 -84h52q8 0 8 7t-8 7h-52q-8 0 -8 -7t8 -7z', '#ffffff', { opacity: 0.85 }));
+    const fringe = 'Q74 -56 16 -54Q-10 -22 -46 -31Q-76 -35 -88.6 -8';
+    p.push(flat('M-88.6 -8A89 89 0 0 1 88.6 -8L97 -8A97.4 97.4 0 0 0 -97 -8Z', hair), flat(`M88.6 -8${fringe}A89 89 0 0 1 88.6 -8Z`, hair), stroke(`M88.6 -8${fringe}`, { w: W(W_DETAIL + 1) }));
+    p.push(flat('M-54 -100h60q8 0 8 8t-8 8h-60q-8 0 -8 -8t8 -8z', '#ffffff', { opacity: 0.85 }));
     if (open) {
-      p.push(eye(-30, 14, 21, { look: [0.1, -0.4], w: W(W_DETAIL + 1) }), eye(30, 14, 21, { look: [0.1, -0.4], w: W(W_DETAIL + 1) }));
-      p.push(ink('M-19 42q19 -9 38 0q-2 28 -19 28q-17 0 -19 -28z', MOUTH, { w: W(W_DETAIL) }));
+      p.push(eye(-37, 16, 30, { look: [0.1, -0.35], w: W(W_DETAIL + 1) }), eye(37, 16, 30, { look: [0.1, -0.35], w: W(W_DETAIL + 1) }));
+      p.push(ink('M-22 52q22 -10 44 0q-2 30 -22 30q-20 0 -22 -30z', MOUTH, { w: W(W_DETAIL) }));
     } else {
-      p.push(stroke('M-46 18q16 -20 32 0M14 18q16 -20 32 0', { w: W(W_DETAIL + 2) }));
-      p.push(inkEllipse(0, 48, 12, 14, MOUTH, { w: W(W_DETAIL) }));
+      p.push(stroke('M-62 24q24 -32 48 0M14 24q24 -32 48 0', { w: W(W_INNER) }));
+      p.push(inkEllipse(0, 56, 15, 18, MOUTH, { w: W(W_DETAIL) }));
     }
-    p.push(el('ellipse', { cx: -52, cy: 34, rx: 13, ry: 8, fill: '#ff9fc4', opacity: 0.85 }), el('ellipse', { cx: 52, cy: 34, rx: 13, ry: 8, fill: '#ff9fc4', opacity: 0.85 }));
-    p.push(star4(56, -74, 17, '#fff3c4', W(W_DETAIL)));
+    p.push(el('ellipse', { cx: -64, cy: 46, rx: 15, ry: 9, fill: '#ff8fb0', opacity: 0.85 }), el('ellipse', { cx: 64, cy: 46, rx: 15, ry: 9, fill: '#ff8fb0', opacity: 0.85 }));
+    p.push(star4(64, -86, 18, '#fff3c4', W(W_DETAIL)));
     return g({ transform: `translate(${x} ${y}) scale(${flip * k} ${k})` }, p);
   };
-  body.push(siren(304, 490, 0.8, -1, '#b594f5', '#8f6fe0', false));
-  body.push(siren(720, 490, 0.8, 1, '#f070b0', '#cf4f98', false));
-  body.push(siren(512, 404, 1, 1, '#ff9fdc', '#ef74c4', true));
+  body.push(siren(240, 440, 1.1, -1, '#b594f5', '#8f6fe0', false));
+  body.push(siren(784, 440, 1.1, 1, '#f070b0', '#cf4f98', false));
+  body.push(siren(512, 290, 1.35, 1, '#ff9fdc', '#ef74c4', true));
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: the near swell with foam at the foot of the rocks, the song's sparkles
@@ -119,6 +126,6 @@ export function build(s) {
   s.add(3, ink(waveBand(1024, 1024, 846, 10, 5, 0.6), '#5445b2', { w: W_INNER }));
   s.add(3, flat(waveBand(1024, 1024, 930, 10, 4, 2), '#3b2f92'));
   s.add(3, bar(150, 890, 160, 12, '#8f7bd6'), bar(880, 886, 180, 12, '#8f7bd6'));
-  s.add(3, star4(236, 250, 30), star4(800, 300, 24, '#ffd1ef'), star4(392, 130, 18, '#fff3c4'), star4(668, 110, 22), diamond(180, 420, 13, '#ffd1ef'), diamond(856, 440, 12, '#fff3c4'));
+  s.add(3, star4(206, 236, 30), star4(826, 250, 24, '#ffd1ef'), star4(360, 128, 18, '#fff3c4'), star4(690, 118, 22), diamond(142, 330, 13, '#ffd1ef'), diamond(884, 316, 12, '#fff3c4'));
   s.specks({ n: 14, y1: 700, rmin: 3, rmax: 6, colors: ['#ffffff', '#ffd1ef', '#fff3c4'], opacity: 0.9 });
 }

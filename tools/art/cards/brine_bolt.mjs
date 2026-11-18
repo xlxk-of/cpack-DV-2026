@@ -47,7 +47,7 @@ export function build(s) {
   // crowns of spray, not hoops: the far half of each passes behind the bolt, the near half is burst open where the
   // bolt goes through and breaks into droplets there. [cx, cy, rx, ry, left piece ends at, right piece ends at (deg),
   // droplets across the gap [deg, size, tilt]]
-  const rings = [[-82, -470, 140, 40, 138, 48, [[108, 9, -24], [78, 10, 20]]], [-5, 32, 150, 42, 141, 33, [[110, 10, -24], [80, 9, 18], [49, 9, 50]]]];
+  const rings = [[-82, -470, 150, 42, 138, 48, [[108, 10, -24], [84, 10, 20]]], [-5, 32, 235, 58, 130, 26, [[119, 10, -40], [104, 11, -20], [86, 11, 16]]]];
   const hit = [tx - 6, ty - 4, 150, 40, 116, 64, []];
   bolt.push(g({ transform: TF }, rings.map((q) => ring(...q, 'back'))));
   bolt.push(ring(...hit, 'back'));
@@ -69,7 +69,7 @@ export function build(s) {
   // ---- 3: thrown droplets, sparks, the near swell
   const drops = [
     [toC(-250, -262), 20, -70], [toC(-300, -200), 12, -80], [toC(160, -262), 18, 60], [toC(210, -214), 11, 75],
-    [toC(-196, 6), 16, -75], [toC(166, -18), 14, 70], [toC(214, 30), 9, 80],
+    [toC(-280, 90), 16, -75], [toC(190, -70), 14, 70], [toC(270, -6), 9, 80],
     [[tx - 176, ty - 44], 16, -60], [[tx + 150, ty - 70], 18, 50], [[tx - 96, ty - 96], 12, -25], [[tx + 62, ty - 112], 13, 20], [[tx + 214, ty - 22], 10, 70],
   ];
   s.add(3, drops.map(([p, k, a]) => drop(p[0], p[1], k, a)));

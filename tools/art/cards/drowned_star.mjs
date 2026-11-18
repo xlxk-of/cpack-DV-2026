@@ -30,7 +30,7 @@ export function build(s) {
 
   // ---- 1: concentric flat halos, the rainbow ring, the big corona of pointed rays; the watchers on the floor
   const mid = [];
-  mid.push(halo(CX, CY, 372, ['#2b2468', '#463c82', '#463c82']));
+  mid.push(halo(CX, CY, 378, ['#2b2468', '#463c82', '#463c82']));
   [VIOLET, SKY, MINT, GOLD, PINK].forEach((c, i) => mid.push(el('circle', { cx: CX, cy: CY, r: 446 - i * 15, fill: 'none', stroke: c, 'stroke-width': 15.6 })));
   mid.push(el('circle', { cx: CX, cy: CY, r: 454, fill: 'none', stroke: INK, 'stroke-width': W_MID }), el('circle', { cx: CX, cy: CY, r: 378, fill: 'none', stroke: INK, 'stroke-width': W_MID }));
   mid.push(ink(burst(CX, CY, 8, 346, 282, 214, 0), GOLD, { w: W_MID }));
@@ -42,7 +42,7 @@ export function build(s) {
   s.add(1, flat(spline([[-30, 800], [60, 778], [160, 786], [240, 812], [130, 816], [40, 822]], true), '#3e3796'));
   s.add(1, ink(spline([[1110, 1100], [1110, 770], [1000, 738], [880, 752], [770, 810], [700, 900], [660, 1100]], true), '#2c2678', { w: W_MID }));
   s.add(1, flat(spline([[1050, 782], [960, 760], [870, 772], [800, 812], [900, 800], [990, 806]], true), '#3e3796'));
-  s.add(1, fishy(118, 630, 1, '#5f82e6', '#4563c0', [0.75, -0.65]), fishy(912, 610, -1, '#56bcd0', '#3b93ae', [-0.75, -0.6]));
+  s.add(1, fishy(132, 630, 1, '#5f82e6', '#4563c0', [0.75, -0.65]), fishy(912, 610, -1, '#56bcd0', '#3b93ae', [-0.75, -0.6]));
   s.add(1, crab(204, 756, '#e86a98', '#bf4c82', [0.6, -0.8]), octo(868, 716, '#9a78ea', '#7658c4', [-0.6, -0.8]));
   s.weed({ x: 40, y: 800, h: 190, fill: '#2f6fa8', sway: 18, width: 34 });
   s.weed({ x: 990, y: 780, h: 210, fill: '#2f6fa8', sway: 18, width: 34, lean: -0.05 });
@@ -61,7 +61,7 @@ export function build(s) {
   const tube = (d, stroke, w) => el('path', { d, fill: 'none', stroke, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
   out.push(g({}, [...[armL, armR].map((d) => tube(d, INK, ARM_W + W_SUBJECT * 2)), ...[gown, headD].map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': W_SUBJECT * 2, 'stroke-linejoin': 'round' }))]));
   out.push(...[armL, armR].flatMap((d) => [tube(d, INK, ARM_W + W_INNER), tube(d, CORE, ARM_W - W_INNER)]));
-  out.push(star4(334, 492, 20, GOLD, W_DETAIL), star4(690, 492, 20, GOLD, W_DETAIL));
+  out.push(star4(284, 492, 20, GOLD, W_DETAIL), star4(740, 492, 20, GOLD, W_DETAIL));
   out.push(ink(gown, CORE, { w: W_INNER }));
   out.push(g({ 'clip-path': s.clip(el('path', { d: gown })) }, [
     ...SPECTRUM.map((c, k) => flat(strip(gownSp, 1 - k * 0.4 + 0.02, 1 - (k + 1) * 0.4 - 0.02), c)),
@@ -93,9 +93,10 @@ export function build(s) {
     : ink(shard(x, y, sz * 1.25, rot), c, { w: W_DETAIL })));
   s.add(3, g({ filter: s.wobble(4, 0.012, 6) }, frag));
   s.lumps({ y: 1000, amp: 44, n: 5, fill: '#120e3c', layer: 3, w: W_SUBJECT });
-  s.inkBubbles({ n: 4, x0: 30, x1: 300, y0: 380, y1: 740, rmin: 8, rmax: 18, fill: '#cfe6ff' });
-  s.inkBubbles({ n: 4, x0: 720, x1: 1000, y0: 300, y1: 740, rmin: 8, rmax: 18, fill: '#cfe6ff' });
-  s.add(3, star4(236, 220, 34), star4(800, 330, 26, '#ffe9a8'), star4(180, 620, 20, '#ffd1ef'), star4(716, 640, 22), star4(430, 60, 18, '#ffe9a8'), star4(900, 90, 22));
+  // bubbles (the set's ink bubble), placed by hand so none kisses a watcher, a hand or the ring's edge
+  s.add(3, g({}, [[102, 420, 13], [26, 318, 9], [84, 566, 8], [26, 236, 11], [930, 372, 12], [780, 630, 10], [984, 206, 10], [862, 548, 9]].flatMap(([x, y, rr]) => [
+    inkCircle(x, y, rr, '#cfe6ff', { w: W_DETAIL, 'fill-opacity': 0.35 }), el('circle', { cx: x - rr * 0.34, cy: y - rr * 0.36, r: rr * 0.22, fill: '#fff' })])));
+  s.add(3, star4(236, 220, 34), star4(800, 330, 26, '#ffe9a8'), star4(184, 598, 20, '#ffd1ef'), star4(716, 640, 22), star4(430, 60, 18, '#ffe9a8'), star4(900, 90, 22));
   s.specks({ n: 18, y1: 790, rmin: 3, rmax: 7, colors: ['#ffffff', '#ffe9a8', '#ffd1ef', '#bff3ff'], opacity: 0.95 });
 }
 
