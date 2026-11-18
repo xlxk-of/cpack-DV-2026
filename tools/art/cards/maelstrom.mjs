@@ -1,11 +1,11 @@
-// MAELSTROM (epic spell) — the whole sea winding down into one bright eye: a fat spiral of water, chunky zig-zag
-// lightning out of the cloud, and small ships and planks going round and in. Deep blue outside, stepping up to an
-// aqua-white core. Only the vortex, the bolts, the cloud and the ships carry ink: the sea round them is flat bands.
+// MAELSTROM (epic spell) — the whole sea winding down into one dark eye: a fat spiral of water, chunky zig-zag
+// lightning out of the cloud, and small ships and planks going round and in. Deep blue outside, stepping up to
+// aqua-white round a hard navy hole. Only the vortex, the bolts, the cloud and the ships carry ink: the sea round them is flat bands.
 // Doodle style: see the DOODLE KIT in lib.mjs.
 import { el, g, spline, ribbon, poly, ink, stroke, flat, inkCircle, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
 const CX = 512, CY = 486, R = 318, SQ = 0.86, TURNS = 1.75, A0 = -2.3, GAP = 80;
-const DARK = ['#2f5fb4', '#3b76cc', '#4a8fde'], LIGHT = ['#6fbcf2', '#9be0fb', '#c8f8ff'], CORE = '#f2ffff', BOLT = '#ffe66b', WOOD = '#c98a5a', CANVAS = '#fff2d2';
+const DARK = ['#2f5fb4', '#3b76cc', '#4a8fde'], LIGHT = ['#6fbcf2', '#9be0fb', '#c8f8ff'], HOLE = '#10214a', HOLE_D = '#0a1636', BOLT = '#ffe66b', WOOD = '#c98a5a', CANVAS = '#fff2d2';
 const P = (rad, a) => [CX + Math.cos(a) * rad, CY + Math.sin(a) * rad * SQ];
 /** A point on the spiral: t = 0 at the rim, 1 at the eye; dr pushes it outward. */
 const sp = (t, dr = 0) => P(R * (1 - t * 0.9) + dr, A0 + t * TURNS * 2 * Math.PI);
@@ -39,6 +39,8 @@ export function build(s) {
     g({ 'clip-path': s.clip(el('path', { d: rim })) }, [flat(rim, DARK[0]), disc(222, DARK[1]), disc(128, DARK[2])]),
     // the bright arm of the spiral, stepping lighter toward the eye
     g({ 'clip-path': s.clip(el('path', { d: arm })) }, [disc(R + 40, LIGHT[0]), disc(222, LIGHT[1]), disc(128, LIGHT[2])]),
+    // drawn light toward the eye: it lies on the fills, under every ink line
+    halo(CX, CY, 138, '#b8f6ff', 3, 0.62),
     stroke(arm, { w: W_INNER }),
     // hard foam on the dark water, ink streaks on the light
     ...[[0.04, 0.15], [0.24, 0.33], [0.43, 0.5], [0.6, 0.66]].map(([a, b]) => flat(streak(a, b, -GAP, 16), '#ffffff', { opacity: 0.92 })),
@@ -46,10 +48,10 @@ export function build(s) {
     // spin: ink speed lines on the outer water following the spiral, and foam ticks riding the rim
     ...[[300, 0.2, 0.72], [282, 0.5, 0.9], [296, 1.42, 2.0], [276, 1.7, 2.12], [292, 2.72, 3.3], [272, 3.0, 3.42]].map(([rad, a0, a1]) => stroke(poly(ring(rad, a0, a1)), { w: W_DETAIL })),
     ...[[-1.22, 0.16], [-0.3, 0.1], [0.24, 0.17], [0.86, 0.1], [1.4, 0.16], [2.04, 0.1], [2.62, 0.17], [3.22, 0.1], [3.74, 0.14]].map(([a, len]) => ink(ribbon(ring(R + 2, a, a + len), 20, 20, (u) => 0.45 + 0.55 * Math.sin(Math.PI * u), 1), '#ffffff', { w: W_DETAIL })),
-    // the eye: drawn light, a bright aqua-white core, a star
-    halo(CX, CY, 138, '#b8f6ff', 3, 0.62),
-    el('ellipse', { cx: CX, cy: CY, rx: 60, ry: 60 * SQ, fill: CORE, stroke: INK, 'stroke-width': W_INNER }),
-    star4(CX, CY, 40, '#ffffff', W_DETAIL),
+    // the eye: a hard dark hole the water sinks into, darker than the sea outside, with one small sparkle in it
+    el('ellipse', { cx: CX, cy: CY, rx: 60, ry: 60 * SQ, fill: HOLE, stroke: INK, 'stroke-width': W_DETAIL }),
+    el('ellipse', { cx: CX + 7, cy: CY + 6, rx: 32, ry: 32 * SQ, fill: HOLE_D }),
+    star4(CX - 18, CY - 15, 17, '#ffffff', W_DETAIL),
   ];
   // each bolt's last point sits below the inner corner of its last jog, so it ends in a clean bright wedge
   const b1 = [[900, -160], [704, 136], [800, 168], [700, 296], [754, 318], [708, 420]], b2 = [[176, -150], [372, 168], [296, 194], [338, 302]];

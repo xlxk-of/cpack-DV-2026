@@ -47,7 +47,8 @@ export function build(s) {
   const tail = ribbon(tailPts, 36, 10);
   const lobeR = ribbon([[596, 570], [616, 632], [584, 668]], 62, 30), lobeL = ribbon([[428, 570], [408, 632], [440, 668]], 62, 30);
   const body = [];
-  body.push(contour([tail, lobeL, lobeR, bodyD]));
+  // the finished outer line is 16 all round: the tail and lobes add half their 8 line, the body half its 14 line
+  body.push(contour([tail, lobeL, lobeR], 12), contour([bodyD], 9));
   body.push(form(tail, BODY, [flat(ribbon(tailPts.map(([x, y]) => [x - 10, y + 12]), 18, 6), BODY_D)]));
   body.push(g({ transform: 'translate(746 706) rotate(26) scale(0.5)' }, el('path', { d: BOLT, fill: ZAP, stroke: INK, 'stroke-width': W_DETAIL / 0.5 + 12, 'stroke-linejoin': 'round' })), bolt(746, 706, 26, 0.5, { w: W_DETAIL, half: false }));
   body.push(form(lobeL, BODY, [flat(ribbon([[412, 570], [392, 632], [424, 668]], 30, 16), BODY_D)]), form(lobeR, BODY, [flat(ribbon([[580, 570], [600, 632], [568, 668]], 30, 16), BODY_D)]));

@@ -2,6 +2,7 @@
 // little plus-shaped sparks of mending drifting up off its raised hand.
 import { el, g, spline, ribbon, sample, ink, stroke, flat, inkCircle, inkEllipse, sticker, eye, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
+const W_OUT = 16; // the finished outer line round the mender (the set's contour)
 const LIME = '#a9e25c', LIME_D = '#78c24e', BELLY = '#fff6c4', GOLD = '#ffc93c', GOLD_D = '#f59a2e', PINK = '#ff9fb0';
 
 export function build(s) {
@@ -32,7 +33,7 @@ export function build(s) {
 
   // tail with its fin, and the feet, behind the body
   const tailPts = [[cx + 40, 706], [cx + 170, 742], [cx + 262, 700], [cx + 286, 610]];
-  ax.push(sticker([
+  ax.push(sticker16([
     { d: ribbon(tailPts, 150, 44, (t) => 0.75 + 0.25 * Math.sin(Math.PI * t)), fill: '#dcf394' },
     { d: ribbon(tailPts, 84, 22), fill: LIME },
     { d: oval(cx - 74, 766, 48, 24), fill: LIME }, { d: oval(cx + 74, 766, 48, 24), fill: LIME },
@@ -46,13 +47,13 @@ export function build(s) {
       gills.push([[cx + sd * b[0], b[1]], [cx + sd * m[0], m[1]], [cx + sd * t[0], t[1]]]);
     }
   }
-  ax.push(sticker(gills.flatMap(frond)));
+  ax.push(sticker16(gills.flatMap(frond)));
   ax.push(...gills.map((p) => stroke(spline([p[0], p[1], [p[1][0] + (p[2][0] - p[1][0]) * 0.6, p[1][1] + (p[2][1] - p[1][1]) * 0.6]]), { w: W_DETAIL + 1, stroke: GOLD_D })));
 
   // arms and body
   const armUp = [[cx - 96, 612], [cx - 172, 618], [cx - 220, 570]], armDn = [[cx + 96, 610], [cx + 150, 650], [cx + 138, 700]];
   const bodyD = `M${cx - 104} 490C${cx - 150} 630 ${cx - 144} 756 ${cx - 56} 768L${cx + 56} 768C${cx + 144} 756 ${cx + 150} 630 ${cx + 104} 490Z`;
-  ax.push(sticker([
+  ax.push(sticker16([
     // the raised hand is a mitten: a round palm and one clear thumb held out toward the head
     { d: ribbon(armUp, 46, 40), fill: LIME },
     { d: ribbon([[cx - 232, 560], [cx - 206, 544], [cx - 184, 530]], 26, 24) + oval(cx - 184, 530, 12, 12), fill: LIME, inner: 0 },
@@ -69,7 +70,7 @@ export function build(s) {
 
   // the head: a wide soft bun
   const head = spline([[cx - 194, 392], [cx - 170, 300], [cx - 84, 244], [cx, 236], [cx + 84, 244], [cx + 170, 300], [cx + 194, 392], [cx + 156, 478], [cx + 62, 520], [cx - 62, 520], [cx - 156, 478]], true);
-  ax.push(ink(head, LIME, { w: W_SUBJECT }));
+  ax.push(ink(head, LIME, { w: W_OUT }));
   ax.push(g({ 'clip-path': s.clip(el('path', { d: head })) }, [
     // one hard shadow: right side and under the chin
     flat(`M${cx + 100} 200C${cx + 200} 330 ${cx + 130} 450 ${cx - 20} 476C${cx - 100} 490 ${cx - 170} 470 ${cx - 230} 440L${cx - 230} 560L${cx + 240} 560L${cx + 240} 200Z`, LIME_D),
@@ -79,7 +80,7 @@ export function build(s) {
     flat(`M${cx - 160} 376C${cx - 158} 322 ${cx - 126} 284 ${cx - 82} 268C${cx - 112} 300 ${cx - 130} 336 ${cx - 132} 378Z`, '#ffffff', { opacity: 0.9 }),
     el('circle', { cx: cx - 148, cy: 408, r: 11, fill: '#fff', opacity: 0.9 }),
   ]));
-  ax.push(stroke(head, { w: W_SUBJECT }));
+  ax.push(stroke(head, { w: W_OUT }));
 
   // the face: wide-set happy eyes, a long soft smile, pink cheeks
   ax.push(eye(cx - 98, 384, 38, { look: [0.1, 0.1], pupil: 0.66 }), eye(cx + 98, 384, 38, { look: [0.1, 0.1], pupil: 0.66 }));
@@ -101,6 +102,15 @@ export function build(s) {
   }
   s.add(3, star4(512, 150, 22), star4(852, 166, 16, '#fff6c0'));
   s.specks({ n: 14, rmin: 3, rmax: 7, colors: ['#ffffff', '#fffbc0', '#ffe46a'], opacity: 0.9 });
+}
+
+/** `sticker`, with the stamp behind each part sized by that part's own inner line (W_OUT less half of it), so the
+ *  finished contour is W_OUT all the way round whether a part carries an inner line or none. */
+function sticker16(parts) {
+  const at = { 'stroke-linejoin': 'round', 'stroke-linecap': 'round' };
+  const back = parts.map((p) => el('path', { d: p.d, fill: INK, stroke: INK, 'stroke-width': (W_OUT - (p.inner ?? W_INNER) / 2) * 2, ...at }));
+  const front = parts.map((p) => el('path', { d: p.d, fill: p.fill, stroke: INK, 'stroke-width': p.inner ?? W_INNER, ...at }));
+  return g({}, [g({}, back), g({}, front)]);
 }
 
 /** The set's bubble: ink ring, tinted fill, one hard glint. */

@@ -2,6 +2,9 @@
 // drawn light. Read the DOODLE KIT rules at the bottom of lib.mjs before drawing another scene.
 import { el, g, spline, ribbon, ink, stroke, flat, inkCircle, inkEllipse, sticker, eye, star4, halo, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
+// The finished outer line is 16 (the set's contour): a bare `ink` line at 16, a `sticker` at 12 plus half its inner line.
+const W_OUT = 16, W_STICK = 12;
+
 export function build(s) {
   const r = s.r;
 
@@ -30,11 +33,11 @@ export function build(s) {
     const pts = [[x0, cy + 30], [x0 + sw * 0.4 + 26, cy + len * 0.34], [x0 + sw * 0.8 - 30, cy + len * 0.68], [x0 + sw * 1.2 + 16, cy + len]];
     tent.push({ d: ribbon(pts, 46, 18, (t) => 1 - t * 0.2), fill: i % 2 ? '#c9a2ff' : '#ff9fdc' });
   }
-  body.push(sticker(tent, { outer: W_SUBJECT, inner: W_INNER }));
+  body.push(sticker(tent, { outer: W_STICK, inner: W_INNER }));
   // the bell
   const bell = `M${cx - R} ${cy + 36}C${cx - R * 1.04} ${cy - R * 0.98} ${cx - R * 0.5} ${cy - R * 1.14} ${cx} ${cy - R * 1.14}C${cx + R * 0.5} ${cy - R * 1.14} ${cx + R * 1.04} ${cy - R * 0.98} ${cx + R} ${cy + 36}`
     + scallop(cx + R, cx - R, cy + 36, 6, 34) + 'Z';
-  body.push(ink(bell, '#8fe6f5', { w: W_SUBJECT }));
+  body.push(ink(bell, '#8fe6f5', { w: W_OUT }));
   const clip = s.clip(el('path', { d: bell }));
   body.push(g({ 'clip-path': clip }, [
     // one hard shadow tone on the right and under the lip
@@ -46,7 +49,7 @@ export function build(s) {
     flat(`M${cx - 168} ${cy - 60}C${cx - 172} ${cy - 150} ${cx - 120} ${cy - 205} ${cx - 62} ${cy - 216}C${cx - 110} ${cy - 180} ${cx - 140} ${cy - 130} ${cx - 138} ${cy - 62}Z`, '#ffffff', { opacity: 0.9 }),
     el('circle', { cx: cx - 150, cy: cy - 22, r: 13, fill: '#fff', opacity: 0.9 }),
   ]));
-  body.push(stroke(bell, { w: W_SUBJECT }));
+  body.push(stroke(bell, { w: W_OUT }));
   // the face: big, simple, a little worried
   body.push(eye(cx - 74, cy - 42, 37, { look: [0.35, 0.3] }), eye(cx + 74, cy - 42, 37, { look: [0.35, 0.3] }));
   body.push(stroke(`M${cx - 26} ${cy + 2}q26 22 52 0`, { w: W_INNER }));

@@ -21,7 +21,8 @@ const fat = (t) => fat0(t) * taper(t);                 // the foam's width
 
 export function build(s) {
   const r = s.r;
-  const contour = (ds, w = W_SUBJECT) => g({}, ds.map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': w * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })));
+  // the fat ink stamp behind a group of shapes; 16 is the set's finished contour, round the foam
+  const contour = (ds, w = 16) => g({}, ds.map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': w * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })));
   const form = (d, fill, inside = [], w = W_INNER) => g({}, [flat(d, fill), inside.length ? g({ 'clip-path': s.clip(el('path', { d })) }, inside) : '', stroke(d, { w })]);
 
   // ---- 0: flat sea from above, the current as broad flat spiral bands (no ink)

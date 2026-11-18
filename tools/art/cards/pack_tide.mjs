@@ -65,8 +65,7 @@ export function build(s) {
   // ---- the pouch's own light: one hard shadow down the right and along the bottom, hard highlights on the left
   const light = [
     el('path', { d: `M-200 -200H${W + 200}V${H + 200}H-200Z` + sil, 'fill-rule': 'evenodd', fill: INK, opacity: 0.26, transform: 'translate(-26 -14)' }),
-    stroke(`M62 ${SEAL_T + 130}V${SEAL_T + 330}`, { w: 12, stroke: '#ffffff', opacity: 0.85 }),
-    el('circle', { cx: 62, cy: SEAL_T + 372, r: 7, fill: '#ffffff', opacity: 0.85 }),
+    stroke(`M58 ${SEAL_T + 60}V${SEAL_T + 96}`, { w: 10, stroke: '#ffffff', opacity: 0.7 }),
     stroke(`M62 48V96`, { w: 10, stroke: '#ffffff', opacity: 0.7 }), stroke(`M62 ${SEAL_B + 26}V${SEAL_B + 70}`, { w: 10, stroke: '#ffffff', opacity: 0.7 }),
   ];
 

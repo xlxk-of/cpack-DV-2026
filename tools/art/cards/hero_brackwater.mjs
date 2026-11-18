@@ -10,9 +10,14 @@ const LIFT = 36; // how far the hat is pushed back up off his brow
 const contour = (ds, w = W_SUBJECT) => g({}, ds.map((d) => el('path', { d, fill: INK, stroke: INK, 'stroke-width': w * 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })));
 const rot = (pts, deg, cx, cy) => { const a = deg * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a); return pts.map(([x, y]) => [cx + (x - cx) * c - (y - cy) * sn, cy + (x - cx) * sn + (y - cy) * c - LIFT]); };
 
-function barnacle(x, y, r) {
-  return g({}, [inkCircle(x, y, r, '#e3dcc6', { w: W_DETAIL }), el('path', { d: `M${x - r} ${y}A${r} ${r} 0 0 0 ${x + r} ${y}Z`, fill: '#b9b09a', opacity: 0.9 }),
-    el('circle', { cx: x, cy: y, r, fill: 'none', stroke: INK, 'stroke-width': W_DETAIL }), el('ellipse', { cx: x, cy: y - r * 0.08, rx: r * 0.42, ry: r * 0.34, fill: INK })]);
+/** A barnacle: a little ridged cream cone with a dark opening on top (the same one the crab and the golem carry). */
+function barnacle(x, y, k, deg = 0) {
+  const cone = `M${-k} ${k * 0.5}L${-k * 0.5} ${-k * 0.7}Q0 ${-k * 0.95} ${k * 0.5} ${-k * 0.7}L${k} ${k * 0.5}Q0 ${k * 0.8} ${-k} ${k * 0.5}Z`;
+  return g({ transform: `translate(${x} ${y}) rotate(${deg})` }, [
+    ink(cone, '#f6e7c4', { w: W_DETAIL + 1 }),
+    el('ellipse', { cx: 0, cy: -k * 0.62, rx: k * 0.3, ry: k * 0.14, fill: INK }),
+    stroke(`M${-k * 0.42} ${k * 0.3}L${-k * 0.3} ${-k * 0.2}M${k * 0.42} ${k * 0.3}L${k * 0.3} ${-k * 0.2}`, { w: W_DETAIL - 1 }),
+  ]);
 }
 
 export function build(s) {
@@ -105,8 +110,8 @@ export function build(s) {
   ]));
   body.push(stroke(brim, { w: W_INNER }));
   // barnacles: on the hat, the cheek, the shoulder
-  body.push(barnacle(620, 128, 28), barnacle(664, 170, 20), barnacle(236, 288, 24));
-  body.push(barnacle(336, 560, 22), barnacle(690, 520, 18), barnacle(760, 870, 28));
+  body.push(barnacle(620, 128, 32, 8), barnacle(664, 170, 23, 20), barnacle(236, 288, 28, -12));
+  body.push(barnacle(336, 560, 25, -10), barnacle(690, 520, 21, 12), barnacle(760, 870, 32, 6));
   s.add(2, g({ filter: s.wobble(5) }, body));
 
   // ---- 3: pipe bubbles, a glint off the eye

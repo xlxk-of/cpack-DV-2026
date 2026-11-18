@@ -60,7 +60,7 @@ export function build(s) {
     // gill crease, cheek and a mean little eye under a heavy brow
     stroke(`M584 380Q626 450 590 520`, { w: W_INNER }),
     stroke(`M548 536Q576 548 580 578`, { w: W_INNER }),
-    eye(432, 340, 48, { look: [-0.7, 0.45], lid: 0.42, lidRot: -22, lidFill: RED_SH, white: '#fff2d2', pupil: 0.44 }),
+    eye(432, 340, 48, { look: [-0.7, 0.45], lid: 0.42, lidRot: -22, lidFill: RED_SH, white: '#fff', pupil: 0.44 }),
     stroke(`M364 320L492 266`, { w: W_SUBJECT }),
   ];
   s.add(2, halo(LX + DX, LY, 208, CYAN, 3, 0.42));

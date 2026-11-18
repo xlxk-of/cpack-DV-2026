@@ -68,6 +68,10 @@ export function build(s) {
   const TILT = -5, CX = 512, CY = 250;
   const crownPts = rotP([[312, 288], [294, 166], [362, 214], [408, 132], [462, 204], [512, 104], [562, 204], [600, 158], [634, 174], [660, 214], [730, 166], [712, 288], [612, 262], [512, 254], [412, 262]], TILT, CX, CY);
   const crown = poly(crownPts, true);
+  // the gem, and its light: it lightens the crown's and the skull's FILLS in two hard steps (each is drawn inside its
+  // own clip, under that shape's ink lines), never as a disc laid over the ink
+  const [[gx, gy]] = rotP([[512, 246]], TILT, CX, CY);
+  const gemLight = () => halo(gx, gy, 84, '#bff6ff', 2, 0.5);
   body.push(contour([cloak, collar, neck, skull, crown]));
 
   // the ragged collar and the mantle
@@ -91,6 +95,7 @@ export function build(s) {
     flat('M610 160C720 250 740 420 670 560L650 800L800 800L800 160Z', BONE_S),
     flat('M330 560Q512 640 694 560L694 600Q512 670 330 600Z', BONE_S),
     flat('M338 330C338 270 380 226 430 212C394 244 374 280 370 334Z', '#ffffff'),
+    gemLight(),
   ]));
   body.push(stroke(skull, { w: W_INNER }));
   body.push(stroke('M346 566q20 14 38 86M678 566q-20 14 -38 86', { w: W_DETAIL }));
@@ -115,14 +120,13 @@ export function build(s) {
     flat(poly(rotP([[290, 244], [512, 222], [734, 244], [734, 320], [290, 320]], TILT, CX, CY), true), STEEL_S),
     flat(poly(rotP([[316, 196], [336, 210], [336, 236], [320, 238]], TILT, CX, CY), true), STEEL_L),
     flat(poly(rotP([[400, 162], [418, 176], [426, 212], [404, 214]], TILT, CX, CY), true), STEEL_L),
+    gemLight(),
   ]));
   body.push(stroke(crown, { w: W_INNER }));
   body.push(stroke(poly(rotP([[304, 240], [412, 226], [512, 220], [612, 226], [720, 240]], TILT, CX, CY)), { w: W_DETAIL + 1 }));
   body.push(stroke(poly(rotP([[634, 174], [650, 204], [636, 222], [652, 246], [644, 270]], TILT, CX, CY)), { w: W_DETAIL }), stroke(poly(rotP([[650, 204], [672, 212]], TILT, CX, CY)), { w: W_DETAIL }));
   const tips = rotP([[294, 166], [408, 132], [512, 104], [730, 166]], TILT, CX, CY);
   tips.forEach(([x, y], i) => body.push(inkCircle(x, y, i === 2 ? 20 : 16, STEEL_L, { w: W_DETAIL + 1 })));
-  const [[gx, gy]] = rotP([[512, 246]], TILT, CX, CY);
-  body.push(halo(gx, gy, 84, '#bff6ff', 2, 0.5));
   body.push(ink(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}L${gx - 28} ${gy}Z`, ICE, { w: W_INNER }));
   body.push(flat(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}Z`, '#3fc0e8'), stroke(`M${gx} ${gy - 36}L${gx + 28} ${gy}L${gx} ${gy + 36}L${gx - 28} ${gy}Z`, { w: W_INNER }));
   body.push(el('circle', { cx: gx - 10, cy: gy - 8, r: 6, fill: '#fff' }));

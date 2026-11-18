@@ -4,6 +4,7 @@ import { el, g, spline, ribbon, ink, stroke, flat, inkCircle, inkEllipse, sticke
 const SEAM_Y = 412; // where the shell's rim seam meets the shell's sides
 /** The seam's height at dx from the crab's middle (it is the quadratic drawn in the shell). */
 const seamY = (dx) => { const t = (dx + 236) / 472; return SEAM_Y - 68 * 2 * t * (1 - t); };
+const W_OUT = 16; // the finished outer line round the crab (the set's contour)
 const RED = '#f2643a', RED_D = '#c93d2e', RED_L = '#ff9a5c', CREAM = '#f6e7c4', CORAL = '#b79df2', CORAL_D = '#8f74d6';
 
 export function build(s) {
@@ -38,16 +39,16 @@ export function build(s) {
     }
     limbs.push({ d: ribbon([[cx + sd * 185, 468], [cx + sd * 262, 452], [cx + sd * 246, 380]], 56, 50), fill: RED });
   }
-  crab.push(sticker(limbs));
+  crab.push(sticker16(limbs));
 
   // what grows on its back: a coral, behind the shell's top edge
   const cor = [[[cx - 104, 372], [cx - 112, 300], [cx - 104, 236]], [[cx - 110, 318], [cx - 150, 282], [cx - 160, 236]], [[cx - 108, 300], [cx - 66, 268], [cx - 54, 222]]];
-  crab.push(sticker([...cor.map((p) => ({ d: ribbon(p, 34, 28), fill: CORAL })), ...cor.map((p) => ({ d: circ(p[2][0], p[2][1], 15), fill: CORAL, inner: 0 }))]));
+  crab.push(sticker16([...cor.map((p) => ({ d: ribbon(p, 34, 28), fill: CORAL })), ...cor.map((p) => ({ d: circ(p[2][0], p[2][1], 15), fill: CORAL, inner: 0 }))]));
   crab.push(...cor.map((p) => el('circle', { cx: p[2][0] - 4, cy: p[2][1] - 4, r: 6, fill: '#fff' })));
 
   // the shell
   const shell = `M${cx - 238} 482C${cx - 244} 388 ${cx - 150} 338 ${cx} 336C${cx + 150} 338 ${cx + 244} 388 ${cx + 238} 482C${cx + 232} 566 ${cx + 142} 618 ${cx} 620C${cx - 142} 618 ${cx - 232} 566 ${cx - 238} 482Z`;
-  crab.push(ink(shell, RED, { w: W_SUBJECT }));
+  crab.push(ink(shell, RED, { w: W_OUT }));
   crab.push(g({ 'clip-path': s.clip(el('path', { d: shell })) }, [
     // one hard shadow: the right side and the underside
     flat(`M${cx + 110} 300C${cx + 220} 420 ${cx + 150} 540 ${cx - 20} 566C${cx - 110} 580 ${cx - 200} 560 ${cx - 270} 520L${cx - 270} 660L${cx + 290} 660L${cx + 290} 300Z`, RED_D),
@@ -57,7 +58,7 @@ export function build(s) {
     // hard highlight
     flat(`M${cx - 206} 470C${cx - 204} 440 ${cx - 190} 424 ${cx - 168} 414C${cx - 180} 432 ${cx - 184} 448 ${cx - 184} 470Z`, '#fff', { opacity: 0.9 }),
   ]));
-  crab.push(stroke(shell, { w: W_SUBJECT }));
+  crab.push(stroke(shell, { w: W_OUT }));
 
   // barnacles sitting on the shell's shoulder
   crab.push(barnacle(cx + 150, 366, 26, 16), barnacle(cx + 92, 340, 38, -4), barnacle(cx + 40, 338, 22, -14));
@@ -94,14 +95,23 @@ export function build(s) {
 function claw(s) {
   const d = 'M0 92C-58 94 -92 46 -90 -14C-88 -78 -54 -132 -16 -146C-4 -150 4 -140 0 -128L-20 -52L46 -108C56 -116 68 -110 70 -98C84 -40 80 28 54 64C40 84 20 92 0 92Z';
   return [
-    ink(d, RED, { w: W_SUBJECT }),
+    ink(d, RED, { w: W_OUT }),
     g({ 'clip-path': s.clip(el('path', { d })) }, [
       flat('M-110 50C-50 80 30 50 60 -30C74 -70 70 -110 60 -150L140 -150L140 130L-110 130Z', RED_D),
       flat('M-70 -20C-70 -62 -54 -98 -30 -118C-44 -90 -50 -58 -48 -20Z', '#fff', { opacity: 0.9 }),
       inkCircle(-24, 30, 11, RED_L, { w: W_DETAIL }), inkCircle(12, 54, 8, RED_L, { w: W_DETAIL }),
     ]),
-    stroke(d, { w: W_SUBJECT }),
+    stroke(d, { w: W_OUT }),
   ];
+}
+
+/** `sticker`, with the stamp behind each part sized by that part's own inner line (W_OUT less half of it), so the
+ *  finished contour is W_OUT all the way round whether a part carries an inner line or none. */
+function sticker16(parts) {
+  const at = { 'stroke-linejoin': 'round', 'stroke-linecap': 'round' };
+  const back = parts.map((p) => el('path', { d: p.d, fill: INK, stroke: INK, 'stroke-width': (W_OUT - (p.inner ?? W_INNER) / 2) * 2, ...at }));
+  const front = parts.map((p) => el('path', { d: p.d, fill: p.fill, stroke: INK, 'stroke-width': p.inner ?? W_INNER, ...at }));
+  return g({}, [g({}, back), g({}, front)]);
 }
 
 /** A barnacle: a little cream volcano. */

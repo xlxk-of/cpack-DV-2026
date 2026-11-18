@@ -3,6 +3,8 @@ import { el, g, spline, ribbon, ink, stroke, flat, inkCircle, inkEllipse, sticke
 
 const TEAL = '#35a9a4', TEAL_D = '#22808a', AMBER = '#ff9f3a', AMBER_D = '#e5741f', GOLD = '#ffd24a', CREAM = '#fff6dc';
 const LX = 296, LY = 236; // the lantern
+// The finished outer line is 16 (the set's contour): a bare `ink` line at 16, a `sticker` at 12 plus half its inner line.
+const W_OUT = 16, W_STICK = 12;
 
 export function build(s) {
   const r = s.r;
@@ -39,16 +41,16 @@ export function build(s) {
   const tail = `M${T(-14, -26)}C${T(18, -66)} ${T(64, -98)} ${T(110, -92)}C${T(88, -60)} ${T(80, -28)} ${T(74, 0)}C${T(80, 28)} ${T(88, 60)} ${T(110, 92)}C${T(64, 98)} ${T(18, 66)} ${T(-14, 26)}Z`;
   const stem = ribbon([[cx + 104, cy + 104], [cx + 160, cy + 158], [tx + 4, ty + 4]], 62, 44);
   const crest = `M${cx + 10} ${cy - 170}L${cx + 36} ${cy - 262}L${cx + 76} ${cy - 205}L${cx + 112} ${cy - 250}L${cx + 140} ${cy - 150}Z`;
-  fish.push(sticker([{ d: stem, fill: TEAL_D }, { d: tail, fill: AMBER }, { d: crest, fill: AMBER }, { d: finL, fill: AMBER }, { d: finR, fill: AMBER }]));
+  fish.push(sticker([{ d: stem, fill: TEAL_D }, { d: tail, fill: AMBER }, { d: crest, fill: AMBER }, { d: finL, fill: AMBER }, { d: finR, fill: AMBER }], { outer: W_STICK }));
   fish.push(stroke(`M${cx - 300} ${cy + 32}L${cx - 232} ${cy + 36}M${cx - 282} ${cy + 76}L${cx - 226} ${cy + 58}M${cx + 286} ${cy + 32}L${cx + 226} ${cy + 36}M${cx + 270} ${cy + 76}L${cx + 222} ${cy + 58}M${T(30, -30)}L${T(84, -56)}M${T(30, 30)}L${T(84, 56)}`, { w: W_DETAIL }));
 
   // the stalk of the lure, off the brow
   const stalk = [[cx - 46, cy - 178], [cx - 62, cy - 276], [cx - 124, cy - 326], [cx - 196, cy - 316], [LX + 6, LY - 30]];
-  fish.push(sticker([{ d: ribbon(stalk, 28, 16), fill: TEAL_D }]));
+  fish.push(sticker([{ d: ribbon(stalk, 28, 16), fill: TEAL_D }], { outer: W_STICK }));
 
   // the body: a dumpling
   const body = spline([[cx, cy - 196], [cx + 122, cy - 170], [cx + 196, cy - 80], [cx + 206, cy + 30], [cx + 160, cy + 140], [cx + 52, cy + 200], [cx - 62, cy + 198], [cx - 166, cy + 138], [cx - 208, cy + 30], [cx - 194, cy - 86], [cx - 118, cy - 172]], true);
-  fish.push(ink(body, TEAL, { w: W_SUBJECT }));
+  fish.push(ink(body, TEAL, { w: W_OUT }));
   fish.push(g({ 'clip-path': s.clip(el('path', { d: body })) }, [
     // one hard shadow, away from the lamp
     flat(`M${cx + 70} ${cy - 260}C${cx + 190} ${cy - 110} ${cx + 150} ${cy + 80} ${cx - 10} ${cy + 150}C${cx - 90} ${cy + 180} ${cx - 170} ${cy + 150} ${cx - 240} ${cy + 90}L${cx - 240} ${cy + 260}L${cx + 280} ${cy + 260}L${cx + 280} ${cy - 260}Z`, TEAL_D),
@@ -58,7 +60,7 @@ export function build(s) {
     flat(`M${cx - 176} ${cy - 30}C${cx - 174} ${cy - 106} ${cx - 132} ${cy - 150} ${cx - 82} ${cy - 164}C${cx - 122} ${cy - 132} ${cx - 146} ${cy - 92} ${cx - 148} ${cy - 30}Z`, '#ffe9b0'),
     el('circle', { cx: cx - 160, cy: cy + 8, r: 12, fill: '#ffe9b0' }),
   ]));
-  fish.push(stroke(body, { w: W_SUBJECT }));
+  fish.push(stroke(body, { w: W_OUT }));
 
   // the face: big scowling eyes, an underbite full of little fangs
   for (const sd of [-1, 1]) {
@@ -77,11 +79,11 @@ export function build(s) {
   fish.push(inkEllipse(cx - 158, cy + 56, 22, 13, '#ff8f6a', { w: 0, stroke: 'none', opacity: 0.85 }), inkEllipse(cx + 158, cy + 56, 22, 13, '#ff8f6a', { w: 0, stroke: 'none', opacity: 0.85 }));
 
   // the lamp itself
-  fish.push(inkCircle(LX, LY, 50, GOLD, { w: W_SUBJECT }));
+  fish.push(inkCircle(LX, LY, 50, GOLD, { w: W_OUT }));
   fish.push(el('path', { d: `M${LX - 50} ${LY}A50 50 0 0 0 ${LX + 50} ${LY}A62 44 0 0 1 ${LX - 50} ${LY}Z`, fill: AMBER }));
   fish.push(el('circle', { cx: LX, cy: LY - 6, r: 24, fill: '#fff6c0' }));
   fish.push(el('circle', { cx: LX - 22, cy: LY - 24, r: 9, fill: '#fff' }));
-  fish.push(inkCircle(LX, LY, 50, 'none', { w: W_SUBJECT }));
+  fish.push(inkCircle(LX, LY, 50, 'none', { w: W_OUT }));
   s.add(2, g({ filter: s.wobble(5) }, fish));
 
   // ---- 3: near weed at the edges, sparks off the lamp, bubbles

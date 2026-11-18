@@ -2,7 +2,7 @@
 // flat starry sky with a couple of stars falling; under the wavy waterline the sea is see-through: sunken ruins, a
 // small whale, and the stars that fell in, still shining. The game lays its logo and menu over the centre column
 // (x 30-70%, y 8-85%; a phone shows only the middle 40% of the width), so that column keeps to quiet things: plain
-// stars, the low beam, far ruins, small drowned stars. The lighthouse stands at x 84%, the whale in the left third,
+// stars, the low beam, far ruins (no drowned stars: those keep outside x 560-1360). The lighthouse stands at x 84%, the whale in the left third,
 // the falling stars in the outer thirds.
 import { el, g, spline, poly, ribbon, ink, stroke, flat, inkCircle, inkEllipse, eye, star4, halo, waveBand, INK, W_SUBJECT, W_INNER, W_DETAIL, W_MID } from '../lib.mjs';
 
@@ -148,8 +148,9 @@ export function build(s) {
   s.weed({ x: 1790, y: H + 20, h: 280, fill: '#1c7a78', sway: 28, width: 46, layer: 2, lean: -0.06 });
   s.weed({ x: 540, y: H + 20, h: 150, fill: '#17625f', sway: 18, width: 34, layer: 2 });
   s.weed({ x: 1310, y: H + 20, h: 170, fill: '#17625f', sway: 18, width: 34, layer: 2 });
-  // the stars that fell in, half sunk in the sea bed
-  s.add(2, drowned(650, 1110, 34, 10), drowned(1000, 1140, 32), drowned(1236, 1060, 30, -8), drowned(1330, 790, 24, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1500, 830, 24), drowned(570, 800, 24, -10));
+  // the stars that fell in, still alight. None of them (halo included) comes inside x 560-1360: the game's logo,
+  // buttons and footer line sit in that column, and only the flat ruins stay behind them
+  s.add(2, drowned(1735, 768, 24, 14), drowned(330, 1090, 40), drowned(1640, 1120, 42, 8), drowned(1500, 830, 24), drowned(498, 1000, 24, -10));
   s.lumps({ y: 1196, amp: 44, n: 10, fill: '#0a1e42', layer: 2, w: W_MID });
 
   // the small whale, in the left third just under the waterline: the Leviathan's kin (same eye, same star-dots)
